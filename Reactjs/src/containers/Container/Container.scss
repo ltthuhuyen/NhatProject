@@ -1,0 +1,65 @@
+@import "../../styles/common.scss";
+
+.img-wrap{
+    margin-top: 60px;
+    height: 400px;
+    /* width: 100px; */
+    overflow: hidden;  
+}
+
+.img-wrap img {
+    height: 400px; 
+    width: 100%;
+    /* object-fit: cover; */
+}
+
+.container-product{
+    margin:  30px 170px ;
+    margin-left: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    .row{
+        .product{
+            margin-top: 110px;
+        }
+    }
+    
+}
+.img-pro {
+    border: 1px solid #ccc;
+    width: 80%;
+    height: 300px;
+    overflow: hidden;
+    // object-fit: cover;
+}
+.img-pro img{
+    height: 300px; 
+    width: 80%;
+
+}
+
+.btn-give{
+    width: 80%;
+    height: 20%;
+    background-color: rgb(136, 134, 134);
+    text-align: center;
+}
+
+.product-name{
+    // margin-left: 10px 20px;
+    padding: 0px 10px;
+    color: azure;
+    opacity: 1;
+    width: 50%;
+    &:hover{
+        background-color: aliceblue;
+        color: rgb(49, 49, 49);
+        opacity: 0.5 ;
+   }
+}
+
+
+
+
+

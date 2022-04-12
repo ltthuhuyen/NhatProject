@@ -1,0 +1,61 @@
+body{
+    overflow: auto;
+}
+.container{
+    font-size: 15px;
+    text-align: center;
+    .btn{
+        padding: auto;
+        height: 40px;
+    }
+    .btn-create{ 
+        line-height: 0px;
+        margin-left: 965px;
+        // font-size: 20px;
+        .title-create{
+            padding: 2px;
+            width: 150px;
+            // font-size: 10px;
+
+        }
+    }
+    .btn-edit {
+        width: 50px;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: #eeee5a;
+        font-size: 20px;
+    
+        &:hover{
+            background-color: transparent;
+            color: rgb(12, 10, 10);
+        }
+    }
+
+    .btn-delete {
+        width: 50px;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: rgb(255, 88, 88);
+        font-size: 20px;
+        border: 1px solid #dc3545 !important;
+
+        &:hover{
+            background-color: transparent;
+            color: rgb(12, 10, 10);
+        }
+    }
+    .border{
+        border: 1px solid #dc3545 !important;
+
+    }
+    
+    
+}
+
+
+
+
+

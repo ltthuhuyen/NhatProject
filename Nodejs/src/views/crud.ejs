@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+    <!-- jQuery library -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+    <!-- Popper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <!-- Latest compiled JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+          <div class="col-6">
+            <form action="/post-crud" method="POST">
+              <h2>Create a new user</h2>
+              <div class="form-group">
+                <label for="">Email address</label>
+                <input type="email" class="form-control" id="" name="email" aria-describedby="emailHelp" placeholder="Enter email">
+                <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
+              </div>
+              <div class="form-group">
+                <label for="">Password</label>
+                <input type="password" class="form-control" id="" name="password" placeholder="Password">
+              </div>
+              <div class="form-group">
+                <label for="">First name</label>
+                <input type="text" class="form-control" id="" name="firstName" aria-describedby="emailHelp" placeholder="First name">
+              </div>
+              <div class="form-group">
+                <label for="">Last name</label>
+                <input type="text" class="form-control" id="" name="lastName" aria-describedby="emailHelp" placeholder="Last name">
+              </div>
+              <div class="form-group">
+                <label for="">Address</label>
+                <input type="text" class="form-control" id="" name="address" aria-describedby="emailHelp" placeholder="Address">
+              </div>
+              <div class="form-group">
+                <label for="inputState">Gender</label>
+                <select class="form-control" name="gender">
+                  <option value="0">Famale</option>
+                  <option value="1">Male</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="inputState">Role</label>
+                <select id="inputState" class="form-control" name="roleId">
+                  <option value="1">Admin</option>
+                  <option value="2">Employee</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+          </div>
+        </div>
+    </div>
+</body>
+</html>
