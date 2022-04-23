@@ -1,9 +1,10 @@
 {
     "homeheader" : {
         "page": "Trang chủ",
-        "introduce" : "Giới thiệu",
+        "appointment-schedule" : "Đặt lịch thu gom",
         "contract": "Liên hệ",
         "news": "Tin tức"
+      
     },
 
     "common": {
@@ -31,6 +32,9 @@
         "username": "Tên đăng nhập",
         "password": "Mật khẩu",
         "userpass-wrong": "Sai tên đăng nhập hoặc mật khẩu!"
+    },
+    "register":{
+        "register": "Đăng ký"
     },
     "menu": {
         "system": {
@@ -79,6 +83,11 @@
         "description": "Mô tả",
         "save": "Lưu",
         "action": "Hành động"
+    },
+    "manage-schedule": {
+        "title": "ĐẶT LỊCH THU GOM",
+        "appointment-date": "Ngày hẹn",
+        "confirm": "Xác nhận"
     },
     "system": {
         "user-manage": {

@@ -153,6 +153,7 @@ class ModalEditUser extends Component {
                                     className="form-control" 
                                     onChange={(e) => {this.handleOnChangeInput(e, 'email')}}
                                     value={email}
+                                    disabled
                                 />
                             </div>
                             <div className="form-group input-container col-4">
@@ -196,7 +197,7 @@ class ModalEditUser extends Component {
                                     {genders && genders.length > 0 && 
                                         genders.map((item, index) => {
                                             return (
-                                                <option key= {index} value={item.key}>
+                                                <option key= {index} value={item.keyMap}>
                                                     {language === LANGUAGES.VI ? item.valueVi : item.valueEn}
                                                 </option>)
                                         })
@@ -223,7 +224,7 @@ class ModalEditUser extends Component {
                                     { roles && roles.length > 0 && 
                                         roles.map((item, index) => {
                                             return (
-                                                <option key= {index} value={item.key} >
+                                                <option key= {index} value={item.keyMap} >
                                                     {language === LANGUAGES.VI ? item.valueVi : item.valueEn}
                                                 </option>)
                                         })

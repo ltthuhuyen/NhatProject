@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Header from '../Header/Header';
 import Container from '../Container/Container';
@@ -7,8 +7,6 @@ import Footer from '../Footer/Footer';
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { faQuestion } from "@fortawesome/free-solid-svg-icons";
 import * as actions from "../../store/actions";
-// import Navigator from '../../components/Navigator';
-// import { adminMenu } from './menuApp';
 import { FormattedMessage } from 'react-intl';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {LANGUAGES} from "../../utils"
@@ -24,7 +22,7 @@ class HomePage extends Component {
         let language = this.props.language;
         return (
           <div>
-             <div className="home-header-container">
+            <div className="home-header-container">
                 <div className="home-header-content">
                     <div className="left-content">
                         <FontAwesomeIcon  style={{ fontSize: "2rem", marginLeft: "1rem", cursor: "pointer"}} icon={faBars} />
@@ -32,29 +30,47 @@ class HomePage extends Component {
                     </div>
                     <div className="center-content">
                         <div className="child-content">
-                            <div><b><FormattedMessage id="homeheader.page"/></b></div>
-                           
+                            <Link to ='/home' className='link-homepage'>
+                                <FormattedMessage id="homeheader.page"/>
+                            </Link>
                         </div>
                         <div className="child-content">
-                            <div><b><FormattedMessage id="homeheader.introduce"/></b></div>
+                            <Link to ='/giver/appointment-schedule' className='link-homepage'>
+                                <FormattedMessage id="homeheader.appointment-schedule"/>
+                            </Link>
                         </div>
                         <div className="child-content">
-                            <div><b><FormattedMessage id="homeheader.contract"/></b></div>
+                            <FormattedMessage id="homeheader.contract"/>
                         </div>
                         <div className="child-content">
-                            <div><b><FormattedMessage id="homeheader.news"/></b></div>
+                            <FormattedMessage id="homeheader.news"/>
                         </div>
+                      
                     </div>
-                    <div className="right-content">
+                    <div className="language-content">
                         <div className="support">
                             <FontAwesomeIcon  style={{ fontSize: "1rem", marginLeft: "1rem", cursor: "pointer"}} icon={faQuestion} />
                         </div>
                         <div className={language ===  LANGUAGES.VI ? 'language-vi active' : 'language-vi'}><span onClick={() => this.changeLanguage(LANGUAGES.VI)}>VN </span></div>
                         <div className={language ===  LANGUAGES.EN ? 'language-en active' : 'language-en'}><span onClick={() => this.changeLanguage(LANGUAGES.EN)}> EN</span></div>
                     </div>
-                    <div className="btn btn-logout" onClick={processLogout}>
-                        <i className="fas fa-sign-out-alt"></i>
+                    <div className="login-register-content">
+                        <div className="btn-content">
+                            <Link to ='/login'>
+                                <button className='btn btn-login-register'><FormattedMessage id="login.login"/></button>
+                            </Link> 
+                    
+                        </div>
+                        <div className="btn-content">
+                            <Link to ='/login'>
+                                <button className='btn btn-login-register'><FormattedMessage id="register.register"/></button>
+                            </Link> 
+                        </div>
                     </div>
+                    
+                    {/* <div className="btn btn-logout" onClick={processLogout}>
+                        <i className="fas fa-sign-out-alt"></i>
+                    </div> */}
                     
                 </div>
             </div>

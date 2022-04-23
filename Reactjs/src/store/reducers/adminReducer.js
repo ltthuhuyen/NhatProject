@@ -5,6 +5,7 @@ const initialState = {
     genders: [],
     isLoadingRole: false,
     roles: [],
+    allTime: [],
     
 }
 
@@ -38,6 +39,16 @@ const  adminReducer = (state = initialState, action) => {
             return {
                 ...state,
             }
+        case actionTypes.FETCH_ALL_APPOINTMENT_TIME_SUCCESS:
+            state.allTime = action.dataTime;
+            return {
+                ...state,
+            }
+        case actionTypes.FETCH_ALL_APPOINTMENT_TIME_FAILDED:
+            state.allTime = [];
+            return {
+                ...state,
+            }    
         default:
             return state;
     }

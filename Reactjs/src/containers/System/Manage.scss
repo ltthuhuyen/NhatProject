@@ -13,17 +13,17 @@
         height: 40px;
     }
     .btn-create{ 
-        margin-top: 0px;
         line-height: 0px;
         margin-left: 1210px;
-        color: white;
+        margin-top: 20px;
+        padding: 8px;
+        color: rgb(158, 205, 247);
         border: 1px solid rgb(158, 205, 247);
         &:hover{
-            color:rgb(234, 250, 255)
-        }
-        .title-create{
-            color: rgb(158, 205, 247);
-            padding: 3px
+            color:rgb(234, 250, 255);
+            background-color: #c0cdd6;
+            border: 1px solid #c0cdd6;
+    
         }
     }
     .table{

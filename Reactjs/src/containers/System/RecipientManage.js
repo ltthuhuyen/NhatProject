@@ -22,6 +22,7 @@ class UserManage extends Component {
         super(props);
         this.state = {
             arrUsers: [],
+            arrRoleID: [],
             isOpenModalUser: false,
             isOpenModalEditUser: false,
             userEdit: {}
@@ -30,7 +31,7 @@ class UserManage extends Component {
 
     async componentDidMount() {
       
-        await this.getAllUsersFromReact()
+        await this.getUserRoleID()
     }
 
     getAllUsersFromReact = async () => {
@@ -38,6 +39,15 @@ class UserManage extends Component {
         if(response && response.errCode == 0){
             this.setState({
                 arrUsers: response.users
+            })
+        }
+    }
+
+    getUserRoleID = async () => {
+        let response = await getUserRoleIDService ('R3'); 
+        if(response && response.errCode == 0){
+            this.setState({
+                arrRoleID: response.users
             })
         }
     }
@@ -68,7 +78,7 @@ class UserManage extends Component {
                 alert(response.errMessange)
             }else{
                 toast.success('Thêm người dùng thành công!')
-                await this.getAllUsersFromReact()
+                await this.getUserRoleID()
                 this.setState({
                     isOpenModalUser: false
                 })
@@ -98,7 +108,7 @@ class UserManage extends Component {
                     isOpenModalEditUser: false
                 })
                 toast.success('Sửa thông tin người dùng thành công!')
-                await this.getAllUsersFromReact()
+                await this.getUserRoleID()
             }
             else {
                 alert(res.errCode)
@@ -113,7 +123,7 @@ class UserManage extends Component {
             let res = await deleteUserSerVice(user.id)
             if(res && res.errCode === 0){
                 toast.success('Xóa người dùng thành công!')
-                await this.getAllUsersFromReact()
+                await this.getUserRoleID()
             }
             else{
                 alert(res.errMessange)
@@ -125,7 +135,8 @@ class UserManage extends Component {
     }
     render() {
         // console.log('check render ', this.state)
-        let arrUsers = this.state.arrUsers;
+        let arrRoleID = this.state.arrRoleID;
+        console.log("arrRoleID",arrRoleID)
         return (
             <div className="container">
                 <Header />
@@ -147,10 +158,14 @@ class UserManage extends Component {
                     <FormattedMessage id='manage-user.title'/>
                 </div>
                 <button 
-                        className='btn btn-create'
+                        className='btn btn-light  btn-create px-2'
                              onClick={this.handleAddNewUser}
                     >
-                          <GrIcons.GrAddCircle  />  <FormattedMessage id='manage-user.add'/>
+
+                        <div className='title-create'>
+                            <GrIcons.GrAddCircle  />  <FormattedMessage id='manage-user.add'/>
+                        </div>
+
                 </button>
              
                 <div className="table" >
@@ -168,8 +183,7 @@ class UserManage extends Component {
                             <th scope="col"><FormattedMessage id="manage-user.action"/></th>
                         </tr>
                     {
-                           arrUsers &&arrUsers.map((item, index) => {
-                               console.log('arrUsers', arrUsers)
+                            arrRoleID && arrRoleID.map((item, index) => {
                                 let imageBase64 =''
                                 if (item.image) {
                                 imageBase64 = new Buffer(item.image, 'base64').toString('binary')  

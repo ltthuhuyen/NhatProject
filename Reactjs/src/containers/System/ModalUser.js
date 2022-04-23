@@ -62,14 +62,14 @@ class ModalUser extends Component {
             let arrGenders = this.props.genderRedux
             this.setState({
                 genderArr: arrGenders,
-              
+                gender: arrGenders && arrGenders.length > 0 ? arrGenders[0].keyMap: ''
             })
         }
         if (prevProps.roleRedux !== this.props.roleRedux) {
             let arrRoles = this.props.roleRedux
             this.setState({
                 roleArr: arrRoles,
-               
+                roleId: arrRoles && arrRoles.length > 0 ? arrRoles[0].keyMap: ''
             })
         }
     }
@@ -144,7 +144,6 @@ class ModalUser extends Component {
       //  console.log('check state:', this.state)
         let genders = this.state.genderArr;
         let roles = this.state.roleArr;
-
         let { email , password , firstName , lastName ,
              phone , address
         } = this.state
@@ -197,7 +196,7 @@ class ModalUser extends Component {
                             {genders && genders.length > 0 && 
                                 genders.map((item, index) => {
                                     return (
-                                        <option key= {index} value={item.key}>
+                                        <option key= {index} value={item.keyMap}>
                                             {language === LANGUAGES.VI ? item.valueVi : item.valueEn}
                                         </option>)
                                 })
@@ -222,7 +221,7 @@ class ModalUser extends Component {
                             { roles && roles.length > 0 && 
                                 roles.map((item, index) => {
                                     return (
-                                        <option key= {index} value={item.key}>
+                                        <option key= {index} value={item.keyMap}>
                                             {language === LANGUAGES.VI ? item.valueVi : item.valueEn}
                                         </option>)
                                 })
@@ -269,7 +268,6 @@ class ModalUser extends Component {
                   
                 </button>
               
-               
                 {this.state.isOpen === true &&
                     <Lightbox
                         mainSrc={this.state.previewImgURL}

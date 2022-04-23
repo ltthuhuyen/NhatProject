@@ -116,6 +116,7 @@ class ProductManage extends Component {
     }
     render() {
         let arrProducts = this.state.arrProducts;
+        console.log('arrProduct', arrProducts)
         let language = this.props.language;
         return (
             <>
@@ -139,18 +140,11 @@ class ProductManage extends Component {
                     <FormattedMessage id='manage-product.title'/>
                 </div>
                 <button 
-                    className='btn btn-create px-2'
+                    className='btn btn-create'
                     onClick={this.handleAddNewProduct}
                 >
-              
-                    <div className='title-create'>
-                        <GrIcons.GrAddCircle  /> Thêm
-                    </div>
-                      
+                    <GrIcons.GrAddCircle  /> Thêm     
                 </button>
-             
-
-          
                 <div className="table">
                 <Table bordered>
                     <thead className='thead'>

@@ -99,9 +99,7 @@ class UserRedux extends Component {
             copyState[id] = e.target.value;
             this.setState({
                 ...copyState
-            }, () => {
-                console.log('check good state' , this.state)
-            } )
+            })
     }
 
     checkValideInput = () => {

@@ -40,6 +40,26 @@ let handleGetAllUsers = async(req, res) => {
         users
     })
 }
+// User Role Test
+let handleGetUsersRole = async(req, res) => {
+    let role = req.query.role; //all, id
+
+    if(!role) {
+        return res.status(200).json({
+            errCode: 0,
+            errMessage: 'Missing required parmeters',
+            users: []  
+        })
+    }
+
+    let users = await userService.getRoleID(role);
+    // console.log(users)
+    return res.status(200).json({
+        errCode: 0,
+        errMessage: 'Ok',
+        users
+    })
+}
 
 let handleCreateNewUser = async (req, res) =>{
     let message = await userService.createNewUser(req.body);
@@ -77,19 +97,6 @@ let getAllCode = async (req,res) =>{
     }
 }
 
-// let getRoleId = async (req, res) => {
-//     try {
-//         let data = await userService.getRoleIdService(req.query.type);
-//         return res.status(200).json(data)
-        
-//     } catch (e) {
-//         return res.status(200).json({
-//             errCode: 1,
-//             errMessage: 'Lỗi server'
-//         })
-//     }
-// }
-
 module.exports = {
     handleLogin: handleLogin,
     handleGetAllUsers: handleGetAllUsers,
@@ -97,5 +104,5 @@ module.exports = {
     handleEditUser: handleEditUser,
     handleDeleteUser: handleDeleteUser,
     getAllCode: getAllCode,
-  
+    handleGetUsersRole: handleGetUsersRole
 }

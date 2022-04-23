@@ -9,20 +9,6 @@
     padding: auto;
     height: 40px;
 }
-.btn-create{ 
-    line-height: 0px;
-    margin-left: 1155px;
-    margin-top: 20px;
-    color: white;
-    border: 1px solid rgb(158, 205, 247);
-    &:hover{
-        color:rgb(234, 250, 255)
-    }
-    .title-create{
-        color: rgb(158, 205, 247);
-        padding: 3px
-    }
-}
 .form-create-edit {
     margin: 20px 0px ;
     .form-row{
@@ -80,6 +66,12 @@
         background-color: rgb(253, 253, 253);
         margin-left: 605px;
         margin-bottom: 30px;
+        padding: 8px;
+        &:hover{
+            color:rgb(234, 250, 255);
+            background-color: #c0cdd6;
+            border: 1px solid #c0cdd6;
+        }
     }
 
    

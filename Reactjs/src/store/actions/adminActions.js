@@ -1,8 +1,7 @@
 import actionTypes from './actionTypes';
 import {createNewUserService, getAllCodeService} from "../../services/userService"
+import {getAllProducts} from "../../services/productService"
 import { ToastContainer, toast } from 'react-toastify';
-
-
 
 export const fetchGenderStart = () => {
     return async (dispatch, getState) => {
@@ -57,6 +56,56 @@ export const fetchRoleSuccess = (roleData) => ({
 export const fetchRoleFAILDED = () => ({
     type: actionTypes.FETCH_ROLE_FAILDED,
 })
+
+export const fetchAllAppointmentTime = (type) => {
+    return async (dispatch, getState) => {
+        try {
+            let res = await getAllCodeService("TIME");
+            // console.log('res',res)
+            if (res && res.errCode === 0) {
+                dispatch({
+                    type: actionTypes.FETCH_ALL_APPOINTMENT_TIME_SUCCESS,
+                    dataTime: res.data
+                });
+              
+            } else {
+                dispatch({
+                    type: actionTypes.FETCH_ALL_APPOINTMENT_TIME_FAILDED
+                });
+            }
+        } catch (e) {
+            dispatch({
+                type: actionTypes.FETCH_ALL_APPOINTMENT_TIME_FAILDED
+            });
+            console.log('fetchRoleStart error',e);
+        }
+    }
+}
+
+export const fetchAllProduct = () => {
+    return async (dispatch, getState) => {
+        try {
+            let res = await getAllProducts("ALL");
+            // console.log('res',res)
+            if (res && res.errCode === 0) {
+                dispatch({
+                    type: actionTypes.FETCH_ALL_PRODUCT_SUCCESS,
+                    dataProduct: res.data
+                });
+              
+            } else {
+                dispatch({
+                    type: actionTypes.FETCH_ALL_PRODUCT_FAILDED
+                });
+            }
+        } catch (e) {
+            dispatch({
+                type: actionTypes.FETCH_ALL_PRODUCT_FAILDED
+            });
+            console.log('fetchRoleStart error',e);
+        }
+    }
+}
 
 export const createNewUser = (data) => {
     return async (dispatch, getState) => {

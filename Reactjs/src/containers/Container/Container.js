@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import './Container.scss'
 import banner1 from "../../assets/images/banner1.jpg";
@@ -10,7 +10,7 @@ import lonnhom from "../../assets/images/3110_bottledwater.jpg"
 import thungcatton from "../../assets/images/thunggiay.png"
 import chaithuytinh from "../../assets/images/chaithuytinh.jpg"
 import {getAllProducts} from '../../services/productService';
-
+import SlideShow from '../SlideShow/SlideShow';
 class Container extends Component {
       constructor(props) {
         super(props);
@@ -39,8 +39,10 @@ class Container extends Component {
       let arrProducts = this.state.arrProducts;
         return (
             <>
-            <div className="home-header-banner img-wrap img container">
-              <img src={banner1} className=""  alt="" width="200"></img>
+            <div className="slide-show">
+              <div className="home-header-banner slide-show img-wrap img container"> <SlideShow /></div>
+              {/* <img src={banner1} className=""  alt="" width="200"></img> */}
+             
             </div>
             <div className="container-product ">
                   <div className="row">
@@ -57,9 +59,10 @@ class Container extends Component {
                               <img src={imageBase64} className='img-pro'/>
                             </div>
                             <div className="btn-give" >
-                              <button type="button" className="btn product-name">{item.product_name}</button>
+                              <Link to="/giver/appointment-schedule">
+                                <button type="button" className="btn product-name">{item.product_name}</button>
+                              </Link>
                             </div>
-                        
                           </div> 
                         </div>
                                 

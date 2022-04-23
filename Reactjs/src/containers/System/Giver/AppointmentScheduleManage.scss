@@ -1,0 +1,37 @@
+.schedule{
+    margin: 40px 100px;
+    .btn-schedule{
+        gap: 50px;
+        flex-wrap: wrap;
+    // display: flex;
+        border: 0.1rem solid #9fcbea;
+        margin-bottom: 10px;
+        margin-right:10px;
+        padding: 0px 10px;
+        color: rgb(184, 198, 203);
+        &.active{
+            background-color: #c0cdd6;
+            color:rgb(234, 250, 255);
+            border: 1px solid #c0cdd6;
+    
+        }
+      
+    }
+    .btn-confirm{
+        margin-top: 0px;
+        line-height: 0px;
+        padding: 8px;
+
+        margin-left: 400px;
+        color: rgb(158, 205, 247);
+        border: 1px solid rgb(158, 205, 247);
+        &:hover{
+            color:rgb(234, 250, 255);
+            background-color: #c0cdd6;
+            border: 1px solid #c0cdd6;
+    
+        }
+       
+    }
+}
+

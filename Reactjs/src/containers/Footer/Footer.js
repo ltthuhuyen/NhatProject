@@ -9,15 +9,11 @@ class Footer extends Component {
                 <div className="row">
                 <div className="col-3 my-3">
                     <h5>THÔNG TIN CÔNG TY</h5>
-                    <p><a href="">Giới Thiệu ByMe</a></p>
-                    <p><a href="">Chương trình khuyến mãi</a></p>
-                    <p><a href="">Blogger Thời Trang</a></p>
+                    <p><a href="">Giới Thiệu</a></p>
                 </div>
                 <div className="col-3 my-3">
                     <h5>HỖ TRỢ KHÁCH HÀNG</h5>
-                    <p><a href="">Phí Vận Chuyển</a></p>
-                    <p><a href="">Trả Lại</a></p>
-                    <p><a href="">Hướng Dẫn Đặt Hàng</a></p>
+                    <p><a href="">Hướng Dẫn Trở Thành Thành Viên</a></p>
                 </div>
                 <div className="col-3 my-3">
                     <h5>DỊCH VỤ KHÁCH HÀNG</h5>

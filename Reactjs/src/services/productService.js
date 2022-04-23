@@ -11,7 +11,6 @@ const editProductService = (inputData) => {
     return axios.put('/api/edit-product', inputData)
         
 }
-
 const deleteProductSerVice = (userId) => {
     return axios.delete('/api/delete-product', {
         data: {

@@ -2,7 +2,7 @@ export const adminMenu = [
     { // người dùng
         name: 'menu.admin.manage-user', menus: [
             {
-                name: 'menu.admin.manage-giver',link: '/system/user-manage' 
+                name: 'menu.admin.manage-user',link: '/system/user-manage' 
                 // subMenus: [
                 //     { name: 'menu.system.system-administrator.user-manage', link: '/system/user-manage' },
                 //     { name: 'menu.system.system-administrator.product-manage', link: '/system/product-manage' },
@@ -10,7 +10,7 @@ export const adminMenu = [
                 // ]
             },
             {
-                name: 'menu.admin.manage-recipient',link: '/system/user-manage' 
+                name: 'menu.admin.manage-giver',link: '/system/giver-manage' 
                 // subMenus: [
                 //     { name: 'menu.system.system-administrator.user-manage', link: '/system/user-manage' },
                 //     { name: 'menu.system.system-administrator.product-manage', link: '/system/product-manage' },
@@ -18,7 +18,7 @@ export const adminMenu = [
                 // ]
             },
             {
-                name: 'menu.admin.manage-giver',link: '/system/user-redux' 
+                name: 'menu.admin.manage-recipient',link: '/system/recipient-manage' 
                 // subMenus: [
                 //     { name: 'menu.system.system-administrator.user-manage', link: '/system/user-manage' },
                 //     { name: 'menu.system.system-administrator.product-manage', link: '/system/product-manage' },
@@ -43,7 +43,7 @@ export const adminMenu = [
     { // đơn thu gom
         name: 'menu.admin.manage-collection-form', menus: [
             {
-                name: 'menu.admin.manage-collection-form',link: '/system/product-manage' 
+                name: 'menu.admin.manage-collection-form',link: '/system/collection-form-manage' 
                 // subMenus: [
                 //     { name: 'menu.system.system-administrator.user-manage', link: '/system/user-manage' },
                 //     { name: 'menu.system.system-administrator.product-manage', link: '/system/product-manage' },
@@ -75,9 +75,17 @@ export const adminMenu = [
 
 export const giverMenu = [
     { // đơn thu gom
-        name: 'menu.giver.manage-collectionform', menus: [
+        name: 'menu.giver.manage-collection-form', menus: [
             {
                 name: 'menu.giver.manage-collection-form',link: '/giver/collection-form-manage' 
+                // subMenus: [
+                //     { name: 'menu.system.system-administrator.user-manage', link: '/system/user-manage' },
+                //     { name: 'menu.system.system-administrator.product-manage', link: '/system/product-manage' },
+                //     { name: 'menu.system.system-administrator.user-redux', link: '/system/user-redux' },
+                // ]
+            },
+            {
+                name: 'menu.giver.manage-collection-form',link: '/giver/appointment-schedule' 
                 // subMenus: [
                 //     { name: 'menu.system.system-administrator.user-manage', link: '/system/user-manage' },
                 //     { name: 'menu.system.system-administrator.product-manage', link: '/system/product-manage' },

@@ -1,5 +1,6 @@
 import db from "../models/index";
 import bcrypt from "bcryptjs";
+// import { Model } from "sequelize/types";
 
 let handleUserLogin = (email, password) => {
     return new Promise(async(resolve,reject) => {
@@ -44,8 +45,6 @@ let handleUserLogin = (email, password) => {
     })
 }
 
-
-
 let checkUserEmail = (userEmail) => {
     return new Promise(async(resolve, reject) => {
         try {
@@ -88,24 +87,23 @@ let getAllUsers = (userId) => {
         }
     })
 }
-//  let getRoleIdService = (roleID) => {
-//     return new Promise(async(resolve, reject) => {
-//         try{
-//             let users = '';
-//             if(roleID && roleID !== 'ALL') {
-//                 users = await db.User.findOne({
-//                     where: { roleId: roleID},
-//                     attributes:{
-//                         exclude: ['password']
-//                     }
-//                 })
-//             }
-//             resolve(users)
-//         }catch(e) {
-//             reject(e)
-//         }
-//     })
-//  }
+
+ let getRoleID = (role) => {
+    return new Promise(async(resolve, reject) => {
+        try{
+            let users = '';
+                users = await db.User.findAll({
+                    where: { roleId: role},
+                    attributes:{
+                        exclude: ['password'],
+                    },
+                })
+            resolve(users)
+        }catch(e) {
+            reject(e)
+        }
+    })
+ }
 
 const  salt = bcrypt.genSaltSync(10);
 let hashUserPassword = (password) => {
@@ -118,6 +116,7 @@ let hashUserPassword = (password) => {
         }
     })
 }
+
 let createNewUser = (data) => {
     return new Promise(async (resolve, reject) =>{
         try {
@@ -235,7 +234,15 @@ let getAllCodeSerVice = (typeInput) => {
             }else{
                 let res= {};
                 let allcode = await db.Allcode.findAll({
-                    where : {type: typeInput}
+                    where : {type: typeInput},
+                    // raw: true,
+                    // include: [
+                    //     {
+                    //         model: db.allcode, as: 'roleIdData', attributes: ['valueVi', 'valueEn']
+                    //     }
+                    // ],
+                    raw: true,
+                    // nest: data
                 });
                 res.errCode = 0;
                 res.data = allcode;
@@ -257,5 +264,6 @@ module.exports = {
     updateUser: updateUser,
     deleteUser: deleteUser,
     getAllCodeSerVice: getAllCodeSerVice,
+    getRoleID:  getRoleID
    
 }

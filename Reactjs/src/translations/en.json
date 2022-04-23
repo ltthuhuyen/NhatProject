@@ -2,9 +2,10 @@
 
     "homeheader" : {
         "page": "Homepage",
-        "introduce" : "Introduce",
+        "appointment-schedule" : "Appointment schedule",
         "contract": "Contract",
-        "news": "News" 
+        "news": "News",
+        "login": "Login"
     },
 
 
@@ -33,6 +34,9 @@
         "username": "Username",
         "password": "Password",
         "userpass-wrong": "Invalid username or password!"
+    },
+    "register":{
+        "register": "Register"
     },
     "menu": {
         "system": {
@@ -90,6 +94,11 @@
         "description": "Description",
         "save": "Save",
         "action": "Action"
+    },
+    "manage-schedule": {
+        "title": "BOOK THE SCHEDULE OF COLLECTION ",
+        "appointment-date": "Appointment date",
+        "confirm": "Confirm"
     },
     "system": {
         "user-manage": {
