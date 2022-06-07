@@ -91,16 +91,16 @@ class ModalEditProduct extends Component {
 
     render() {
        // console.log('check child props', this.props);
-       let { product_name , image, description } = this.state
+       let { product_name , description } = this.state
         return (
             <Modal 
                 isOpen={this.props.isOpen} 
                 toggle={() => {this.toggle()}} 
-                className={'modal-product-container'}
+                className={'modal-user-container'}
                 size='lg'
                 //centered
             >
-                <ModalHeader toggle={() => {this.toggle()}}>Sửa thông tin sản phẩm</ModalHeader>
+                <ModalHeader toggle={() => {this.toggle()}}><FormattedMessage id="manage-product.edit"/></ModalHeader>
                 <ModalBody>
                     <form className='form-create-edit'>
                         <div className="form-row">
@@ -119,7 +119,7 @@ class ModalEditProduct extends Component {
                                     <input id="previewImg" type="file" accept='image/*' hidden
                                         onChange={(event) => this.handleOnchangeImage(event)}
                                     />
-                                    <label className="upload-file" htmlFor="previewImg">Tải ảnh</label>
+                                    <label className="upload-file" htmlFor="previewImg"><FormattedMessage id="common.upload-image"/> <i className="fas fa-upload"></i></label>
                                     <div className='preview-image'
                                         style ={{ backgroundImage: `url(${this.state.previewImgURL})` }}
                                         onClick= {() => this.openPreviewImage()}>

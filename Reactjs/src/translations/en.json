@@ -1,9 +1,8 @@
 {
-
     "homeheader" : {
         "page": "Homepage",
         "appointment-schedule" : "Appointment schedule",
-        "contract": "Contract",
+        "collection-history": "Collection history",
         "news": "News",
         "login": "Login"
     },
@@ -11,11 +10,16 @@
 
     "common": {
         "add": "Add",
-        "edit": "Edit",
+        "edit": "Edit personal information",
         "delete": "Delete",
         "decentralize": "Decentralize",
         "close": "Close",
         "save": "Save",
+        "detail": "Detail",
+        "update": "Update",
+        "upload-image": "Upload",
+        "choose-continue": "CONTINUE TO CHOOSE PRODUCT",
+        "booking": "MAKE AN APPOINTMENT",
         "refresh": "Refresh",
         "accept": "Accept",
         "confirm": "Confirm",
@@ -72,6 +76,7 @@
     "manage-user": {
         "title": "USER MANAGE",
         "add": "Create ",
+        "edit" : "Edit",
         "email": "Email",
         "password": "Password",
         "fName": "FirstName",
@@ -85,11 +90,23 @@
         "save": "Save",
         "action": "Action"
 
+
     },
     "manage-product": {
         "title": "PRODUCT MANAGE",
         "add": "Create",
+        "edit" : "Edit",
         "product_name": "Product name",
+        "image": "Image",
+        "description": "Description",
+        "save": "Save",
+        "action": "Action"
+    },
+    "manage-news": {
+        "title": "NEWS MANAGE",
+        "add": "Create",
+        "edit" : "Edit",
+        "name": "Title",
         "image": "Image",
         "description": "Description",
         "save": "Save",
@@ -97,8 +114,20 @@
     },
     "manage-schedule": {
         "title": "BOOK THE SCHEDULE OF COLLECTION ",
+        "product-giveaways": "Product giveaways", 
         "appointment-date": "Appointment date",
+        "time": "Collection time",
         "confirm": "Confirm"
+    },
+    "manage-collection-form": {
+        "title": "COLLECT FROM",
+        "product-giveaways": "Product giveaways", 
+        "appointment-date": "Appointment date",
+        "time": "Collection time",
+        "status": "Collection status",
+        "giver": "Giver",
+        "confirm": "Confirm",
+        "action": "Action"
     },
     "system": {
         "user-manage": {

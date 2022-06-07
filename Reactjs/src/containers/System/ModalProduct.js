@@ -74,7 +74,6 @@ class ModalProduct extends Component {
     }   
 
     handleSaveProduct = () => {
-        console.log("save")
         let isValid = this.checkValideInput()
         if(isValid === false) return ;
         this.props.createNewproduct({
@@ -123,7 +122,7 @@ class ModalProduct extends Component {
                                     <input id="previewImg" type="file" hidden
                                         onChange={(event) => this.handleOnchangeImage(event)}
                                     />
-                                    <label className="upload-file" htmlFor="previewImg">Tải ảnh</label>
+                                    <label className="upload-file" htmlFor="previewImg"><FormattedMessage id="common.upload-image"/> <i className="fas fa-upload"></i></label>
                                     <div className='preview-image'
                                         style ={{ backgroundImage: `url(${this.state.previewImgURL})` }}
                                         onClick= {() => this.openPreviewImage()}>

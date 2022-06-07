@@ -141,7 +141,6 @@ class ModalUser extends Component {
 
     render() {
         let language = this.props.language;
-      //  console.log('check state:', this.state)
         let genders = this.state.genderArr;
         let roles = this.state.roleArr;
         let { email , password , firstName , lastName ,
@@ -234,7 +233,7 @@ class ModalUser extends Component {
                             <input id="previewImg" type="file" accept='image/*' hidden
                                 onChange={(event) => this.handleOnchangeImage(event)}
                             />
-                            <label className="upload-file" htmlFor="previewImg">Tải ảnh</label>
+                            <label className="upload-file" htmlFor="previewImg"><FormattedMessage id="common.upload-image"/> <i className="fas fa-upload"></i></label>
                             <div className='preview-image'
                                 style ={{ backgroundImage: `url(${this.state.previewImgURL})` }}
                                 onClick= {() => this.openPreviewImage()}>

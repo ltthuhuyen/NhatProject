@@ -9,7 +9,7 @@ let handleUserLogin = (email, password) => {
             let isExist = await checkUserEmail(email);
             if (isExist) {
                 let user = await db.User.findOne({
-                    attributes: ['email','firstName', 'lastName', 'roleId', 'password'],
+                    // attributes: ['id','email','firstName', 'lastName', 'roleId', 'password'],
                     where: {email: email},
                     raw: true
                     
@@ -17,7 +17,6 @@ let handleUserLogin = (email, password) => {
                 if(user){
                     //compare password
                     let check = await bcrypt.compareSync(password, user.password);
-                    // let check = true;
                     if(check) {
                         userData.errCode = 0;
                         userData.errMessage = 'Ok',
@@ -36,9 +35,10 @@ let handleUserLogin = (email, password) => {
             } else {
                 //return error
                 userData.errCode = 1;
-                userData.errMessage = `Your's Email isn't exist in your system. Please try other email`
+                userData.errMessage = `Your's Email isn't exist in your system. Please try other em.ail`
             }
             resolve(userData)
+            console.log('userData', userData)
         }catch(e){
             reject(e)
         }
@@ -68,9 +68,20 @@ let getAllUsers = (userId) => {
             let users = '';
             if(userId === 'ALL') {
                 users = await db.User.findAll({
+                    include: [
+                        {
+                            model: db.Allcode, as: 'roleIdData' , attributes: ['valueVi', 'valueEn']
+                        },
+                        {
+                            model: db.Allcode, as: 'genderData' , attributes: ['valueVi', 'valueEn']
+                        },  
+                    ],
+                    raw: true,
+                    nest: true,
                     attributes:{
                         exclude: ['password']
                     }
+
                 })
             }
             if(userId && userId !== 'ALL') {
@@ -94,9 +105,20 @@ let getAllUsers = (userId) => {
             let users = '';
                 users = await db.User.findAll({
                     where: { roleId: role},
+                    include: [
+                        {
+                            model: db.Allcode, as: 'roleIdData' , attributes: ['valueVi', 'valueEn']
+                        },
+                        {
+                            model: db.Allcode, as: 'genderData' , attributes: ['valueVi', 'valueEn']
+                        },  
+                    ],
+                    raw: true,
+                    nest: true,
                     attributes:{
-                        exclude: ['password'],
-                    },
+                        exclude: ['password']
+                    }
+                   
                 })
             resolve(users)
         }catch(e) {
@@ -235,14 +257,7 @@ let getAllCodeSerVice = (typeInput) => {
                 let res= {};
                 let allcode = await db.Allcode.findAll({
                     where : {type: typeInput},
-                    // raw: true,
-                    // include: [
-                    //     {
-                    //         model: db.allcode, as: 'roleIdData', attributes: ['valueVi', 'valueEn']
-                    //     }
-                    // ],
-                    raw: true,
-                    // nest: data
+
                 });
                 res.errCode = 0;
                 res.data = allcode;

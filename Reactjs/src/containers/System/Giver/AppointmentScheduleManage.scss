@@ -1,12 +1,17 @@
 .schedule{
     margin: 40px 100px;
+    margin-left: 120px;
+    .date{
+        width: 590px;
+    }
     .btn-schedule{
         gap: 50px;
         flex-wrap: wrap;
     // display: flex;
+        width: 270px;
         border: 0.1rem solid #9fcbea;
         margin-bottom: 10px;
-        margin-right:10px;
+        margin-right:50px;
         padding: 0px 10px;
         color: rgb(184, 198, 203);
         &.active{
@@ -22,7 +27,7 @@
         line-height: 0px;
         padding: 8px;
 
-        margin-left: 400px;
+        margin-left: 173px;
         color: rgb(158, 205, 247);
         border: 1px solid rgb(158, 205, 247);
         &:hover{

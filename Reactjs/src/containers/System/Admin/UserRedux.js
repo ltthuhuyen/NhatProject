@@ -140,12 +140,12 @@ class UserRedux extends Component {
 
     render() {
         let language = this.props.language;
-        console.log('check state:', this.state)
+        // console.log('check state:', this.state)
         let genders = this.state.genderArr;
         let roles = this.state.roleArr;
 
-        let { email , password , firstName , lastName , gender,
-             phone , avata , address
+        let { email , password , firstName , lastName , 
+             phone , address
         } = this.state
         return (
             <>

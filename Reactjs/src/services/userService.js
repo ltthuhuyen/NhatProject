@@ -32,6 +32,8 @@ const getUserRoleIDService = (role) => {
     return axios.get(`/api/get-user-role?role=${role}`)
   
 }
+
+
 export { handleLoginApi ,
          getAllUsers , 
          createNewUserService , 

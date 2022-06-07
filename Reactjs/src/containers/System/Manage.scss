@@ -5,7 +5,7 @@
 
 .container{
   
-    max-width: 100%;
+    max-width: auto;
     font-size: 15px;
     text-align: center;
     .btn{
@@ -28,9 +28,9 @@
     }
     .table{
         background-color: white;
-        width: 1300px;
+        width: auto;
         margin: 0 50px;
-        margin-top: 10px;
+        margin-top: 20px;
         .thead{
             background-color:black;
             color: white;
@@ -40,8 +40,6 @@
             width: 180px;
             height: 150px;
         }
-           
-     
         .btn-edit {
             width: 50px;
             background-color: white;
@@ -67,7 +65,30 @@
                 background-color: #fc394d;
             }
         }
+        .btn-update {
+            width: 80px;
+            color: rgb(158, 205, 247);
+            border: 1px solid rgb(158, 205, 247);
+            &:hover{
+                color:rgb(234, 250, 255);
+                background-color: #c0cdd6;
+                border: 1px solid #c0cdd6;
         
+            }
+        }
+        .btn-detail {
+            width: 80px;
+            background-color: white;
+            color:#000000;
+            border: 1px solid #000000;
+            font-size: 15px;
+        
+            &:hover{
+                background-color: rgb(57, 57, 57);
+                color: white;
+                // background-color: #a4d2ea
+            }
+        }
     }
    
     

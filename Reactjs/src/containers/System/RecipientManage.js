@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { FormattedMessage } from 'react-intl';
+import {LANGUAGES } from "../../utils"
 import { connect } from 'react-redux';
 import './Manage.scss';
 import ModalUser from './ModalUser'
@@ -136,6 +137,7 @@ class UserManage extends Component {
     render() {
         // console.log('check render ', this.state)
         let arrRoleID = this.state.arrRoleID;
+        let language = this.props.language;
         console.log("arrRoleID",arrRoleID)
         return (
             <div className="container">
@@ -191,11 +193,11 @@ class UserManage extends Component {
                                 return (
                                     <tr>  
                                         <td>{index+1}</td>
-                                        <td>{item.roleId }</td>
+                                        <td>{language === LANGUAGES.VI ? item.roleIdData.valueVi : item.roleIdData.valueEn}</td>
                                         <td>{item.email}</td>
                                         <td>{item.firstName} {item.lastName}</td>
                                       
-                                        <td>{item.gender}</td>
+                                        <td>{language === LANGUAGES.VI ? item.genderData.valueVi : item.genderData.valueEn}</td>
                                         <td>
                                             <div className="img">
                                                 <img src={imageBase64} className='img-img'/>
@@ -222,6 +224,7 @@ class UserManage extends Component {
 
 const mapStateToProps = state => {
     return {
+        language: state.app.language,
     };
 };
 

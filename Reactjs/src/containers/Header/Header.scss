@@ -1,22 +1,28 @@
 @import "../../styles/common.scss";
 
 .header-container {
-    height: 70px;
+    height: 100px;
     text-align: center;
     z-index: 99;
     display: flex;
     justify-content: space-between;
-    background-color:#c0cdd6;
-    color: azure;
+    // background-color:#c0cdd6;
+    color: rgb(255, 255, 255);
     position: relative;
     // margin:auto;  
     font-weight: 700;
     padding: 15px 15px;
    
     .welcome{
-      padding: 8px;
-    
+        padding: 8px;
+        font-size: 15px;
+        cursor: pointer;
+        .icon-user{
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
     }
+    
     .language{
         width: 100px;
         // margin-left: 900px;

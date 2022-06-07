@@ -6,6 +6,7 @@ import * as AiIcons from 'react-icons/ai';
 import { faL, faPlus } from "@fortawesome/free-solid-svg-icons";
 import './Manage.scss';
 import {getAllProducts, createNewProductService, editProductService, deleteProductSerVice} from '../../services/productService';
+import {getAllCollectionForm} from '../../services/collectionformService'
 import  {emitter} from '../../utils/emitter';
 import {LANGUAGES} from "../../utils";
 import { changeLanguageApp } from '../../store/actions';
@@ -13,6 +14,7 @@ import { FormattedMessage } from 'react-intl';
 import Header from '../../containers/Header/Admin/Header';
 import ModalProduct from './ModalProduct';
 import ModalEditProduct from './ModalEditProduct';
+
 class ProductManage extends Component {
 
     constructor(props) {
@@ -21,22 +23,36 @@ class ProductManage extends Component {
             arrProducts: [],
             isOpenModalProduct: false,
             isOpenModalEditProduct: false,
-            productEdit: {}
+            productEdit: {},
+            arrCollectionForms: []
         }
     }
   
-
     async componentDidMount() {
       
         await this.getAllProductsFromReact()
+        await this.getAllCollectionFormReact()
     }
 
     getAllProductsFromReact = async () => {
         let response = await getAllProducts('ALL');
+        console.log(response)
         if(response && response.errCode == 0){
             this.setState({
                 arrProducts: response.products
             })
+        }
+        
+    }
+
+    getAllCollectionFormReact = async () => {
+        let response = await getAllCollectionForm('ALL');
+        console.log('getAllCollectionForm',response)
+        if(response && response.errCode == 0){
+            this.setState({
+                arrCollectionForms: response.appointments
+            })
+            
         }
     }
 
@@ -50,6 +66,12 @@ class ProductManage extends Component {
     toggleProductModal = () =>{
         this.setState({
             isOpenModalProduct: !this.state.isOpenModalProduct,
+        })
+    }
+
+    toggleEditProductModal = () =>{
+        this.setState({
+            isOpenModalEditProduct: !this.state.isOpenModalEditProduct,
         })
     }
 
@@ -77,7 +99,7 @@ class ProductManage extends Component {
             productEdit: product
         })
     }
-
+ 
     doEditProduct = async (product) => {
         try {
             let res = await editProductService(product)
@@ -116,8 +138,9 @@ class ProductManage extends Component {
     }
     render() {
         let arrProducts = this.state.arrProducts;
-        console.log('arrProduct', arrProducts)
+        let arrCollectionForms = this.state.arrCollectionForms;
         let language = this.props.language;
+        // console.log(arrCollectionForms)
         return (
             <>
             <div className="container">
@@ -143,7 +166,7 @@ class ProductManage extends Component {
                     className='btn btn-create'
                     onClick={this.handleAddNewProduct}
                 >
-                    <GrIcons.GrAddCircle  /> Thêm     
+                    <GrIcons.GrAddCircle  /> <FormattedMessage id='manage-product.add'/> 
                 </button>
                 <div className="table">
                 <Table bordered>
@@ -162,10 +185,11 @@ class ProductManage extends Component {
                                 let imageBase64 =''
                                 if (item.image) {
                                     imageBase64 = new Buffer(item.image, 'base64').toString('binary')  
+                                    console.log('item',imageBase64)
                                 }
                              return (
                                 <tr>
-                                    <td>{index+1}</td>
+                                    <td>{item.id}</td>
                                     <td>{item.product_name}</td>
                                     <td>
                                         <div className="img">
@@ -175,8 +199,15 @@ class ProductManage extends Component {
                                     <td>{item.description}</td>
                                     <td>
                                         <button type="button" className="btn btn-edit px-2 mx-3" onClick={() => this.handleEditProduct(item)}><AiIcons.AiOutlineEdit /></button>
-                                        <button type="button" className="btn btn-delete px-2" onClick={() => this.handleDeleteProduct(item)}><AiIcons.AiOutlineDelete /></button>
+                                        <button 
+                                            type="button" 
+                                            className="btn btn-delete px-2" 
+                                            onClick={() => this.handleDeleteProduct(item)}
+                                            disabled={arrCollectionForms.map(prd=>prd.productId).includes(item.id)}
+                                            >
+                                            <AiIcons.AiOutlineDelete /></button>
                                     </td>
+                                 
                                 </tr>
                                     )
                             })

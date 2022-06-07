@@ -30,6 +30,7 @@ class ModalEditUser extends Component {
    
     componentDidMount() {
         let user = this.props.currentUser;
+        console.log('user', user)
         this.props.getGenderStart();
         this.props.getRoleStart();
         let imageBase64 = '';
@@ -142,7 +143,7 @@ class ModalEditUser extends Component {
                 size='lg'
                 //centered
             >
-                <ModalHeader toggle={() => {this.toggle()}}>Edit a user</ModalHeader>
+                <ModalHeader toggle={() => {this.toggle()}}> <FormattedMessage id="manage-user.edit"/> </ModalHeader>
                 <ModalBody>
                     <div className='form-create-edit'>
                         <div className="form-row">
@@ -237,7 +238,7 @@ class ModalEditUser extends Component {
                                     <input id="previewImg" type="file" accept='image/*' hidden
                                         onChange={(event) => this.handleOnchangeImage(event)}
                                     />
-                                    <label className="upload-file" htmlFor="previewImg">Tải ảnh</label>
+                                    <label className="upload-file" htmlFor="previewImg"><FormattedMessage id="common.upload-image"/> <i className="fas fa-upload"></i></label>
                                     <div className='preview-image'
                                         style ={{ backgroundImage: `url(${this.state.previewImgURL})` }}
                                         onClick= {() => this.openPreviewImage()}>

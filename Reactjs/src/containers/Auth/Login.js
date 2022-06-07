@@ -41,9 +41,10 @@ class Login extends Component {
         // console.log('password: ' +this.state.password)
         try {
             let data = await handleLoginApi(this.state.username, this.state.password);
+        // console.log('User', data)
                 if(data && data.errCode !== 0){
                     this.setState({
-                        errMessage: data.message
+                        errMessage: data.message,
                 })
             }
             if(data && data.errCode === 0){
@@ -78,6 +79,8 @@ class Login extends Component {
         }
     }
     render() {
+        let userInfo = this.props.userInfo
+        //console.log("check userInfo",userInfo)
         return (
             <div className='login-background'>
                 <div className='login-container'>
@@ -138,7 +141,8 @@ class Login extends Component {
 
 const mapStateToProps = state => {
     return {
-        language: state.app.language
+        language: state.app.language,
+        userInfo: state.user.userInfo
     };
 };
 

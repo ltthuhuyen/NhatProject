@@ -12,7 +12,11 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association 
         Allcode.hasMany(models.Schedule, { foreignKey: 'timeType', as: 'timeTypeData' })
+        Allcode.hasMany(models.Schedule, { foreignKey: 'statusType', as: 'statusTypeData' })
         Allcode.hasMany(models.User, {foreignKey: 'roleId', as: 'roleIdData'})
+        Allcode.hasMany(models.User, {foreignKey: 'gender', as: 'genderData'})
+        Allcode.hasMany(models.Temp, { foreignKey: 'timeType', as: 'timeTypeTemp' })
+        Allcode.hasMany(models.Temp, { foreignKey: 'statusType', as: 'statusTypeTemp' })
     }
   };
     Allcode.init({

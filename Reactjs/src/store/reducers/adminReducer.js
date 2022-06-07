@@ -6,6 +6,8 @@ const initialState = {
     isLoadingRole: false,
     roles: [],
     allTime: [],
+    statuses: [],
+    temps: []
     
 }
 
@@ -48,7 +50,27 @@ const  adminReducer = (state = initialState, action) => {
             state.allTime = [];
             return {
                 ...state,
-            }    
+            }   
+        case actionTypes.FETCH_STATUS_SUCCESS:
+            state.statuses = action.data;
+            return {
+                 ...state,
+            }
+        case actionTypes.FETCH_STATUS_FAILDED:
+            state.statuses = [];
+            return {
+                ...state,
+            } 
+        case actionTypes.FETCH_ALL_TEMP_SUCCESS:
+            state.temps = action.dataTemp;
+            return {
+                ...state,
+        }
+        case actionTypes.FETCH_ALL_TEMP_FAILDED:
+            state.temps = [];
+            return {
+                ...state,
+        }
         default:
             return state;
     }

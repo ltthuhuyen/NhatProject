@@ -33,7 +33,6 @@ let handleGetAllUsers = async(req, res) => {
     }
 
     let users = await userService.getAllUsers(id);
-    // console.log(users)
     return res.status(200).json({
         errCode: 0,
         errMessage: 'Ok',
@@ -72,6 +71,7 @@ let handleEditUser = async (req, res) =>{
     let message = await userService.updateUser(data);
     return res.status(200).json(message);
 }
+
 let handleDeleteUser  = async (req, res) =>{
     if (!req.body.id) {
         return res.status(200).json({

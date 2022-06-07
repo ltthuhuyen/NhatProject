@@ -5,10 +5,12 @@ import { faQuestion } from "@fortawesome/free-solid-svg-icons";
 import * as actions from "../../store/actions";
 // import Navigator from '../../components/Navigator';
 // import { adminMenu } from './menuApp';
+import ModalEditUser from '../System/ModalEditUser';
+import * as FaIcons from 'react-icons/fa';
 import { FormattedMessage } from 'react-intl';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Navigator from '../../components/Navigator';
-import { adminMenu, giverMenu, recipientMenu } from '../Header/menuApp';
+import { adminMenu, recipientMenu } from './menuApp';
 import {LANGUAGES, USER_ROLE} from "../../utils"
 import { changeLanguageApp } from '../../store/actions'
 import './Header.scss';
@@ -18,7 +20,9 @@ class Header extends Component {
     constructor(props){
         super(props);
         this.state = {
-            menuApp: []
+            menuApp: [],
+            isOpenModalEditUser: false,
+            userEdit: {},
         }
     }
     changeLanguage = (language) => {
@@ -33,9 +37,9 @@ class Header extends Component {
             if(role === USER_ROLE.ADMIN){
                 menu = adminMenu
             }
-            if(role === USER_ROLE.GIVER){
-                menu = giverMenu
-            }
+            // if(role === USER_ROLE.GIVER){
+            //     menu = giverMenu
+            // }
             if(role === USER_ROLE.RECIPIENT){
                 menu = recipientMenu
             }
@@ -47,17 +51,42 @@ class Header extends Component {
         
     }
 
+    toggleEditUserModal = () =>{
+        this.setState({
+            isOpenModalEditUser: !this.state.isOpenModalEditUser,
+        })
+    }
+
+    handleEditUserInfo = (userId) =>{
+        console.log('check userId',userId )
+        this.setState({
+            isOpenModalEditUser: true,
+            userEdit: userId
+        })
+    }
+
     render() {
         const { processLogout , userInfo} = this.props;
         let language = this.props.language;
         return (
+            <>
+            {
+                this.state.isOpenModalEditUser &&
+                <ModalEditUser 
+                    isOpen = {this.state.isOpenModalEditUser}
+                    toggleFromParent = {this.toggleEditUserModal}
+                    currentUser = {this.state.userEdit}
+                />
+            }
             <div className='row'>
-                <div className="col-12 header-container">
+                <div className=" col-12 header-container">
                     {/* thanh navigator */}
                     <div className="col-8 header-tabs-container">
                         <Navigator menus={this.state.menuApp} />
                     </div>
-                    <span className='col-2 welcome'><FormattedMessage id='menu.system.welcome'/> {userInfo && userInfo.lastName ? userInfo.lastName : '' }</span>
+                    <span className='col-2 welcome' onClick={() => this.handleEditUserInfo(userInfo)}>
+                        <FaIcons.FaUserAlt className='icon-user' />  {userInfo && userInfo.firstName + userInfo.lastName  ? userInfo.firstName + ' ' + userInfo.lastName : '' }
+                    </span>
                     <div className='col-1 language'>
                         <div className={language ===  LANGUAGES.VI ? 'language-vi active' : 'language-vi'}><span onClick={() => this.changeLanguage(LANGUAGES.VI)}>VN </span></div>
                         <div className={language ===  LANGUAGES.EN ? 'language-en active' : 'language-en'}><span onClick={() => this.changeLanguage(LANGUAGES.EN)}> EN</span></div>
@@ -69,6 +98,7 @@ class Header extends Component {
                     </div>
                 </div>
             </div>
+            </>
         );
     }
 

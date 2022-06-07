@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import * as actions from "../../../store/actions";
 import Navigator from '../../../components/Navigator';
-import { adminMenu, giverMenu, recipientMenu } from '../../Header/menuApp';
+import { adminMenu, recipientMenu } from '../../Header/menuApp';
 import {LANGUAGES, USER_ROLE} from "../../../utils"
 import { changeLanguageApp } from '../../../store/actions'
 import { FormattedMessage } from 'react-intl';
@@ -29,9 +29,7 @@ class Header extends Component {
             if(role === USER_ROLE.ADMIN){
                 menu = adminMenu
             }
-            if(role === USER_ROLE.GIVER){
-                menu = giverMenu
-            }
+            
             if(role === USER_ROLE.RECIPIENT){
                 menu = recipientMenu
             }

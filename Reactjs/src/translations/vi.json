@@ -2,6 +2,7 @@
     "homeheader" : {
         "page": "Trang chủ",
         "appointment-schedule" : "Đặt lịch thu gom",
+        "collection-history": "Lịch sử thu gom",
         "contract": "Liên hệ",
         "news": "Tin tức"
       
@@ -14,6 +15,11 @@
         "decentralize": "Phân quyền",
         "close": "Đóng",
         "save": "Lưu",
+        "update": "Cập nhật",
+        "upload-image": "Tải ảnh",
+        "detail": "Chi tiết",
+        "choose-continue": "TIẾP TỤC CHỌN SẢN PHẨM",
+        "booking": "ĐẶT LỊCH HẸN",
         "refresh": "Refresh",
         "accept": "Chấp nhận",
         "confirm": "Xác nhận",
@@ -57,11 +63,15 @@
         "giver": {
             "manage-user": "Quản lý người dùng",
             "manage-collection-form": "Quản lý đơn thu gom"
+        },
+        "recipient": {
+            "manage-collection-form": "Quản lý đơn thu gom"
         }
     },
     "manage-user": {
         "title": "QUẢN LÝ NGƯỜI DÙNG",
         "add": "Thêm ",
+        "edit" : "Sửa thông tin người dùng",
         "email": "Email",
         "password": "Mật khẩu",
         "fName": "Họ",
@@ -78,7 +88,18 @@
     "manage-product": {
         "title": "QUẢN LÝ SẢN PHẨM",
         "add": "Thêm ",
+        "edit" : "Sửa thông tin sản phẩm",
         "product_name": "Tên sản phẩm",
+        "image": "Hình ảnh",
+        "description": "Mô tả",
+        "save": "Lưu",
+        "action": "Hành động"
+    },
+    "manage-news": {
+        "title": "QUẢN LÝ TIN TỨC",
+        "add": "Thêm ",
+        "edit" : "Sửa thông tin tin tức",
+        "name": "Title",
         "image": "Hình ảnh",
         "description": "Mô tả",
         "save": "Lưu",
@@ -87,7 +108,18 @@
     "manage-schedule": {
         "title": "ĐẶT LỊCH THU GOM",
         "appointment-date": "Ngày hẹn",
+        "time": "Thời gian hẹn",
         "confirm": "Xác nhận"
+    },
+    "manage-collection-form": {
+        "title": "ĐƠN THU GOM",
+        "product-giveaways": "Product giveaways", 
+        "appointment-date": "Ngày hẹn",
+        "time": "Thời gian thu gom",
+        "status": "Trạng thái đơn",
+        "giver": "Người cho",
+        "confirm": "Xác nhận",
+        "action": "Hành động"
     },
     "system": {
         "user-manage": {

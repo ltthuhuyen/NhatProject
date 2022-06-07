@@ -5,9 +5,8 @@
     height: 75px;
     width: 100%;
     font-weight: 700;
-    // background-color: rgb(211, 136, 255);
-    background-color: #c0cdd6;
-    color: rgb(231, 252, 252);
+    // background-color: #c0cdd6;
+    color: rgb(255, 255, 255);
     
 
     .home-header-content {
@@ -15,7 +14,7 @@
         height: 100%;
         display: flex;
         .left-content {
-            width: 25%;
+            width: 20%;
             align-items: center;
             display: flex;
             .header-logo {
@@ -30,24 +29,25 @@
         }
 
         .center-content {
-            width: 70%;
+            width: 50%;
             display: flex;
             font-size: 18px;
             justify-content: space-between;
             align-items: center;
             .link-homepage{
-                color: rgb(231, 252, 252);
+                color: rgb(255, 255, 255);
                 text-decoration: none;
             }
         }
 
         .language-content {
-            width: 30%;
+            width: 25%;
             display: flex;
             justify-content: center;
             align-items: center;
 
             .support {
+                color: rgb(231, 252, 252);
                 padding-right: 20px;
                 display: flex;
                 align-items: center;
@@ -86,7 +86,7 @@
         }
         .login-register-content{
             margin-right: 20px;
-            width: 19%;
+            width: 15%;
             display: flex;
             font-size: 15px;
             justify-content: space-between;
@@ -103,13 +103,52 @@
                
             }
         }
-      
+
+        .container-welcome{
+            display: flex;
+            // border: 1px solid red;
+            width: auto;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+
+            .icon-user{
+                width: auto;
+                font-size: 20px;
+            }
+
+            .ten{
+                width: 200px;
+            }
+        }
+
+        // .welcome{
+        //     width: auto;
+        //     padding: 2px;
+        //     font-size: 15px;
+        //     margin-bottom: 5px;
+        //     display: flex;
+        //     justify-content: flex-start;
+        //     border: 1px solid red;
+
+        //     .icon-user{
+        //         display: flex;
+        //         justify-content: flex-start;
+        //         font-size: 20px;
+        //         margin-top: 45px;
+        //     }
+        // }
+        
         .btn-logout {
             color: $common-text-color;
             line-height: 40px;
             height: 40px;
-            padding: 0 10px;
-            margin-top: 18px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            // margin-left: 150px;
+            ;
             &:hover {
                 background-color: darken($colormain, 5);
             }

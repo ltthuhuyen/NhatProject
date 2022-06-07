@@ -5,7 +5,10 @@ import UserManage from '../containers/System/UserManage';
 import GiverManage from '../containers/System/GiverManage';
 import RecipientManage from '../containers/System/RecipientManage';
 import ProductManage from '../containers/System/ProductManage';
-import UserRedux from '../containers/System/Admin/UserRedux';
+import CollectionFormManage from '../containers/System/CollectionFormManage'
+import DetailCollectionForm from '../containers/System/DetailCollectionForm'
+import NewsManage from "../containers/System/NewsManage"
+
 
 class System extends Component {
     render() {
@@ -18,7 +21,13 @@ class System extends Component {
                         <Route path="/system/giver-manage" component={GiverManage} />
                         <Route path="/system/recipient-manage" component={RecipientManage} />
                         <Route path="/system/product-manage" component={ProductManage} />
+                        <Route path="/system/news-manage" component={NewsManage} />
+                        <Route path="/system/collection-form-manage" component={CollectionFormManage} />
+                        <Route path="/system/collection-form-detail/:id" component={DetailCollectionForm} />   
+                        {/* <Route path="/system/user-info" component={UserInfo} />        */}
+
                         {/* <Route component={() => { return (<Redirect to={systemMenuPath} />) }} /> */}
+
                     </Switch>
                 </div>
             </div>

@@ -5,9 +5,10 @@ import { FormattedMessage } from 'react-intl'
 import DatePicker from '../../../components/Input/DatePicker';
 import * as actions from "../../../store/actions"
 import { LANGUAGES , dateFormat} from '../../../utils';
+import Home from '../../HomePage/Home'
 import './AppointmentScheduleManage.scss'
 import { getAllProducts } from '../../../services/productService'
-import {  saveBulkScheduleAppoinment } from '../../../services/giverService';
+import {  saveBulkScheduleAppoinment } from '../../../services/appointmentService';
 import { toast } from 'react-toastify'
 import _, { result } from 'lodash'
 import moment from 'moment';
@@ -19,43 +20,37 @@ class AppointmentScheduleManage extends Component {
         currentDate.setHours(0,0,0,0);
         this.state = {
             currentDate: '',
+            giverId: '',
             rangeTime: [],
-            arrProducts: [],
-            productId: '1',
+            arrTemps: [],
+            statusType: '',
+            date: '',
+            timeType: '',
+           
         }
     }
 
     componentDidMount(){
         this.props.fetchAllAppointmentTime();
-      //  this.props.fetchAllProduct();
-        this.getAllProductsFromReact()
+        this.props.fetchAllTemp(this.state.giverId)
         
     }
-    
-    getAllProductsFromReact = async () => {
-        let response = await getAllProducts('ALL');
-        if(response && response.errCode == 0){
-            this.setState({
-                arrProducts: response.products
-            })
-        }
-    }
 
-    buildDataInputSelect = (inputData) => {
-        let result = [];
-        if(inputData && inputData.length > 0){
-            inputData.map((item , index) => {
-                let object = {};
-                object.label = item.product_name;
-                object.value = item.productId;
-                result.push(object);
-            })
+    // buildDataInputSelect = (inputData) => {
+    //     let result = [];
+    //     if(inputData && inputData.length > 0){
+    //         inputData.map((item , index) => {
+    //             let object = {};
+    //             object.label = item.product_name;
+    //             object.value = item.productId;
+    //             result.push(object);
+    //         })
          
-        }
-        console.log('inputData', result)
-        return result;
+    //     }
+    //     console.log('inputData', result)
+    //     return result;
        
-    }
+    // }
     componentDidUpdate(prevProps){
         if (prevProps.allTime !== this.props.allTime) {
             let dataTime = this.props.allTime
@@ -75,12 +70,23 @@ class AppointmentScheduleManage extends Component {
             })
             
         }
+        if (prevProps.allStatus !== this.props.allStatus) {
+            let dataSelect = this.buildDataInputSelect(this.props.allStatus)
+            this.setState({
+                arrProducts: dataSelect,
+                productId: dataSelect && dataSelect.length > 0 ? dataSelect[0].id : ''
+              
+            })
+            
+        }
     }
 
     handleOnChangeDataPicker =(date) => {
        this.setState({
-           currentDate: date[0]
+           currentDate:moment( date[0]).format(dateFormat.SEND_TO_SERVER)
+           
        })
+      // console.log('currentDate', this.state.currentDate)
     }
 
     handleOnChangeSelect =(e, id) => {
@@ -92,68 +98,58 @@ class AppointmentScheduleManage extends Component {
     }
 
     handleClickSchedule = (time) => {
-        let {rangeTime} = this.state ;
-        if(rangeTime && rangeTime.length > 0){
-            rangeTime = rangeTime.map(item => {
-                if(item.id === time.id) item.isSelected =  !item.isSelected;
-                return item; 
-              
-            })
+        // console.log('time', time)
+        // // let {rangeTime} = this.state ;
+        // // if(rangeTime && rangeTime.length > 0){
+        // //     rangeTime = rangeTime.map(item => {
+        // //         if(item.id === time.id) item.isSelected =  !item.isSelected;
+        // //         return item; 
+               
+        // //     })
         
             this.setState({
-                rangeTime: rangeTime
+                timeType: time.keyMap
             })
-        }
+     
+        
     }
     
     handleConfirm = async () => {
-        let {rangeTime , currentDate , productId, arrProducts} = this.state;
-     
-        let result = []
+        let {currentDate , timeType} = this.state;
         if (!currentDate) {
             toast.error("Vui lòng chọn ngày hẹn !");
             return;
         }
-        if (productId && _.isEmpty(productId)){
-            toast.error("Vui lòng chọn sản phẩm !");
-            return;
+        let arrTemps = this.props.temps
+        if(arrTemps && arrTemps.length>0)
+        {
+            arrTemps = arrTemps.map(item =>{               
+            item.date = currentDate
+            item.timeType = timeType
+            item.statusType = "S1"
+            return item;
+            })
+           
         }
-        let formatedDate = moment(currentDate).format(dateFormat.SEND_TO_SERVER)
-        // let formatedDate = new Date(currentDate).getTime();
-        if (rangeTime && rangeTime.length >0){
-            let selectedTime = rangeTime.filter(item => item.isSelected === true);
-            console.log('selectedTime',selectedTime)
-            if (selectedTime && selectedTime.length >0){
-                selectedTime.map((schedule,index) => {
-                    let object ={};
-                    object.productId = arrProducts[index].id;
-                    object.date = formatedDate;
-                    object.timeType = schedule.keyMap;
-                    result.push(object)
-                
-                })
-            } else {
-                toast.error("Vui lòng chọn thời gian !");
-                return;
-            }
-        }
-        console.log('result avb', result.productId)
-       // let timetest = result
-        // console.log('result avb', timetest.time)
+        // console.log("check result",result)
+        let response = await saveBulkScheduleAppoinment({
+            arrSchedule: arrTemps
+            
         
-        let res = await saveBulkScheduleAppoinment({
-            arrSchedule: result
-        });
-      
-        
+        });  
+        toast.success("Đặt lịch thu gom thành công") 
     }
 
     render() {
-        let {rangeTime, arrProducts, productId} = this.state;
+        let {rangeTime, arrTemps } = this.state;
         let {language} = this.props;
-
-      console.log('state', this.state)
-
+        if(this.props.userInfo)
+        {
+            this.state.giverId = this.props.userInfo.id;
+        }
+        
+        // console.log("Check state", this.state)
+        // console.log("check temps", this.props.temps)
         return (
             <>
                 <div className="title text-center">
@@ -161,44 +157,20 @@ class AppointmentScheduleManage extends Component {
                 </div>
                 <div className='schedule'> 
                     <div className='row '>
-                        <div className='col-6 form-group'>
-                        <label><FormattedMessage id="manage-schedule.appointment-date"/></label>
-                        {/* <Select
-                            // value={this.state.selectedOption}
-                            // onChange={this.handleChangeSelect}
-                            options={this.state.arrProducts}
-                            placeholder={'Chọn sản phẩm'}
-                        /> */}
-
-                            <select id="product" class="form-control"
-                                onChange={(e) => {this.handleOnChangeSelect(e, 'productId')}}
-                                value={productId}
-                            >
-                                {arrProducts && arrProducts.length > 0 && 
-                                    arrProducts.map((item, index) => {
-                                        return (
-                                            <option key= {index} value={item.id} style={{color: "black"}}>
-                                                {/* {language === LANGUAGES.VI ? item.valueVi : item.valueEn} */}
-                                            {item.product_name}
-                                            </option>)
-                                    })
-                                }
-                            </select>
-                        </div>
+                        <div className='col-3 form-group'></div>
                         <div className='col-6 form-group'>
                             <label><FormattedMessage id="manage-schedule.appointment-date"/></label>
                             <DatePicker
                                 onChange = {this.handleOnChangeDataPicker}
-                                className = 'form-control'
+                                className = 'form-control date'
                                 value = {this.state.currentDate}
                                 minDate = {new Date()}
                             />
                         </div>
+                        <div className='col-3 form-group'></div>
                     </div>
                     <div className='row '>
-                        <div className='col-6 form-group'>
-                        
-                        </div>
+                        <div className='col-3 form-group'></div>
                         <div className='col-6 form-group'>
                             { rangeTime && rangeTime.length > 0 &&
                                 rangeTime.map((item , index) => {
@@ -213,7 +185,8 @@ class AppointmentScheduleManage extends Component {
                                     )
                                 } )
                             }
-                        </div>     
+                        </div>   
+                        <div className='col-3 form-group'></div>  
                     </div>
                     <div className='row'>
                         <div className='col-6 form-group'>
@@ -238,14 +211,16 @@ const mapStateToProps = state => {
         language: state.app.language,
         systemMenuPath: state.app.systemMenuPath,
         allTime: state.admin.allTime,
-        allProduct: state.admin.allProduct
+        allProduct: state.admin.allProduct,
+        userInfo: state.user.userInfo,
+        temps: state.admin.temps
     };
 };
 
 const mapDispatchToProps = dispatch => {
     return {
         fetchAllAppointmentTime:() => dispatch(actions.fetchAllAppointmentTime()),
-        fetchAllProduct:() => dispatch(actions.fetchAllProduct())
+        fetchAllTemp:(giverId) => dispatch(actions.fetchAllTemp(giverId)),
     };
 };
 

@@ -1,20 +1,26 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
 import { Redirect, Route, Switch } from 'react-router-dom';
-import AppointmentScheduleManage from '../containers/System/Giver/AppointmentScheduleManage';
+import CartManage from '../containers/System/Giver/CartManage';
 import CollectionFormManage from '../containers/System/Giver/CollectionFormManage';
-import Header from '../containers/Header/Header';
+import AppointmentScheduleManage from "../containers/System/Giver/AppointmentScheduleManage"
+import Home from '../containers/HomePage/Home';
+import News from "../containers/System/News"
+import DetailNews from '../containers/System/DetailNews';
 class Giver extends Component {
     render() {
         const { isLoggedIn } = this.props;
         return (
             <>
-            {isLoggedIn && <Header />}
+            {isLoggedIn && <Home />}
             <div className="giver-container">
                 <div className="giver-list">
                     <Switch>
+                        <Route path="/giver/cart/:id" component={CartManage} />
+                        <Route path="/giver/collection-form" component={CollectionFormManage} />
                         <Route path="/giver/appointment-schedule" component={AppointmentScheduleManage} />
-                        <Route path="/giver/collection-form-manage" component={CollectionFormManage} />
+                        <Route path="/giver/news" component={News} />
+                        <Route path="/giver/news-detail/:id" component={DetailNews} />
                     </Switch>
                 </div>
             </div>

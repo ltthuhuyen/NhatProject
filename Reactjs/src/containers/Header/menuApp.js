@@ -44,21 +44,13 @@ export const adminMenu = [
         name: 'menu.admin.manage-collection-form', menus: [
             {
                 name: 'menu.admin.manage-collection-form',link: '/system/collection-form-manage' 
-                // subMenus: [
-                //     { name: 'menu.system.system-administrator.user-manage', link: '/system/user-manage' },
-                //     { name: 'menu.system.system-administrator.product-manage', link: '/system/product-manage' },
-                //     { name: 'menu.system.system-administrator.user-redux', link: '/system/user-redux' },
-                // ]
-            },
-
-           
-           
+            }
         ]
     },
     { // tin tức
         name: 'menu.admin.manage-news', menus: [
             {
-                name: 'menu.admin.manage-news',link: '/system/product-manage' 
+                name: 'menu.admin.manage-news',link: '/system/news-manage' 
                 // subMenus: [
                 //     { name: 'menu.system.system-administrator.user-manage', link: '/system/user-manage' },
                 //     { name: 'menu.system.system-administrator.product-manage', link: '/system/product-manage' },
@@ -73,36 +65,36 @@ export const adminMenu = [
 
 ]
 
-export const giverMenu = [
-    { // đơn thu gom
-        name: 'menu.giver.manage-collection-form', menus: [
-            {
-                name: 'menu.giver.manage-collection-form',link: '/giver/collection-form-manage' 
-                // subMenus: [
-                //     { name: 'menu.system.system-administrator.user-manage', link: '/system/user-manage' },
-                //     { name: 'menu.system.system-administrator.product-manage', link: '/system/product-manage' },
-                //     { name: 'menu.system.system-administrator.user-redux', link: '/system/user-redux' },
-                // ]
-            },
-            {
-                name: 'menu.giver.manage-collection-form',link: '/giver/appointment-schedule' 
-                // subMenus: [
-                //     { name: 'menu.system.system-administrator.user-manage', link: '/system/user-manage' },
-                //     { name: 'menu.system.system-administrator.product-manage', link: '/system/product-manage' },
-                //     { name: 'menu.system.system-administrator.user-redux', link: '/system/user-redux' },
-                // ]
-            },
-        ]
-    },
+// export const giverMenu = [
+//     { // đơn thu gom
+//         name: 'menu.giver.manage-collection-form', menus: [
+//             {
+//                 name: 'menu.giver.manage-collection-form',link: '/giver/collection-form-manage' 
+//                 // subMenus: [
+//                 //     { name: 'menu.system.system-administrator.user-manage', link: '/system/user-manage' },
+//                 //     { name: 'menu.system.system-administrator.product-manage', link: '/system/product-manage' },
+//                 //     { name: 'menu.system.system-administrator.user-redux', link: '/system/user-redux' },
+//                 // ]
+//             },
+//             {
+//                 name: 'menu.giver.manage-collection-form',link: '/giver/appointment-schedule' 
+//                 // subMenus: [
+//                 //     { name: 'menu.system.system-administrator.user-manage', link: '/system/user-manage' },
+//                 //     { name: 'menu.system.system-administrator.product-manage', link: '/system/product-manage' },
+//                 //     { name: 'menu.system.system-administrator.user-redux', link: '/system/user-redux' },
+//                 // ]
+//             },
+//         ]
+//     },
    
    
-];
+// ];
     
 export const recipientMenu = [
     { // đơn thu gom
-        name: 'menu.recipient.manage-collection form', menus: [
+        name: 'menu.recipient.manage-collection-form', menus: [
             {
-                name: 'menu.admin.manage-giver',link: '/system/user-manage' 
+                name: 'menu.recipient.manage-collection-form',link: '/recipient/collection-form' 
                 // subMenus: [
                 //     { name: 'menu.system.system-administrator.user-manage', link: '/system/user-manage' },
                 //     { name: 'menu.system.system-administrator.product-manage', link: '/system/product-manage' },

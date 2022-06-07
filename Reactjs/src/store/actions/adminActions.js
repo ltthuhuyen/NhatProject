@@ -1,6 +1,7 @@
 import actionTypes from './actionTypes';
 import {createNewUserService, getAllCodeService} from "../../services/userService"
 import {getAllProducts} from "../../services/productService"
+import { getAllTemps } from '../../services/appointmentService';
 import { ToastContainer, toast } from 'react-toastify';
 
 export const fetchGenderStart = () => {
@@ -106,6 +107,57 @@ export const fetchAllProduct = () => {
         }
     }
 }
+
+
+export const fetchAllTemp = (giverId) => {
+    return async (dispatch, getState) => {
+        try {
+            let res = await getAllTemps(giverId);
+            // console.log('resssss',res.temps)
+            if (res && res.errCode === 0) {
+                dispatch({
+                    type: actionTypes.FETCH_ALL_TEMP_SUCCESS,
+                    dataTemp: res.temps
+                });
+              
+            } else {
+                dispatch({
+                    type: actionTypes.FETCH_ALL_TEMP_FAILDED
+                });
+            }
+        } catch (e) {
+            dispatch({
+                type: actionTypes.FETCH_ALL_TEMP_FAILDED
+            });
+            console.log('fetchRoleStart error',e);
+        }
+    }
+}
+
+export const fetchStatusStart = () => {
+    return async (dispatch, getState) => {
+        try {
+            let res = await getAllCodeService("STATUS");
+            if (res && res.errCode === 0) {
+                dispatch(fetchStatusSuccess(res.data));
+            } else {
+                dispatch(fetchStatusFAILDED());
+            }
+        } catch (e) {
+            dispatch(fetchStatusFAILDED())
+            console.log('fetchStatusStart error',e);
+        }
+    }
+}
+
+export const fetchStatusSuccess = (statusData) => ({
+    type: actionTypes.FETCH_STATUS_SUCCESS,
+    data: statusData,
+})
+
+export const fetchStatusFAILDED = () => ({
+    type: actionTypes.FETCH_STATUS_FAILDED,
+})
 
 export const createNewUser = (data) => {
     return async (dispatch, getState) => {
