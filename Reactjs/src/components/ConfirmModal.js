@@ -58,8 +58,8 @@ class ConfirmModal extends Component {
         const { contentOfConfirmModal } = this.props;
 
         return (
-            <Modal isOpen={contentOfConfirmModal.isOpen} className='confirm-modal' centered={true}>
-                <div className="modal-header">
+            <Modal isOpen={contentOfConfirmModal.isOpen} className='confirm-modal shadow-lg' centered={true}>
+                <div className="modal-header ">
                     <div className="modal-title">
                         <FormattedMessage id={"common.confirm"} />
                     </div>
@@ -92,7 +92,7 @@ class ConfirmModal extends Component {
                         </div>
                     </div>
                 </div>
-            </Modal >
+            </Modal>
         );
     }
 

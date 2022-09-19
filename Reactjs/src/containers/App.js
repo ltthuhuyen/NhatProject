@@ -11,18 +11,12 @@ import { userIsAuthenticated, userIsNotAuthenticated } from '../hoc/authenticati
 import { path } from '../utils'
 
 import Home from '../routes/Home';
-// import Login from '../routes/Login';
 import Login from './Auth/Login';
-
-// import Header from './Header/Header';
+import Register from './Auth/Register';
 import System from '../routes/System';
 import Recipient from "../routes/Recipient"
 import Giver from '../routes/Giver';
-import HomePage from './HomePage/HomePage.js'
 import CustomScrollbars from '../components/CustomScrollbars';
-
-import { CustomToastCloseButton } from '../components/CustomToast';
-import ConfirmModal from '../components/ConfirmModal';
 
 class App extends Component {
 
@@ -57,10 +51,11 @@ class App extends Component {
                             <Switch>
                                 <Route path={path.HOME} exact component={(Home)} />
                                 <Route path={path.LOGIN} component={userIsNotAuthenticated(Login)} />
+                                <Route path={path.REGISTER} component={userIsNotAuthenticated(Register)} />
                                 <Route path={path.SYSTEM} component={userIsAuthenticated(System)} />
                                 <Route path={'/giver/'} component={userIsAuthenticated(Giver)} />
                                 <Route path={'/recipient/'} component={userIsAuthenticated(Recipient)} />
-                                <Route path={path.HOMEPAGE} component={HomePage} />
+                              
                             </Switch>
                         </CustomScrollbars>
                         </span>

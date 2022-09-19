@@ -73,23 +73,13 @@ class DetailNews extends Component {
                             <div className="content-up">
                                 <div className="News-title">Tin Tức</div>
                             </div>
-                        </div>
-{/*                     
-                                let imageBase64 =''
-                                if (item.avatar) {
-                                imageBase64 = new Buffer(item.avatar, 'base64').toString('binary')  
-                                }
-                                console.log('avata', imageBase64) */}
-                        
+                        </div>                     
                             <div className="frames-cont">
                             <div className="frames-header row">
                                 <div className="frames-img col-3">
                                     <img src={newsDetail.avatar}/>
                                 </div>
                                 <div className="frames-description col-9">
-                                    {/* <div className="description">
-                                        {item.description}
-                                    </div> */}
                                     <div className="frames-title">
                                       
                                             {newsDetail.title}

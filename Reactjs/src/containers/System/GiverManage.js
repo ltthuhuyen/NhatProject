@@ -6,14 +6,16 @@ import './Manage.scss';
 import ModalUser from './ModalUser'
 import ModalEditUser from './ModalEditUser';
 import Header from '../../containers/Header/Admin/Header'
-import {getAllUsers, getUserRoleIDService, createNewUserService, editUserService, deleteUserSerVice} from '../../services/userService';
+import {searchUser, getUserRoleIDService, createNewUserService, editUserService, deleteUserSerVice} from '../../services/userService';
 import { IconContext } from 'react-icons';
 import { Table } from 'reactstrap';
 import * as GrIcons from 'react-icons/gr';
 import * as AiIcons from 'react-icons/ai';
-import { faL, faPlus } from "@fortawesome/free-solid-svg-icons";
 import  {emitter} from '../../utils/emitter'
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
+import * as BsIcons from 'react-icons/bs';
+import * as MdIcons from 'react-icons/md';
+import NavAdmin from '../../components/NavAdmin';
 
 
 
@@ -26,7 +28,9 @@ class UserManage extends Component {
             arrRoleID: [],
             isOpenModalUser: false,
             isOpenModalEditUser: false,
-            userEdit: {}
+            userEdit: {},
+            search: '',
+            arrSearchUser: []
         }
     }
 
@@ -35,13 +39,14 @@ class UserManage extends Component {
         await this.getUserRoleID()
     }
 
-    getAllUsersFromReact = async () => {
-        let response = await getAllUsers('ALL');
-        if(response && response.errCode == 0){
-            this.setState({
-                arrUsers: response.users
-            })
-        }
+    handleOnChangeInput = (e, id) => {
+        let copyState = {...this.state};
+        copyState[id] = e.target.value;
+        this.setState({
+            ...copyState
+         }, () => {
+            console.log('check good state' , this.state)
+        } )
     }
 
     getUserRoleID = async () => {
@@ -58,6 +63,23 @@ class UserManage extends Component {
             isOpenModalUser: true,
         })
 
+    }
+
+    handleSearch = async (search) => {
+        let response = await searchUser(this.state.search); 
+        console.log('response searchUser', response)
+        if(response ){
+            this.setState({
+                arrSearchUser: response.data,
+                
+            })
+        }
+        this.props.history.push(`/system/search-user/${this.state.search}`) 
+    }
+
+    handleDetailUser = async (item) => {
+        this.props.history.push(`/system/user-manage-detail/${item.id}`) 
+       
     }
 
     toggleUserModal = () =>{
@@ -137,11 +159,15 @@ class UserManage extends Component {
     render() {
         // console.log('check render ', this.state)
         let arrRoleID = this.state.arrRoleID;
-        let language = this.props.language;
-        console.log("arrRoleID",arrRoleID)
+        const { processLogout , userInfo } = this.props;
+        let imageBase64 =''
+        if (userInfo.image) {
+        imageBase64 = new Buffer(userInfo.image, 'base64').toString('binary')  
+        }   
         return (
-            <div className="container">
-                <Header />
+            <>
+            <NavAdmin />
+            <div className="main_content">
                 <ModalUser 
                     isOpen = {this.state.isOpenModalUser}
                     toggleFromParent = {this.toggleUserModal}
@@ -156,67 +182,77 @@ class UserManage extends Component {
                     editUser = {this.doEditUser}
                 />
                 }
-                <div className="title text-center">
-                    <FormattedMessage id='manage-user.title'/>
-                </div>
-                <button 
-                        className='btn btn-light  btn-create px-2'
-                             onClick={this.handleAddNewUser}
-                    >
-
-                        <div className='title-create'>
-                            <GrIcons.GrAddCircle  />  <FormattedMessage id='manage-user.add'/>
+                <div className='row header'>
+                    <div className='d-flex'>
+                        <div className="img">
+                            <img src={imageBase64} className='img-img'/>
                         </div>
-
-                </button>
-             
-                <div className="table" >
-                    <Table bordered>
-                    <tbody>
-                        <tr className='thead'>
-                            <th scope="col">ID</th>
-                            <th scope="col"><FormattedMessage id="manage-user.roleID"/></th>
-                            <th scope="col"><FormattedMessage id="manage-user.email"/></th>
-                            <th scope="col"><FormattedMessage id="manage-user.fullName"/> </th>
-                            <th scope="col"><FormattedMessage id="manage-user.gender"/></th>
-                            <th scope="col"><FormattedMessage id="manage-user.image"/></th>
-                            <th scope="col"><FormattedMessage id="manage-user.phone"/></th>
-                            <th scope="col"><FormattedMessage id="manage-user.address"/></th>
-                            <th scope="col"><FormattedMessage id="manage-user.action"/></th>
-                        </tr>
-                    {
-                            arrRoleID && arrRoleID.map((item, index) => {
-                                let imageBase64 =''
-                                if (item.image) {
-                                imageBase64 = new Buffer(item.image, 'base64').toString('binary')  
-                                }
-                                return (
-                                    <tr>  
-                                        <td>{index+1}</td>
-                                        <td>{language === LANGUAGES.VI ? item.roleIdData.valueVi : item.roleIdData.valueEn}</td>
-                                        <td>{item.email}</td>
-                                        <td>{item.firstName} {item.lastName}</td>
-                                      
-                                        <td>{language === LANGUAGES.VI ? item.genderData.valueVi : item.genderData.valueEn}</td>
-                                        <td>
-                                            <div className="img">
-                                                <img src={imageBase64} className='img-img'/>
-                                            </div>
-                                        </td>
-                                        <td>{item.phone}</td>
-                                        <td>{item.address}</td>
-                                        <td>
-                                            <button type="button" className="btn btn-edit px-2 mx-3" onClick={() => this.handleEditUser(item)}><AiIcons.AiOutlineEdit /></button>
-                                            <button type="button" className="btn btn-delete px-2" onClick={() => this.handleDeleteUser(item)}><AiIcons.AiOutlineDelete /></button>
-                                        </td>
-                                    </tr>
-                                    )
-                                })
-                        }
-                    </tbody>
-                    </Table>
+                        <div className='profile-info'>Xin chào {userInfo && userInfo.firstName + userInfo.lastName  ? userInfo.firstName + ' ' + userInfo.lastName : '' }</div>
+                    </div>  
                 </div>
+                <div className='row title d-flex'>
+                    <div className='col-10 title-manage'>QUẢN LÝ NGƯỜI CHO</div>
+                    <div className='serach_field-area d-flex align-items-center'>
+                            <input type="text" placeholder="Search here..."
+                                onChange={(e) => {this.handleOnChangeInput(e, 'search')}}/>
+                            <button type="search" className="btn btn-search rounded-pill"
+                                onClick = {() => this.handleSearch()}
+                                ><BsIcons.BsSearch/> Tìm</button>
+                    </div>
+                    <button 
+                        className='col-1 btn btn-create '
+                        onClick={this.handleAddNewUser}
+                        >
+                        <MdIcons.MdOutlineCreate/> <FormattedMessage id='manage-user.add'/>
+                    </button>
+                </div>
+                <div className='row content'>
+                    <div className="table" >
+                        <Table >
+                            <tr className='thead'>
+                                <th scope="col">ID</th>
+                                <th scope="col">Quyền</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Ảnh đại diện</th>
+                                <th scope="col">Họ tên</th>
+                                <th scope="col">Giới tính</th>
+                                <th scope="col">Hành động</th>
+                            </tr>
+                            <tbody className='tbody'>
+                        {
+                                arrRoleID && arrRoleID.map((item, index) => {
+                                    let imageBase64 =''
+                                    if (item.image) {
+                                    imageBase64 = new Buffer(item.image, 'base64').toString('binary')  
+                                    }
+                                    return (
+                                        <tr>  
+                                            <td>{item.id}</td>
+                                            <td>{item.roleIdData.valueVi}</td>
+                                            <td>{item.email}</td>
+                                            <td>
+                                                <div className="img">
+                                                    <img src={imageBase64} className='img-img'/>
+                                                </div>
+                                            </td>
+                                            <td>{item.firstName} {item.lastName}</td>
+                                            <td>{item.genderData.valueVi}</td>
+                                            <td>
+                                                <button type="button" className="btn btn-detail  " onClick={() => this.handleDetailUser(item)}><BsIcons.BsThreeDots /></button>
+                                                {/* <button type="button" className="btn btn-edit mx-3" onClick={() => this.handleEditUser(item)}><AiIcons.AiOutlineEdit /></button>
+                                                <button type="button" className="btn btn-delete" onClick={() => this.handleDeleteUser(item)}><AiIcons.AiOutlineDelete /></button> */}
+                                            </td>
+                                        </tr>
+                                        )
+                                    })
+                            }
+                        </tbody>
+                        </Table>
+                    </div>
+                </div>
+                
             </div>
+            </>
         );
     }
 
@@ -225,6 +261,8 @@ class UserManage extends Component {
 const mapStateToProps = state => {
     return {
         language: state.app.language,
+        isLoggedIn: state.user.isLoggedIn,
+        userInfo: state.user.userInfo,
     };
 };
 

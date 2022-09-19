@@ -5,8 +5,12 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter} from 'reactstrap';
 import {emitter} from '../../utils/emitter'
 import _ from 'lodash'
 import Lightbox from 'react-image-lightbox';
-import {CRUD_ACTIONS, LANGUAGES , CommonUtils} from "../../utils"
+import {CRUD_ACTIONS, CommonUtils} from "../../utils"
 import { FormattedMessage } from 'react-intl';
+import TextField from '@mui/material/TextField';
+import Grid from '@mui/material/Grid';
+import * as BsIcons from "react-icons/bs";
+import * as MdIcons from "react-icons/md";
 class ModalEditProduct extends Component {
     constructor(props){
         super(props);
@@ -105,21 +109,22 @@ class ModalEditProduct extends Component {
                     <form className='form-create-edit'>
                         <div className="form-row">
                             <div className="input-container col-7 ">
-                                <label><FormattedMessage id="manage-product.product_name"/></label>
-                                <input 
-                                    type="text" 
-                                    className="form-control" 
-                                    onChange={(e) => {this.handleOnChangeInput(e, 'product_name')}}
-                                    value={product_name}
-                                />
+                                <Grid item xs={8}>
+                                    <TextField
+                                        label="Tên sản phẩm"
+                                        color="success"
+                                        multiline
+                                        value={product_name}
+                                        onChange={(e) => {this.handleOnChangeInput(e, 'product_name')}}
+                                    />
+                                </Grid>
                             </div>
                             <div class="form-group col-md-5">
-                                <label for=""> <FormattedMessage id="manage-product.image"/> </label>
                                 <div className="preview-img-container">
                                     <input id="previewImg" type="file" accept='image/*' hidden
                                         onChange={(event) => this.handleOnchangeImage(event)}
                                     />
-                                    <label className="upload-file" htmlFor="previewImg"><FormattedMessage id="common.upload-image"/> <i className="fas fa-upload"></i></label>
+                                    <label className="upload-file" htmlFor="previewImg"><BsIcons.BsCamera size={'20px'}/> Tải ảnh<i className="fas fa-upload"></i></label>
                                     <div className='preview-image'
                                         style ={{ backgroundImage: `url(${this.state.previewImgURL})` }}
                                         onClick= {() => this.openPreviewImage()}>
@@ -129,16 +134,19 @@ class ModalEditProduct extends Component {
                         </div>
                         <div className='form-row'>
                             <div class="form-group col-md-12">
-                                <label for=""><FormattedMessage id="manage-product.description"/></label>
-                                <input type="text" class="form-control" id="description" placeholder="1234 Main St"
-                                    onChange={(e) => {this.handleOnChangeInput(e, 'description')}}
-                                    value={description}
-                                />
+                                <Grid item xs={12}>
+                                    <TextField
+                                        label="Mô tả sản phẩm"
+                                        color="success"
+                                        value={description}
+                                        onChange={(e) => {this.handleOnChangeInput(e, 'description')}}
+                                    />
+                                </Grid>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-save" 
                             onClick = {() => this.handleSaveProduct()}
-                            ><FormattedMessage id="manage-product.save"/>
+                            > Lưu
                         </button>
                                 
                         {this.state.isOpen === true &&

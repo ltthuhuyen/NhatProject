@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Table } from 'reactstrap';
-import * as GrIcons from 'react-icons/gr';
+import * as MdIcons from 'react-icons/md';
 import * as AiIcons from 'react-icons/ai';
+import * as BsIcons from 'react-icons/bs';
 import { faL, faPlus } from "@fortawesome/free-solid-svg-icons";
 import './Manage.scss';
 import {getAllProducts, createNewProductService, editProductService, deleteProductSerVice} from '../../services/productService';
@@ -14,6 +15,7 @@ import { FormattedMessage } from 'react-intl';
 import Header from '../../containers/Header/Admin/Header';
 import ModalProduct from './ModalProduct';
 import ModalEditProduct from './ModalEditProduct';
+import NavAdmin from '../../components/NavAdmin';
 
 class ProductManage extends Component {
 
@@ -139,12 +141,15 @@ class ProductManage extends Component {
     render() {
         let arrProducts = this.state.arrProducts;
         let arrCollectionForms = this.state.arrCollectionForms;
-        let language = this.props.language;
-        // console.log(arrCollectionForms)
+        const { processLogout , userInfo } = this.props;
+        let imageBase64 =''
+        if (userInfo.image) {
+        imageBase64 = new Buffer(userInfo.image, 'base64').toString('binary')  
+        }   
         return (
             <>
-            <div className="container">
-                <Header />
+            <NavAdmin />
+            <div className="main_content">
                 <ModalProduct
                     isOpen = {this.state.isOpenModalProduct}
                     toggleFromParent = {this.toggleProductModal}
@@ -159,61 +164,78 @@ class ProductManage extends Component {
                     editProduct = {this.doEditProduct}
                 />
                 }
-                <div className="title text-center">
-                    <FormattedMessage id='manage-product.title'/>
+                <div className='row header'>
+                    <div className='d-flex'>
+                        <div className="img">
+                            <img src={imageBase64} className='img-img'/>
+                        </div>
+                        <div className='profile-info'>Xin chào {userInfo && userInfo.firstName + userInfo.lastName  ? userInfo.firstName + ' ' + userInfo.lastName : '' }</div>
+                    </div> 
                 </div>
-                <button 
-                    className='btn btn-create'
-                    onClick={this.handleAddNewProduct}
-                >
-                    <GrIcons.GrAddCircle  /> <FormattedMessage id='manage-product.add'/> 
-                </button>
-                <div className="table">
-                <Table bordered>
-                    <thead className='thead'>
-                        <tr>
-                            <th scope="col">ID</th>
-                            <th scope="col"><FormattedMessage id="manage-product.product_name"/></th>
-                            <th scope="col"><FormattedMessage id="manage-product.image"/></th>
-                            <th scope="col"><FormattedMessage id="manage-product.description"/></th>
-                            <th scope="col"><FormattedMessage id="manage-product.action"/></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            arrProducts && arrProducts.map((item, index) => {
-                                let imageBase64 =''
-                                if (item.image) {
-                                    imageBase64 = new Buffer(item.image, 'base64').toString('binary')  
-                                    console.log('item',imageBase64)
-                                }
-                             return (
-                                <tr>
-                                    <td>{item.id}</td>
-                                    <td>{item.product_name}</td>
-                                    <td>
-                                        <div className="img">
-                                            <img src={imageBase64} className='img-img'/>
-                                        </div>
-                                    </td>
-                                    <td>{item.description}</td>
-                                    <td>
-                                        <button type="button" className="btn btn-edit px-2 mx-3" onClick={() => this.handleEditProduct(item)}><AiIcons.AiOutlineEdit /></button>
-                                        <button 
-                                            type="button" 
-                                            className="btn btn-delete px-2" 
-                                            onClick={() => this.handleDeleteProduct(item)}
-                                            disabled={arrCollectionForms.map(prd=>prd.productId).includes(item.id)}
-                                            >
-                                            <AiIcons.AiOutlineDelete /></button>
-                                    </td>
-                                 
-                                </tr>
-                                    )
-                            })
-                        }
-                    </tbody>
-                </Table>
+                <div className='row title d-flex'>
+                    <div className='col-10 title-manage'>QUẢN LÝ SẢN PHẨM</div>
+                    <div className='serach_field-area d-flex align-items-center'>
+                        <input type="text" placeholder="Search here..."
+                            onChange={(e) => {this.handleOnChangeInput(e, 'search')}}/>
+                        <button type="search" className="btn btn-search rounded-pill"
+                            onClick = {() => this.handleSearch()}
+                        ><BsIcons.BsSearch/> Tìm</button>
+                    </div>
+                    <button 
+                        className='col-1 btn btn-create'
+                        onClick={this.handleAddNewProduct}
+                        >
+                        <MdIcons.MdOutlineCreate/> <FormattedMessage id='manage-user.add'/>
+                    </button>
+                </div>
+               <div className='row content'>
+                    <div className="table">
+                    <Table >
+                        <thead className='thead'>
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col"><FormattedMessage id="manage-product.product_name"/></th>
+                                <th scope="col"><FormattedMessage id="manage-product.image"/></th>
+                                <th scope="col"><FormattedMessage id="manage-product.description"/></th>
+                                <th scope="col"><FormattedMessage id="manage-product.action"/></th>
+                            </tr>
+                        </thead>
+                        <tbody className='tbody'>
+                            {
+                                arrProducts && arrProducts.map((item, index) => {
+                                    let imageBase64 =''
+                                    if (item.image) {
+                                        imageBase64 = new Buffer(item.image, 'base64').toString('binary')  
+                                        console.log('item',imageBase64)
+                                    }
+                                return (
+                                    <tr>
+                                        <td>{item.id}</td>
+                                        <td>{item.product_name}</td>
+                                        <td>
+                                            <div className="img">
+                                                <img src={imageBase64} className='img-img'/>
+                                            </div>
+                                        </td>
+                                        <td>{item.description}</td>
+                                        <td>
+                                            <button type="button" className="btn btn-edit mx-3" onClick={() => this.handleEditProduct(item)}><AiIcons.AiOutlineEdit /></button>
+                                            <button 
+                                                type="button" 
+                                                className="btn btn-delete" 
+                                                onClick={() => this.handleDeleteProduct(item)}
+                                                disabled={arrCollectionForms.map(prd=>prd.productId).includes(item.id)}
+                                                >
+                                                <AiIcons.AiOutlineDelete /></button>
+                                        </td>
+                                    
+                                    </tr>
+                                        )
+                                })
+                            }
+                        </tbody>
+                    </Table>
+                    </div>
                 </div>
             </div>
             </>
@@ -227,6 +249,9 @@ class ProductManage extends Component {
 const mapStateToProps = state => {
     return {
         language: state.app.language,
+        isLoggedIn: state.user.isLoggedIn,
+        userInfo: state.user.userInfo,
+
     };
 };
 

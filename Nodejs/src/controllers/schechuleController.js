@@ -8,6 +8,12 @@ let  handleCreateSchedule = async (req, res) =>{
     return res.status(200).json(message);
 }
 
+let handleUpdateStatusS2 = async (req, res) =>{
+    let data = req.body;
+    console.log("check data",data)
+    let message = await scheduleService.updateStatusS2(data);
+    return res.status(200).json(message);
+}
 
 let handleUpdateStatus = async (req, res) =>{
     let data = req.body;
@@ -20,5 +26,6 @@ let handleUpdateStatus = async (req, res) =>{
 
 module.exports ={
     handleCreateSchedule: handleCreateSchedule,
+    handleUpdateStatusS2: handleUpdateStatusS2,
     handleUpdateStatus: handleUpdateStatus
 }

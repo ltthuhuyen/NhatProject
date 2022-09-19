@@ -1,70 +1,52 @@
 
 @import "../../../styles/common.scss";
-
-.header-container {
-    height: 70px;
-    text-align: center;
-    z-index: 99;
-    display: flex;
-    justify-content: space-between;
-    background-color:#c0cdd6;
-    color: azure;
-    position: relative;
-    // margin:auto;  
-    font-weight: 700;
-    padding: 15px 15px;
+.admin-header {
+    font-weight: 400; 
+    position: fixed;
+    z-index: 1;
+    top: 0; 
+    width: 100%;   
+    
+    .t{
+        background-color: #fff;
+        .title-header{
+            // font-weight: 400; 
+            font-family: Comic Sans MS;
+            text-shadow: 3px 7px 5px rgb(207, 243, 243);
+            padding: 10px;
+            color: green;
+            font-size: 30px;
+            text-align: center;
+            
+        }
+    }
    
-    .welcome{
-      padding: 8px;
-    
-    }
-    .language{
-        width: 100px;
-        // margin-left: 900px;
+    .header-container {
+        max-width: 100%;
+        background-color:#7ed000;
+        // margin-top: 0px;
+        text-align: center;
         display: flex;
-        .language-vi {
-            padding: 9px;
-            cursor: pointer;
-            opacity: 0.2;
+        justify-content: space-between;
+        color: white;
+        position: relative;
+        font-weight: 520;
+        font-size: 17px;
+        // font-family: 'Courier New', Courier, monospace;
+        font-family: Courier ;
+        padding: 15px 15px;
+        .welcome{
+            font-family: monospace;
+            padding: 8px;
+        
+        }
+        .btn-logout {
+            line-height: 40px;
+            height: 40px;
             
-            &.active {
-                opacity: 1;
-                span {
-                    color: azure;
-                }  
-            }   
-            
-            &:hover {
-                opacity: 1;
+            i {
+                font-size: $base-size + 1px;
             }
-        }
-        .language-en{
-            padding: 9px;
-            cursor: pointer;
-            opacity: 0.2;
-            &.active {
-                opacity: 1;
-                span{
-                    
-                    color: azure;
-                }
-            }
-            &:hover {
-                opacity: 1;
-            }
-        }
-    }
-    
-    .btn-logout {
-        color: $common-text-color;
-        line-height: 40px;
-        height: 40px;
-        padding: 0 10px;
-        &:hover {
-            background-color: darken($colormain, 5);
-        }
-        i {
-            font-size: $base-size + 1px;
         }
     }
 }

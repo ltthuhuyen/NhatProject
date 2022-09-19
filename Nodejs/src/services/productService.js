@@ -1,4 +1,23 @@
 import db from "../models/index";
+const Sequelize = require("sequelize");
+const Op = Sequelize.Op;
+let searchProduct = (search) => {
+    return new Promise (async (resolve , reject) => {
+        try {
+            let data = await db.Product.findAll({
+              where: {
+                product_name : {
+                    [Op.like]: `%${search.product_name}%` 
+                }      
+              }
+            })
+            resolve(data)
+        } catch (error) {
+            reject(error)
+        }
+    })
+    
+}
 
 let createNewProduct = (data) => {
     return new Promise(async (resolve, reject) =>{
@@ -107,6 +126,7 @@ let deleteProduct = (id) =>
 }
 
 module.exports ={
+    searchProduct: searchProduct,
     createNewProduct: createNewProduct,
     getAllProducts: getAllProducts, 
     updateProduct: updateProduct,

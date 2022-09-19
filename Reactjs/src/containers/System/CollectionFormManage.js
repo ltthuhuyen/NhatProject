@@ -1,18 +1,17 @@
 
 import React, { Component } from 'react';
 import { connect } from "react-redux";
-import { Redirect, Route, Switch } from 'react-router-dom';
-import { FormattedMessage } from 'react-intl';
-import {LANGUAGES , CommonUtils} from "../../utils"
-import * as GrIcons from 'react-icons/gr';
-import * as AiIcons from 'react-icons/ai';
-import * as actions from "../../store/actions"
+import { FormattedMessage } from 'react-intl'
+import * as BsIcons from 'react-icons/bs';
+import * as BiIcons from 'react-icons/bi';
+import * as MdIcons from 'react-icons/md';
+import * as actions from "../../store/actions";
 import { Table } from 'reactstrap';
 import './Manage.scss';
 import { withRouter } from 'react-router';
-import Moment from 'react-moment';
-import Header from '../Header/Header';
 import {getAllCollectionForm} from '../../services/collectionformService'
+import NavAdmin from '../../components/NavAdmin';
+
 class CollectionFormManage extends Component {
     constructor(props){
         super(props);
@@ -42,7 +41,6 @@ class CollectionFormManage extends Component {
     
     getAllCollectionFormReact = async () => {
         let response = await getAllCollectionForm('ALL');
-        // console.log('response',response)
         if(response && response.errCode == 0){
             this.setState({
                 arrCollectionForms: response.appointments
@@ -63,60 +61,81 @@ class CollectionFormManage extends Component {
     }
 
     handleLook = async (schedule) => {
+        console.log(schedule)
         this.props.history.push(`/system/collection-form-detail/${schedule.id}`);
     }
 
     render() {
         let arrCollectionForms = this.state.arrCollectionForms;
-        // let statuses = this.state.statusArr;
-        let language = this.props.language;
-    //    console.log("",this.state.arrCollectionForms)
+        console.log('arrCollectionForms', arrCollectionForms)
+        const { processLogout , userInfo } = this.props;
+        let imageBase64 =''
+        if (userInfo.image) {
+        imageBase64 = new Buffer(userInfo.image, 'base64').toString('binary')  
+        }   
         return (
             <>  
-            <Header />
-            <div className="container">
-                <div className="title text-center">
-                    <FormattedMessage id='manage-collection-form.title'/>
+            <NavAdmin />
+            <div className="main_content">
+                <div className='row header'>
+                    <div className='d-flex'>
+                        <div className="img">
+                            <img src={imageBase64} className='img-img'/>
+                        </div>
+                        <div className='profile-info'>Xin chào {userInfo && userInfo.firstName + userInfo.lastName  ? userInfo.firstName + ' ' + userInfo.lastName : '' }</div>
+                    </div> 
                 </div>
-                <div className="table">
-                <Table  bordered hover>
-                    <thead className='thead'>
-                        <tr>
-                            <th scope="col">ID</th>
-                            <th scope="col"><FormattedMessage id="manage-collection-form.giver"/></th>
-                            <th scope="col"><FormattedMessage id="manage-user.email"/></th>
-                            <th scope="col"><FormattedMessage id="manage-user.phone"/></th>
-                            <th scope="col"><FormattedMessage id="manage-product.product_name"/></th>
-                            <th scope="col"><FormattedMessage id="manage-collection-form.appointment-date"/></th>
-                            <th scope="col"><FormattedMessage id="manage-collection-form.time"/></th>
-                            <th scope="col"><FormattedMessage id="manage-collection-form.status"/></th>
-                            <th scope="col"><FormattedMessage id="manage-collection-form.action"/></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {
-                            arrCollectionForms && arrCollectionForms.map((item, index) => {
-                               
-                             return (
-                                <tr key={index}>
-                                    <td>{item.id}</td>
-                                    <td>{item.giverData.firstName} {item.giverData.lastName}</td>
-                                    <td>{item.giverData.email}</td>
-                                    <td>{item.giverData.phone}</td>
-                                    {/* <td>{item.giverData.address}</td> */}
-                                    <td>{item.productData.product_name}</td>
-                                    <td>{item.date}</td>
-                                    <td>{language === LANGUAGES.VI ? item.timeTypeData.valueVi : item.timeTypeData.valueEn}</td>  
-                                    <td>{language === LANGUAGES.VI ? item.statusTypeData.valueVi : item.statusTypeData.valueEn}</td>
+                <div className='row title d-flex'>
+                    <div className='col-10 title-manage'>QUẢN LÝ ĐƠN THU GOM</div>
+                    <div className='serach_field-area d-flex align-items-center'>
+                        <input type="text" placeholder="Search here..."
+                            onChange={(e) => {this.handleOnChangeInput(e, 'search')}}/>
+                        <button type="search" className="btn btn-search rounded-pill"
+                            onClick = {() => this.handleSearch()}
+                        ><BsIcons.BsSearch/> Tìm</button>
+                    </div>
+                </div>
+                <div className='row content'>
+                    <div className="table">
+                    <Table >
+                        <thead className='thead'>
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col"colspan='3'>Thông tin người cho</th>
+                                <th scope="col">Sản phẩm</th>
+                                {/* <th scope="col">Ngày thu gom</th>
+                                <th scope="col">Thời gian</th> */}
+                                <th scope="col">Người nhận thu gom</th>
+                                <th scope="col">Trạng thái</th>
+                                <th scope="col">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody className='tbody'>
+                        {
+                                arrCollectionForms && arrCollectionForms.map((item, index) => {
                                 
-                                    <td><button type="button" className="btn btn-detail px-2 mx-3" onClick={() => this.handleLook(item)}><FormattedMessage id="common.detail"/></button></td>
-                                </tr>
-                                    )
-                            })
-                        }
-                    </tbody>
-                </Table>
+                                return (
+                                    <tr key={index}>
+                                        <td>{item.id}</td>
+                                        <td>{item.giverData.firstName} {item.giverData.lastName}</td>
+                                        <td>{item.giverData.email}</td>
+                                        <td>{item.giverData.phone}</td>
+                                        <td>{item.productData.product_name}</td>
+                                        {/* <td>{item.date}</td>
+                                        <td>{item.timeTypeData.valueVi}</td>  */}
+                                        <td>{item.recipientData.firstName} {item.recipientData.lastName}</td>
+                                        <td>{item.statusTypeData.valueVi}</td>
+                                    
+                                        <td><button type="button" className="btn btn-detail px-2 " onClick={() => this.handleLook(item)}><BsIcons.BsInfoCircle/> Chi tiết</button></td>
+                                    </tr>
+                                        )
+                                })
+                            }
+                        </tbody>
+                    </Table>
+                    </div>
                 </div>
+               
             </div>  
             </>
         );
@@ -128,7 +147,8 @@ const mapStateToProps = state => {
         language: state.app.language,
         systemMenuPath: state.app.systemMenuPath,
         statusRedux: state.admin.statuses,
-        // roleRedux: state.admin.roles
+        isLoggedIn: state.user.isLoggedIn,
+        userInfo: state.user.userInfo,
     };
 };
 

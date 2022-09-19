@@ -16,3 +16,21 @@ export const userLoginFail = () => ({
 export const processLogout = () => ({
     type: actionTypes.PROCESS_LOGOUT
 })
+
+// export const fetchSearchUser = () => {
+//     return async (dispatch, getState) => {
+//         try {
+//             let res = await getAllCodeService("ROLE");
+
+//             if (res && res.errCode === 0) {
+//                 dispatch(fetchRoleSuccess(res.data));
+              
+//             } else {
+//                 dispatch(fetchRoleFAILDED());
+//             }
+//         } catch (e) {
+//             dispatch(fetchRoleFAILDED())
+//             console.log('fetchRoleStart error',e);
+//         }
+//     }
+// }

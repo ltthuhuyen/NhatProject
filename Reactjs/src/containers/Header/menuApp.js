@@ -102,12 +102,19 @@ export const recipientMenu = [
                 // ]
             },
             {
-                name: 'menu.admin.manage-recipient',link: '/system/user-manage' 
+                name: 'menu.recipient.manage-collection-form',link: '/recipient/collection-history' 
                 // subMenus: [
                 //     { name: 'menu.system.system-administrator.user-manage', link: '/system/user-manage' },
                 //     { name: 'menu.system.system-administrator.product-manage', link: '/system/product-manage' },
                 //     { name: 'menu.system.system-administrator.user-redux', link: '/system/user-redux' },
                 // ]
+            },
+          
+        ],
+        name: 'menu.recipient.manage-collection-history', menus: [
+            {
+                name: 'menu.recipient.manage-collection-history',link: '/recipient/collection-history' 
+              
             },
           
         ]

@@ -1,198 +1,41 @@
-// .section-Ungdung{
-//     //border: 1px solid red;
-//     width: 485px;
-//     margin-left: 74px;
-//     .section-content{
-//         .section-header{
-//             .btn-UD{
-//                      display: block;
-//                      padding: 3px 10px;
-//                      border: none;
-//                      outline: none;
-//                      margin-top: -25px;
-//                      background: white;
-//                      color: black;
-//                      cursor: pointer;
-//                      text-transform: uppercase;
-//                      margin-left: 389px;
-//                      &:hover{
-//                          color: black;
-//                          background: yellow;
-//             }
-//         }
-//     }
-//     .section-body{
-//         .img-UD{
-//             //border: 1px solid red;
-//             .title-text{
-//                 display:  flex;
-//                 padding: 10px;
-//                 .avt{
-//                     img{
-//                         height: 60px;
-//                         width: 60px;
-//                     }
-//                 }
-//                 .text{
-//                     width: 83%;
-//                     margin-left: 12px;
-//                     font-size: 14px;
-//                     font-weight: bold;
-//                     line-height: 27px;
-//                     margin-top: 1px;;
-//                     &:hover{
-//                         color: rgb(89, 89, 241);
-//                     }
-//                 }
-//             }
-//             img{
-//                 height: 282px;
-//                 width: 483px;
-//             }
-//         }
-//     }
-// }
-// }
 
-
-
-// .section-share{
-//     &.section-QC{
-//         background: white;
-//         }
-//     }
-    
-
-// .section-share{
-//     height: 415px;
-   
-//     //margin: 0 50px;
-//     .section-content{
-//         margin: 0 100px;
-//         display: flex;
-//         flex-direction: column;
-
-//         .section-header{
-//             height: 60px;
-            
-//             padding-top: 20px;
-//             margin-bottom: 10px;
-
-//             .title1{
-//                 font-size: 20px;
-//                 font-weight: 600;
-//             }
-
-//             .btn-1 {
-//                 float: right;
-//                 display: block;
-//                 padding: 6px 10px;
-//                 border: none;
-//                 outline: none;
-//                 margin-top: -5px;
-//                 background: #ebebeb;
-//                 color: black;
-//                 cursor: pointer;
-//                 text-transform: uppercase;
-
-//                 &:hover{
-//                     color: white;
-//                     background: yellow;
-//                 }
-//             }
-//         }
-
-//         .section-body{
-//             //border: 1px solid black;
-//             .slick-prev {
-//                 z-index: 1000;
-//                 left: -10px !important;
-//                 height: 48px !important;
-//                 width: 44px !important;
-//                 background: #fff !important;
-//                 border: 2px solid #d7d7d7 !important;
-        
-//                 &:hover{
-//                     background: #d7d7d7 !important;
-//                 }
-//         }
-
-// .slick-prev:before{
-//     font-family: "Font Awesome 5 Free" !important;
-//     color: red !important;
-//     //content: "\f060" !important;
-// } 
-
-// .slick-next{
-//     z-index: 1000;
-//     right: -10px !important;
-//     height: 48px !important;
-//     width: 44px !important;
-//     background: green !important;
-//     background: #fff !important;
-//     border: 2px solid #d7d7d7 !important;
-
-//     &:hover{
-//         background: #d7d7d7 !important;
-//     }
-// }
-
-// .slick-next:before{
-//     font-family: "Font Awesome 5 Free" !important;
-//     color: red !important;
-
-//     //content: "\e258" !important;
-// }
-//         }
-        
-//     } 
-// }
-
-
-
-
-
-// .slick-prev {
-//     z-index: 1000;
-//     left: -10px !important;
-//     height: 48px !important;
-//     width: 44px !important;
-//     background: #fff !important;
-//     border: 2px solid #d7d7d7 !important;
-
-//     &:hover{
-//         background: #d7d7d7 !important;
-//     }
-// }
-
-// .slick-prev:before{
-//     font-family: "Font Awesome 5 Free" !important;
-//     color: red !important;
-//     //content: "\f060" !important;
-// } 
-
-// .slick-next{
-//     z-index: 1000;
-//     right: -10px !important;
-//     height: 48px !important;
-//     width: 44px !important;
-//     background: green !important;
-//     background: #fff !important;
-//     border: 2px solid #d7d7d7 !important;
-
-//     &:hover{
-//         background: #d7d7d7 !important;
-//     }
-// }
-
-// .slick-next:before{
-//     font-family: "Font Awesome 5 Free" !important;
-//     color: red !important;
-
-//     //content: "\e258" !important;
-// }
-
-// .slick-disabled{
-//     display: none !important;
-// }
-
+.slick-arrow{
+    position: absolute;
+    background-color: #f2f6fe;
+    border-radius: 50%;
+    padding: 4px;
+    display: flex;
+    top: 15% ;
+    height: 150px;
+    width: 10px;
+    margin: 160px 40px;
+    z-index: 12;
+    color: black !important;
+}
+.slick-arrow:hover {
+    background-color: #2cccff;
+    color: white;
+}
+.slick-dots {
+    position: absolute;
+    bottom: 10px;
+    left: 10%;
+    transform: translate(-50%, 0);
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0 20px;
+}
+.slick-dots button {
+    font-size: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 100rem;
+    background-color: #eee;
+    border: none;
+    outline: none;
+    transition: all 0.2s linear;
+}
+.slick-dots .slick-active button {
+background-color: #2cccff;
+}

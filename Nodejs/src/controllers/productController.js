@@ -1,6 +1,11 @@
 import { use } from 'express/lib/router';
 import productService from '../services/productService'
 
+let handleSearchProduct = async (req, res) => {
+    let data = req.body;
+    let message = await productService.searchProduct(data);
+    return res.status(200).json(message);
+}
 
 let  handleCreateNewProduct = async (req, res) =>{
     let message = await productService.createNewProduct(req.body);
@@ -47,6 +52,7 @@ let handleDeleteProduct  = async (req, res) =>{
 }
 
 module.exports ={
+    handleSearchProduct: handleSearchProduct,
     handleCreateNewProduct: handleCreateNewProduct,
     handleGetAllProducts: handleGetAllProducts,
     handleEditProduct: handleEditProduct,

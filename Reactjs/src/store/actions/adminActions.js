@@ -1,5 +1,5 @@
 import actionTypes from './actionTypes';
-import {createNewUserService, getAllCodeService} from "../../services/userService"
+import {createNewUserService, getAllCodeService, editUserService} from "../../services/userService"
 import {getAllProducts} from "../../services/productService"
 import { getAllTemps } from '../../services/appointmentService';
 import { ToastContainer, toast } from 'react-toastify';
@@ -38,7 +38,7 @@ export const fetchRoleStart = () => {
 
             if (res && res.errCode === 0) {
                 dispatch(fetchRoleSuccess(res.data));
-                console.log('sdjfsdfskdjfsd',res.data)
+              
             } else {
                 dispatch(fetchRoleFAILDED());
             }
@@ -183,3 +183,21 @@ export const saveUserSuccess = ()=> ({
 export const saveUserFailded = () => ({
     type: 'CREATE_USER_FAILDED'
 })
+
+export const doEditUser = (inputData) => {
+    return async (dispatch, getState) => {
+        try {
+            let res = await editUserService(inputData)   
+            if (res && res.errCode === 0) {
+                toast.success('Thêm người dùng thành công!')
+                dispatch(saveUserSuccess(res.user));
+                await this.getAllUsersFromReact()
+            } else {
+                dispatch(saveUserFailded());
+            }
+        } catch (e) {
+            dispatch(saveUserFailded())
+            console.log('fetchRoleStart error',e);
+        }
+    }
+}

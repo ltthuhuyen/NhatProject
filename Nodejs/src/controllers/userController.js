@@ -21,6 +21,13 @@ let handleLogin = async (req, res) =>{
     })
 }
 
+let handleSearchUser = async (req, res) => {
+    let data = req.query.email;
+    console.log("data",data)
+    let message = await userService.searchUser(data);
+    return res.status(200).json(message);
+}
+
 let handleGetAllUsers = async(req, res) => {
     let id = req.query.id; //all, id
 
@@ -39,6 +46,7 @@ let handleGetAllUsers = async(req, res) => {
         users
     })
 }
+
 // User Role Test
 let handleGetUsersRole = async(req, res) => {
     let role = req.query.role; //all, id
@@ -99,6 +107,7 @@ let getAllCode = async (req,res) =>{
 
 module.exports = {
     handleLogin: handleLogin,
+    handleSearchUser: handleSearchUser,
     handleGetAllUsers: handleGetAllUsers,
     handleCreateNewUser: handleCreateNewUser,
     handleEditUser: handleEditUser,

@@ -4,6 +4,10 @@ import axios from '../axios';
 const handleLoginApi = (userEmail, userPassword) => {
     return axios.post('/api/login', {email: userEmail, password: userPassword});
 }
+const searchUser = (search) => {
+    return axios.get(`/api/search-user?email=${search}`)
+}
+
 const getAllUsers = (inputId) => {
     return axios.get(`/api/get-all-users?id=${inputId}`)
 }
@@ -35,6 +39,7 @@ const getUserRoleIDService = (role) => {
 
 
 export { handleLoginApi ,
+         searchUser,
          getAllUsers , 
          createNewUserService , 
          editUserService , 

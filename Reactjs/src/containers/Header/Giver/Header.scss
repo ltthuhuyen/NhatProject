@@ -1,0 +1,147 @@
+
+
+// @import "../../styles/common.scss";
+
+.home-header {
+    font-weight: 400; 
+    overflow: hidden;
+    position: fixed;
+    z-index: 1;
+    top: 0; 
+    width: 100%;   
+
+    .t{
+        background-color: #fff;
+        .title{
+            word-spacing: 1px;
+            font-family: Comic Sans MS;
+            padding: 10px;
+            color: green;
+            font-size: 30px;
+            text-align: center;
+            
+        }
+        .login-register-content{
+            width: auto;
+            display: flex;
+            font-size: 15px;
+            justify-content: space-between;
+            align-items: center;
+            .btn-login-register{
+                background-color:  green;
+                margin: 7px;
+                color:  #ffffff;
+                font-size: 15px;
+                border: 2px solid rgb(255, 255, 255);
+                border-radius: 8px;       
+            }
+            .btn-login-register:hover{
+                background-color: #ffffff;
+                color: #077709;
+                border: 2px solid  #077709;
+                border-radius: 8px;
+                transform: scale(1.07);
+                     
+            }
+        }
+    
+        .container-welcome{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          
+            cursor: pointer;
+            img.img-img {
+                clip-path: circle(20px);
+                border: 1px solid black;
+                width: 50px;
+                height: 50px;
+            }
+            .profile-info{
+                font-family: monospace;
+                font-size: 14px;
+                margin-top: 22px;
+                width: auto;
+            }
+        }
+        .btn-logout{
+            font-size: 20px;
+            margin-top: 5px;
+            color: green;
+          
+
+        }
+        .tool{
+            font-family: monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0px 20px;
+            margin-top: 15px;
+        }
+    
+    }
+   
+    .content {  
+        background-color:#7ed000;
+        color: rgb(255, 255, 255);
+        display: flex;
+        .center-content {
+            margin: 25px 40px;
+            display: flex;
+            font-size: 18px;
+            justify-content: space-between;
+            align-items: center;
+            .child-content{
+                margin: 0px 65px;
+                .link-homepage{
+                    color: rgb(244, 247, 245);
+                    text-decoration: none;
+                }
+                :hover{
+                    padding: 8px 13px;
+                    background-color: rgb(255, 255, 255);
+                    transform: scale(1.07);
+                    color: #019117;
+                    border-radius: 10px;
+            
+    
+                }
+            }
+            
+            
+        }
+
+        .right-content {
+            width: 30%;
+            // margin: 10px;
+            align-items: center;
+            display: flex;
+            .btn-search{
+                margin-left: 10px;
+                color: green;
+                width: 130px;
+                border-radius: 13px;
+                background-color: rgb(226, 249, 249);
+                color: rgb(1, 113, 16);
+                &:hover{
+                    background-color: #ffffff;
+                    transform: scale(1.1);
+                    border: 1px solid rgb(1, 113, 16);
+                }
+            }
+            
+            
+        }
+
+        
+        
+       
+    }
+}
+
+
+
+  
+
+

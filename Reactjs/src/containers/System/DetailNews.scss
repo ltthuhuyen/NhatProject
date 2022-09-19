@@ -17,11 +17,12 @@
         margin-top: -150px;
         // border: 1px solid red;
         height: auto;
-        background: rgb(218, 210, 210);
+        background-color: rgb(242, 251, 251);
+       // color: rgb(1, 113, 16);
         border-radius: 10px;
 
         .News-header{
-            background: #8b8bdd;
+            background: green;
             color: white;
             border-radius: 10px;
             height: 80px;
@@ -32,11 +33,10 @@
                 padding: 12px;
                 .News-title{
                     text-align: center;
-                    font-family: 'Roboto Condensed', sans-serif;
                     font-size: 40px;
                     text-shadow: 2px 1px #000;
-                    color: floralwhite;
-                    font-weight: bold; 
+                    color: #ffffff;
+                    font-weight: 200; 
                 }
             }
         }
@@ -52,12 +52,17 @@
                     font-size: 22px;
                     color: #24348f;
                 }
+                &.hover{
+                    background-color: #ffffff;
+                    transform: scale(1.1);
+                }
             }
-
+           
             .frames-header{
                 display: flex;
                 height: 170px;
-                background: #f1f1f1;
+                background-color: rgb(226, 249, 249);
+                // background: #f1f1f1;
                 // gap: 5px;
 
                 .frames-img{
@@ -80,7 +85,6 @@
                         text-align: justify;
                         height: 80%;
                         width: 100%;
-
                     }
                     
                     .frames-time{

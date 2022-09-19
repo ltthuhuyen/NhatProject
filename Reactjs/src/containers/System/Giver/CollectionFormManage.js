@@ -4,10 +4,10 @@ import { connect } from "react-redux";
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 import {LANGUAGES , CommonUtils} from "../../../utils"
-import * as GrIcons from 'react-icons/gr';
-import * as AiIcons from 'react-icons/ai';
+import * as BiIcons from 'react-icons/bi';
 import * as actions from "../../../store/actions"
 import { Table } from 'reactstrap';
+import Header from '../../Header/Giver/Header';
 import './CollectionFormManage.scss';
 import { withRouter } from 'react-router';
 import Moment from 'react-moment';
@@ -63,26 +63,24 @@ class CollectionFormManage extends Component {
     }
 
     handleLook = async (schedule) => {
-        this.props.history.push(`/recipient/collection-form-detail/${schedule.id}`);
+        this.props.history.push(`/giver/collection-form-detail/${schedule.id}`);
     }
 
     render() {
         let arrCollectionForms = this.state.arrCollectionForms;
-        // let statuses = this.state.statusArr;
         let language = this.props.language;
         if(this.props.userInfo)
         {
             this.state.giverId = this.props.userInfo.id;
         }
-       console.log("",this.state.arrCollectionForms)
+       console.log("collection form",this.state.arrCollectionForms)
         return (
             <>  
+            <Header />
             <div className="container">
-                <div className="title text-center">
-                    <FormattedMessage id='manage-collection-form.title'/>
-                </div>
-                <div className="table">
-                <Table  bordered hover>
+                <div className='title-collection'>LỊCH SỬ ĐƠN THU GOM</div>
+                <div className="table-cart">
+                <Table>
                     <thead className='thead'>
                         <tr>
                             <th scope="col">ID</th>
@@ -93,10 +91,11 @@ class CollectionFormManage extends Component {
                             <th scope="col"><FormattedMessage id="manage-collection-form.appointment-date"/></th>
                             <th scope="col"><FormattedMessage id="manage-collection-form.time"/></th>
                             <th scope="col"><FormattedMessage id="manage-collection-form.status"/></th>
+                            <th scope="col"><FormattedMessage id="manage-collection-form.action"/></th>
 
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className='tbody'>
                     {
                             arrCollectionForms && arrCollectionForms.map((item, index) => {
                                
@@ -112,7 +111,7 @@ class CollectionFormManage extends Component {
                                     <td>{language === LANGUAGES.VI ? item.timeTypeData.valueVi : item.timeTypeData.valueEn}</td>  
                                     <td>{language === LANGUAGES.VI ? item.statusTypeData.valueVi : item.statusTypeData.valueEn}</td>
                                 
-
+                                    <td><button type="button" className="btn btn-detail px-2 " onClick={() => this.handleLook(item)}><BiIcons.BiMessageDetail/> Chi tiết</button></td>
                                 </tr>
                                     )
                             })

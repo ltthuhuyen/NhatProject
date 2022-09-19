@@ -2,7 +2,10 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { push } from "connected-react-router";
 import * as actions from "../../store/actions";
-import imglogin from '../../images/hinh1.png'
+import imglogin from '../../assets/images/banner4.jpg'
+import * as HiIcons from 'react-icons/hi';
+import * as RiIcons from 'react-icons/ri';
+import * as BsIcons from 'react-icons/bs';
 import './Login.scss';
 import { FormatteMessage } from 'react-intl';
 import { handleLoginApi } from '../../services/userService';
@@ -30,7 +33,7 @@ class Login extends Component {
         this.setState({
             password: event.target.value
         })
-        console.log(event.target.value)
+       // console.log(event.target.value)
     }
 
     handleLogin = async () => {
@@ -82,55 +85,59 @@ class Login extends Component {
         let userInfo = this.props.userInfo
         //console.log("check userInfo",userInfo)
         return (
-            <div className='login-background'>
-                <div className='login-container'>
-                    <div className='login-content row'>
-                        <div className='col-12 text-login'>Đăng Nhập</div>
-                        <div className='col-12 form-group login-input'>
-                            <label>Tên đăng nhập</label>
-                                <input 
-                                    type='text' 
-                                    className='form-control' 
-                                    // placeholder='Nhập tài khoản..'
-                                    value={this.state.username}
-                                    onChange={(event) => this.handleOnChangeUsername(event)}
-                                ></input>
-                        </div>
+            <div className='login'>
+                <div className='login-header'>
+                Website "NHẶT"
+                </div>
+                <div className='login-background row'>
+                    <img
+                        className="imgLogin object-cover col-8"
+                        src={imglogin}
+                      
+                    />
+                    <div className='login-container col-3 shadow'>
+                        <div className='login-content row '>
+                                <div className='col-12 text-login'>ĐĂNG NHẬP</div>
+                                <div className='col-12 login-input'>
+                                    <label>Tên đăng nhập</label>
+                                    <div className='d-flex'>
+                                        <div className='icon'><HiIcons.HiOutlineMail/></div>
+                                        <input 
+                                            type='text' 
+                                            placeholder='Nhập email'
+                                            value={this.state.username}
+                                            onChange={(event) => this.handleOnChangeUsername(event)}
+                                        ></input>
+                                    </div>
+                                       
+                                </div>
 
-                        <div className='col-12 form-group login-input'>
-                            <label>Mật khẩu</label>
-                            <div className='custom-input-password'>
-                                <input 
-                                    type= {this.state.isShowPassword ? 'text' : 'password'}
-                                    className='form-control' 
-                                    // placeholder='Nhập mật khẩu'
-                                    onChange={(event) => this.handleOnChangePassword(event)}
-                                    onKeyDown={(event) => this.handleKeyDown(event)}
-                                ></input>
-                            <span
-                                onClick={() => { this.handleShowHidePassword()
-                                }}
-                            ><i className= {this.state.isShowPassword ? 'far fa-eye' : 'far fa-eye-slash'}></i></span>
-                            </div>
-                        </div>
-                        <div className='col-12' style={{color:'red'}}>
-                            {this.state.errMessage}
-                        </div>
-                        <div className='col-12 text-center'>
-                        <button className='btn-login
-                        ' onClick={() => {this.handleLogin()}}> LOGIN</button>
-                        </div>
-                        
-                        <div className='col-12'>
-                            <span className='forgot-password'>Quên mật khẩu</span>
-                        </div>
-                        <div className='col-12 text-center mt-5'>
-                        <span className='text-order-login'>Đăng nhập bằng cách khác</span> 
-                        </div>
-                        <div className='col-12  icon'>
-                            <label><i className="fab fa-facebook"></i></label>
-                            <label><i className="fab fa-google-plus-g"></i></label>
-                            <label><i className="fab fa-twitter"></i></label>
+                                <div className='col-12 login-input'>
+                                    <label>Mật khẩu</label>
+                                    <div className='d-flex custom-input-password'>
+                                        <div className='icon'><RiIcons.RiLockPasswordLine/></div>
+                                        <input 
+                                            type= {this.state.isShowPassword ? 'text' : 'password'}
+                                            placeholder='Nhập mật khẩu'
+                                            onChange={(event) => this.handleOnChangePassword(event)}
+                                            onKeyDown={(event) => this.handleKeyDown(event)}
+                                        ></input>
+                                    <span
+                                        onClick={() => { this.handleShowHidePassword()
+                                        }}
+                                    ><div className= {this.state.isShowPassword ? <BsIcons.BsEye/> : <BsIcons.BsEyeSlash/> }></div></span>
+                                    </div>
+                                </div>
+                                <div className='col-12'>
+                                    <span className='forgot-password'>Quên mật khẩu ?</span>
+                                </div>
+                                <div className='col-12 text-center'>
+                                    <button className='btn btn-login
+                                    ' onClick={() => {this.handleLogin()}}>Đăng nhập</button>
+                                </div>
+                                <div className='col-12' style={{color:'red'}}>
+                                    {this.state.errMessage}
+                                </div>
                         </div>
                     </div>
                 </div>

@@ -1,40 +1,46 @@
+
 .schedule{
-    margin: 40px 100px;
-    margin-left: 120px;
+    // margin: 40px 100px;
+    margin-left: 80px;
+    .title {
+        font-size: 25px;
+        font-weight: 320;
+        margin-top: 200px;
+        color:  rgb(9, 116, 32);
+    }
     .date{
         width: 590px;
     }
     .btn-schedule{
         gap: 50px;
         flex-wrap: wrap;
-    // display: flex;
         width: 270px;
-        border: 0.1rem solid #9fcbea;
+        border: 1px solid rgb(1, 113, 16);
         margin-bottom: 10px;
         margin-right:50px;
         padding: 0px 10px;
-        color: rgb(184, 198, 203);
+        color: rgb(1, 113, 16); 
         &.active{
-            background-color: #c0cdd6;
-            color:rgb(234, 250, 255);
-            border: 1px solid #c0cdd6;
+            background-color: rgb(226, 249, 249);
+            color: rgb(1, 113, 16); 
+            // color:rgb(234, 250, 255);
+            border: 1px solid rgb(1, 113, 16);
     
         }
-      
     }
-    .btn-confirm{
-        margin-top: 0px;
-        line-height: 0px;
-        padding: 8px;
-
-        margin-left: 173px;
-        color: rgb(158, 205, 247);
-        border: 1px solid rgb(158, 205, 247);
-        &:hover{
-            color:rgb(234, 250, 255);
-            background-color: #c0cdd6;
-            border: 1px solid #c0cdd6;
     
+    .btn-confirm{
+        margin-top: 70px;
+        line-height: 0px;
+        font-weight: 500;
+        margin-left: 160px;
+        border-radius: 13px;
+        background-color: rgb(226, 249, 249);
+        color: rgb(1, 113, 16);
+        &:hover{
+            background-color: #ffffff;
+            transform: scale(1.1);
+            border: 1px solid rgb(1, 113, 16);
         }
        
     }

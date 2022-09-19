@@ -4,8 +4,7 @@ import { connect } from "react-redux";
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 import {LANGUAGES , CommonUtils} from "../../../utils"
-import * as GrIcons from 'react-icons/gr';
-import * as AiIcons from 'react-icons/ai';
+import * as BiIcons from 'react-icons/bi';
 import * as actions from "../../../store/actions"
 import { Table } from 'reactstrap';
 import './CollectionFormManage.scss';
@@ -19,7 +18,8 @@ class CollectionFormManage extends Component {
             arrCollectionForms: [],
             statusArr: [],
             status: '',
-            statusType: ''
+            statusType: '',
+            recipientId: ''
         }
     }
     handleOnChangeInput = (e, id) => {
@@ -35,8 +35,6 @@ class CollectionFormManage extends Component {
     componentDidMount(){
         this.getAllCollectionFormReact();    
         this.props.getStatusStart();
-        
-
     }
     
     getAllCollectionFormReact = async () => {
@@ -70,26 +68,31 @@ class CollectionFormManage extends Component {
         // let statuses = this.state.statusArr;
         let language = this.props.language;
        console.log("",this.state.arrCollectionForms)
+       if(this.props.userInfo)
+       {
+           this.state.recipientId = this.props.userInfo.id;
+       }
+       console.log('RecipientID', this.props.userInfo.id)
         return (
             <>  
             <div className="container">
                 <div className="title text-center">
                     <FormattedMessage id='manage-collection-form.title'/>
                 </div>
-                <div className="table">
-                <Table  bordered hover>
+                <div className="table-recipient">
+                <Table >
                     <thead className='thead'>
                         <tr>
                             <th scope="col">ID</th>
-                            <th scope="col"><FormattedMessage id="manage-collection-form.giver"/></th>
-                            <th scope="col"><FormattedMessage id="manage-user.email"/></th>
-                            <th scope="col"><FormattedMessage id="manage-user.phone"/></th>
-                            <th scope="col"><FormattedMessage id="manage-product.product_name"/></th>
-                            <th scope="col"><FormattedMessage id="manage-collection-form.status"/></th>
-                            <th scope="col"><FormattedMessage id="manage-collection-form.action"/></th>
+                            <th scope="col" colSpan='3'>Thông tin người cho</th>
+                            <th scope="col">Sản phẩm</th>
+                            <th scope="col">Ngày thu gom</th>
+                            <th scope="col">Thời gian</th>
+                            <th scope="col">Trạng thái</th>
+                            <th scope="col">Hành động</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className='tbody'>
                     {
                             arrCollectionForms && arrCollectionForms.map((item, index) => {
                                
@@ -99,12 +102,15 @@ class CollectionFormManage extends Component {
                                     <td>{item.giverData.firstName} {item.giverData.lastName}</td>
                                     <td>{item.giverData.email}</td>
                                     <td>{item.giverData.phone}</td>
-                                    {/* <td>{item.giverData.address}</td> */}
                                     <td>{item.productData.product_name}</td>
+                                    <td>{item.date}</td>
+                                    <td>{item.timeTypeData.valueVi}</td>
+                                    {/* <td>{item.giverData.address}</td> */}
+                                  
                                 
                                     <td>{language === LANGUAGES.VI ? item.statusTypeData.valueVi : item.statusTypeData.valueEn}</td>
                                 
-                                    <td><button type="button" className="btn btn-detail px-2 mx-3" onClick={() => this.handleLook(item)}><FormattedMessage id="common.detail"/></button></td>
+                                    <td><button type="button" className="btn btn-detail px-2 " onClick={() => this.handleLook(item)}><BiIcons.BiMessageDetail/> Chi tiết</button></td>
                                 </tr>
                                     )
                             })
@@ -123,7 +129,8 @@ const mapStateToProps = state => {
         language: state.app.language,
         systemMenuPath: state.app.systemMenuPath,
         statusRedux: state.admin.statuses,
-        // roleRedux: state.admin.roles
+        userInfo: state.user.userInfo,
+
     };
 };
 

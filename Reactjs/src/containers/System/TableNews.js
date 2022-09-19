@@ -4,12 +4,11 @@ import { connect } from 'react-redux';
 import './Manage.scss';
 import * as actions from "../../store/actions";
 import { Table } from 'reactstrap';
-
 import * as AiIcons from 'react-icons/ai';
 import MarkdownIt from 'markdown-it';
 import MdEditor from 'react-markdown-editor-lite';
-// import style manually
 import 'react-markdown-editor-lite/lib/index.css';
+import './News.scss'
 
 // Register plugins if required
 // MdEditor.use(YOUR_PLUGINS_HERE);

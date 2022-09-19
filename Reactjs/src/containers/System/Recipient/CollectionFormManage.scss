@@ -6,34 +6,41 @@
 .container{
   
     max-width: 100%;
-    font-size: 15px;
-    text-align: center;
+  
+    .title{
+        margin-top: 200px;
+        font-size: 25px;
+        font-weight: 320;
+        margin-top: 150px;
+        color:  rgb(9, 116, 32);
+    }
     .btn{
         padding: auto;
         height: 40px;
     }
     .btn-create{ 
-        line-height: 0px;
-        margin-left: 1210px;
-        margin-top: 20px;
         padding: 8px;
-        color: rgb(158, 205, 247);
-        border: 1px solid rgb(158, 205, 247);
+        border-radius: 13px;
+        background-color: rgb(226, 249, 249);
+        color: rgb(1, 113, 16);
         &:hover{
-            color:rgb(234, 250, 255);
-            background-color: #c0cdd6;
-            border: 1px solid #c0cdd6;
+            background-color: #ffffff;
+            transform: scale(1.1);
+            border: 1px solid rgb(1, 113, 16);
     
         }
     }
-    .table{
+    .table-recipient{
         background-color: white;
-        width: 1300px;
-        margin: 0 50px;
-        margin-top: 10px;
         .thead{
+            border-radius: 10px;
             background-color:black;
             color: white;
+        }
+        .tbody{
+            :hover{
+                background-color:rgb(237, 245, 246);
+            }
         }
       
         img.img-img {
@@ -69,26 +76,24 @@
         }
         .btn-update {
             width: 80px;
-            color: rgb(158, 205, 247);
-            border: 1px solid rgb(158, 205, 247);
+            border-radius: 13px;
+            background-color: rgb(226, 249, 249);
+            color: rgb(1, 113, 16);
             &:hover{
-                color:rgb(234, 250, 255);
-                background-color: #c0cdd6;
-                border: 1px solid #c0cdd6;
-        
+                background-color: #ffffff;
+                transform: scale(1.1);
+                border: 1px solid rgb(1, 113, 16);
             }
         }
         .btn-detail {
-            width: 80px;
-            background-color: white;
-            color:#000000;
-            border: 1px solid #000000;
-            font-size: 15px;
-        
+            width: 105px;
+            border-radius: 13px;
+            background-color: rgb(226, 249, 249);
+            color: rgb(1, 113, 16);
             &:hover{
-                background-color: rgb(57, 57, 57);
-                color: white;
-                // background-color: #a4d2ea
+                background-color: #ffffff;
+                transform: scale(1.13);
+                border: 1px solid rgb(1, 113, 16);
             }
         }
         

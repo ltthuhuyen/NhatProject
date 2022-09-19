@@ -6,13 +6,11 @@ import {emitter} from '../../utils/emitter'
 import { FormattedMessage } from 'react-intl';
 import './Create.scss'
 import * as actions from "../../store/actions"
-import * as GrIcons from 'react-icons/gr';
-import {getAllCodeService} from "../../services/userService"
+import * as HiIcons from 'react-icons/hi';
 import {LANGUAGES , CommonUtils} from "../../utils"
-import { changeLanguageApp } from '../../store/actions'
-import { Row } from 'reactstrap';
-import * as BsIcons from 'react-icons/bs';
-import Lightbox from 'react-image-lightbox';
+import {getAllCities , getAllDistricts , getAllWards, } from '../../services/addressService'
+import { faArrowUp19 } from '@fortawesome/free-solid-svg-icons';
+
 
 class ModalUser extends Component {
     constructor(props){
@@ -31,6 +29,13 @@ class ModalUser extends Component {
             phone: '',
             roleId: '',
             address: '',
+            city: '',
+            district: '',
+            ward: '',
+            city_name: '',
+            district_name: '',
+            ward_name: ''
+           
         }
         this.listenToEmiiter()
 
@@ -53,6 +58,9 @@ class ModalUser extends Component {
     }
 
     componentDidMount() {
+        this.getAllCitiesFromReact()
+        this.getAllDistrictsFromReact()
+        this.getAllWardFromReact()
         this.props.getGenderStart();
         this.props.getRoleStart();
     }
@@ -72,6 +80,68 @@ class ModalUser extends Component {
                 roleId: arrRoles && arrRoles.length > 0 ? arrRoles[0].keyMap: ''
             })
         }
+    }
+
+    getAllCitiesFromReact = async () => {
+        let response = await getAllCities();
+        if(response){
+            this.setState({
+                arrCities: response
+            })
+        }
+    }
+
+    getAllDistrictsFromReact = async () => {
+        let response = await getAllDistricts();
+        if(response){
+            this.setState({
+                arrDistricts: response
+            })
+        }
+    }
+
+    getAllWardFromReact = async () => {
+        let response= await getAllWards();
+        if(response){
+            this.setState({
+                arrWards: response
+            })
+        }
+    }
+    
+    handleClickCity = (e) => {
+        let {arrCities , arrDistricts} = this.state;
+        const idx = e.target.value;
+        let kq = arrDistricts.filter(item => item.province_code == idx);
+        let kq2 = arrCities.filter(item => item.code == idx);
+        this.setState({
+            districts: kq,
+            city_name:  kq2[0].name
+        })
+       
+           
+    }    
+
+    handleClickDistrict = (e) => {
+        let {arrDistricts , arrWards} = this.state;
+        const idx = e.target.value;
+        let kq = arrWards.filter(item => item.district_code == idx);
+        let kq2 = arrDistricts.filter(item => item.code == idx)
+        this.setState({
+            wards: kq,
+            district_name: kq2[0].name
+        })
+       
+    }   
+
+    handleClickWard = (e) => {
+        let {arrWards} = this.state;
+        const idx = e.target.value;
+        let kq2 = arrWards.filter(item => item.code == idx)
+        this.setState({
+            ward_name: kq2[0].name
+        })
+        
     }
 
     toggle = () => { 
@@ -98,9 +168,9 @@ class ModalUser extends Component {
             ...copyState
          }, () => {
             console.log('check good state' , this.state)
+
         } )
     }
-
 
     checkValideInput = () => {
         let isValid = true
@@ -116,6 +186,7 @@ class ModalUser extends Component {
         return isValid
     }   
 
+   
     handleSaveUser = () => {
         let isValid = this.checkValideInput()
         if(isValid === false) return ;
@@ -128,8 +199,14 @@ class ModalUser extends Component {
             address: this.state.address,
             gender: this.state.gender,
             roleId: this.state.roleId,
-            avatar: this.state.avatar
+            avatar: this.state.avatar,
+            city_name: this.state.city_name,
+            district_name: this.state.district_name,
+            ward_name: this.state.ward_name,
+            address_name: this.state.address,
+
         })
+      
     }
 
     openPreviewImage =() =>{
@@ -143,9 +220,13 @@ class ModalUser extends Component {
         let language = this.props.language;
         let genders = this.state.genderArr;
         let roles = this.state.roleArr;
+        let arrCities = this.state.arrCities;
         let { email , password , firstName , lastName ,
-             phone , address
+             phone , address , districts , wards, diachi
         } = this.state
+       
+       
+     
         return (
             <Modal 
                 isOpen={this.props.isOpen} 
@@ -154,69 +235,81 @@ class ModalUser extends Component {
                 size='lg'
                 //centered
             >
-                <ModalHeader toggle={() => {this.toggle()}}>  <FormattedMessage id="manage-user.add"/> </ModalHeader>
+                <ModalHeader toggle={() => {this.toggle()}}>THÊM MỚI NGƯỜI DÙNG </ModalHeader>
                 <ModalBody>
-                <form className='form-create-edit'>
-                <div class="form-row">
-                    <div class="form-group col-md-7">
-                        <label for="inputEmail4"> <FormattedMessage id="manage-user.email"/> </label>
-                        <input type="email" class="form-control" id="email"
-                            onChange={(e) => {this.handleOnChangeInput(e, 'email')}}
-                            value={email}
-                        />
+                <form className='form-create-edit'>     
+                    <div className='form-row'>
+                        <div className="col-8">
+                            <label > <FormattedMessage id="manage-user.email"/> </label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                onChange={(e) => {this.handleOnChangeInput(e, 'email')}}
+                                value={email}
+                                
+                            />
                         </div>
-                        <div class="form-group col-md-5">
-                        <label for="inputPassword4"> <FormattedMessage id="manage-user.password"/> </label>
-                        <input type="password" class="form-control" id="password"
-                           onChange={(e) => {this.handleOnChangeInput(e, 'password')}}
-                           value={password}
-                        />
+                        <div className="col-4">
+                            <label >Password</label>
+                            <input
+                                type='password'
+                                class="form-control" 
+                                onChange={(e) => {this.handleOnChangeInput(e, 'password')}}
+                                value={password}
+                                                        
+                            />
+                        </div>
                     </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-5">
-                        <label for="text"> <FormattedMessage id="manage-user.fName"/> </label>
-                        <input type="text" class="form-control" id="firstName"
-                           onChange={(e) => {this.handleOnChangeInput(e, 'firstName')}}
-                           value={firstName}/>
+                    <div className='form-row'>
+                        <div className="col-5">
+                            <label>Họ</label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                value={firstName}
+                                onChange={(e) => {this.handleOnChangeInput(e, 'firstName')}}    
+                            />
+                        </div>
+                        <div className="col-5">
+                            <label>Tên</label>
+                            <input
+                                type='text'
+                                class="form-control" 
+                                onChange={(e) => {this.handleOnChangeInput(e, 'lastName')}}
+                                value={lastName}                             
+                            />
+                        </div>
+                        <div className='col-2'>
+                            <label>Giới tính</label>
+                            <select id="gender" class="form-control"
+                                onChange={(e) => {this.handleOnChangeInput(e, 'gender')}}
+                            >
+                                {genders && genders.length > 0 && 
+                                    genders.map((item, index) => {
+                                        return (
+                                            <option key= {index} value={item.keyMap}>
+                                                {language === LANGUAGES.VI ? item.valueVi : item.valueEn}
+                                            </option>)
+                                    })
+                            }
+                            </select> 
+                        </div>
                     </div>
-                    <div class="form-group col-md-5">
-                        <label for="text"> <FormattedMessage id="manage-user.lName"/> </label>
-                        <input type="text" class="form-control" id="lastName"
-                           onChange={(e) => {this.handleOnChangeInput(e, 'lastName')}}
-                           value={lastName}
-                        />
-                    </div>
-                    <div class="form-group col-md-2">
-                        <label for="inputState"><FormattedMessage id="manage-user.gender"/> </label>
-                        <select id="gender" class="form-control"
-                            onChange={(e) => {this.handleOnChangeInput(e, 'gender')}}
-                        >
-                            {genders && genders.length > 0 && 
-                                genders.map((item, index) => {
-                                    return (
-                                        <option key= {index} value={item.keyMap}>
-                                            {language === LANGUAGES.VI ? item.valueVi : item.valueEn}
-                                        </option>)
-                                })
-                        }
-                        </select>
-                    </div>
-                </div>
-                  
-                <div class="form-row">
-                    <div class="form-group col-md-4">
-                        <label for="inputZip"><FormattedMessage id="manage-user.phone"/> </label>
-                        <input type="text" class="form-control" id="phone"
-                            onChange={(e) => {this.handleOnChangeInput(e, 'phone')}}
-                            value={phone}
-                        />
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="inputState"> <FormattedMessage id="manage-user.roleID"/></label>
-                        <select id="roleId" class="form-control"
+                    <div className='form-row'>
+                        <div className='col-4'>
+                            <label >Số điện thoại</label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                onChange={(e) => {this.handleOnChangeInput(e, 'phone')}}
+                                value={phone}
+                            />
+                        </div>
+                        <div className='col-4'>
+                            <label >Quyền</label>
+                            <select id="roleId" class="form-control"
                             onChange={(e) => {this.handleOnChangeInput(e, 'roleId')}}
-                        >
+                            >
                             { roles && roles.length > 0 && 
                                 roles.map((item, index) => {
                                     return (
@@ -224,63 +317,94 @@ class ModalUser extends Component {
                                             {language === LANGUAGES.VI ? item.valueVi : item.valueEn}
                                         </option>)
                                 })
-                        }
-                        </select>
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="inputZip"> <FormattedMessage id="manage-user.image"/> </label>
-                        <div className="preview-img-container">
-                            <input id="previewImg" type="file" accept='image/*' hidden
-                                onChange={(event) => this.handleOnchangeImage(event)}
-                            />
-                            <label className="upload-file" htmlFor="previewImg"><FormattedMessage id="common.upload-image"/> <i className="fas fa-upload"></i></label>
-                            <div className='preview-image'
-                                style ={{ backgroundImage: `url(${this.state.previewImgURL})` }}
-                                onClick= {() => this.openPreviewImage()}>
+                            }
+                            </select>
+                        </div>
+                        <div className='col-4'>
+                            <div className="preview-img-container">
+                                <input id="previewImg" type="file" accept='image/*' hidden
+                                    onChange={(event) => this.handleOnchangeImage(event)}
+                                />
+                                <label className="upload-file" htmlFor="previewImg">Tải ảnh <HiIcons.HiOutlineCamera className='icon'/></label>
+                                <div className='preview-image'
+                                    style ={{ backgroundImage: `url(${this.state.previewImgURL})` }}
+                                    onClick= {() => this.openPreviewImage()}>
+                                </div>
                             </div>
+                        </div>  
+                    </div>
+                    <div className='form-row'>
+                        <div className='col-3'>
+                            <label >Thành phố</label>
+                            <select id="citiesId" class="form-control"
+                            onChange={(e) => this.handleClickCity(e, 'citiesId')}
+
+                            >
+                            <option selected>Chọn thành phố</option>
+                            { arrCities && arrCities.length > 0 && 
+                                arrCities.map((item, index) => {
+                                    return (
+                                        <option key= {index} value={item.code}>
+                                            {item.name}
+                                        </option>)
+                                })
+                            }
+                            </select>
+                        </div>
+                        <div className='col-3'>
+                            <label >Quận</label>
+                            <select id="districtId" class="form-control"
+                                onChange={(e) => this.handleClickDistrict(e, 'districtId')}
+                            >
+                            <option selected>Chọn quận huyện</option> 
+                            { districts && districts.length > 0 && 
+                                districts.map((item, index) => {
+                                    return (
+                                        <>
+                                        <option key= {index} value={item.code}>
+                                            {item.name}
+                                        </option>
+                                        </>
+                                        )
+                                })
+                            }
+                            </select>
+                        </div>
+                        <div className='col-3'>
+                            <label >Phường</label>
+                            <select id="wardId" class="form-control"
+                                onChange={(e) => {this.handleClickWard(e, 'wardId')}}
+                            >
+                            <option selected>Chọn xã phường</option> 
+                            { wards && wards.length > 0 && 
+                                wards.map((item, index) => {
+                                    return (
+                                        <>
+                                        <option key= {index} value={item.code}>
+                                            {item.name}
+                                        </option>
+                                        </>
+                                        )
+                                })
+                            }
+                            </select>
+                        </div>
+                        <div className='col-3'>
+                            <label for="inputAddress">Địa chỉ</label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                onChange={(e) => {this.handleOnChangeInput(e, 'address')}}
+                                value={address}
+                             />
                         </div>
                     </div>
-                </div>
-                <div className='form-row'>
-                    <div class="form-group col-md-12">
-                        <label for="inputAddress"><FormattedMessage id="manage-user.address"/></label>
-                        <input type="text" class="form-control" id="address" placeholder="1234 Main St"
-                            onChange={(e) => {this.handleOnChangeInput(e, 'address')}}
-                            value={address}
-                        />
-                    </div>
-                </div>
-                {/* <div className='form-row'>
-                    <div class="form-group ">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="gridCheck"/>
-                            <label class="form-check-label" for="gridCheck">
-                                Check me out
-                            </label>
-                        </div>
-                    </div>
-                </div> */}
-                
-                <button type="submit" class="btn btn-save" 
-                    onClick = {() => this.handleSaveUser()}
-                    ><FormattedMessage id="manage-user.save"/>
-                  
-                </button>
-              
-                {this.state.isOpen === true &&
-                    <Lightbox
-                        mainSrc={this.state.previewImgURL}
-                        onCloseRequest={() => this.setState({ isOpen: false })}
-                    />
-                }
-            
-            </form>
-          
+                    <button type="submit" class="btn btn-save" 
+                        onClick = {() => this.handleSaveUser()}>
+                        <FormattedMessage id="manage-user.save"/>
+                    </button>
+                </form>
                 </ModalBody>
-                {/* <ModalFooter>   
-                    <Button className='btn-save px-2' onClick={() => {this. handleSaveUser()}}>Lưu</Button>
-                    <Button color="danger" className='px-2' onClick={() => {this.toggle()}}>Thoát</Button>
-                </ModalFooter> */}
             </Modal>
         )
     }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th4 20, 2022 lúc 11:08 AM
+-- Thời gian đã tạo: Th8 25, 2022 lúc 07:24 AM
 -- Phiên bản máy phục vụ: 10.1.38-MariaDB
 -- Phiên bản PHP: 7.3.2
 
@@ -30,37 +30,37 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `allcodes` (
   `id` int(11) NOT NULL,
-  `type` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `key` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `valueEn` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `valueVi` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `createdAt` datetime DEFAULT NULL,
-  `updatedAt` datetime DEFAULT NULL
+  `keyMap` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `valueEn` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `valueVi` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `allcodes`
 --
 
-INSERT INTO `allcodes` (`id`, `type`, `keyMap`, `valueEn`, `valueVi`, `createdAt`, `updatedAt`) VALUES
-(1, 'ROLE', 'R1', 'Admin', 'Quản trị viên', NULL, NULL),
-(2, 'ROLE', 'R2', 'Giver', 'Người cho', NULL, NULL),
-(3, 'ROLE', 'R3', 'Recipient', 'Người nhận', NULL, NULL),
-(4, 'STATUS', 'S1', 'New', 'Lịch hẹn mới', NULL, NULL),
-(5, 'STATUS', 'S2', 'Confirmed', 'Đã xác nhận', NULL, NULL),
-(6, 'STATUS', 'S3', 'Done', 'Đã nhận xong', NULL, NULL),
-(7, 'STATUS', 'S4', 'Cancel', 'Đã hủy', NULL, NULL),
-(8, 'GENDER', 'M', 'Male', 'Nam', NULL, NULL),
-(9, 'GENDER', 'F', 'Female', 'Nữ', NULL, NULL),
-(10, 'GENDER', 'O', 'Other', 'Khác', NULL, NULL),
-(11, 'TIME', 'T1', '8:00 AM - 9:00 AM', '8:00 - 9:00', NULL, NULL),
-(12, 'TIME', 'T2', '9:00 AM - 10:00 AM', '9:00 - 10:00', NULL, NULL),
-(13, 'TIME', 'T3', '10:00 AM - 11:00 AM', '10:00 - 11:00', NULL, NULL),
-(14, 'TIME', 'T4', '11:00 AM - 0:00 PM', '11:00 - 12:00', NULL, NULL),
-(15, 'TIME', 'T5', '1:00 PM - 2:00 PM', '13:00 - 14:00', NULL, NULL),
-(16, 'TIME', 'T6', '2:00 PM - 3:00 PM', '14:00 - 15:00', NULL, NULL),
-(17, 'TIME', 'T7', '3:00 PM - 4:00 PM', '15:00 - 16:00', NULL, NULL),
-(18, 'TIME', 'T8', '4:00 PM - 5:00 PM', '16:00 - 17:00', NULL, NULL);
+INSERT INTO `allcodes` (`id`, `keyMap`, `type`, `valueEn`, `valueVi`, `createdAt`, `updatedAt`) VALUES
+(1, 'R1', 'ROLE', 'Admin', 'Quản trị viên', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
+(2, 'R2', 'ROLE', 'Giver', 'Người cho', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
+(3, 'R3', 'ROLE', 'Recipient', 'Người nhận thu gom', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
+(4, 'T1', 'TIME', '8:00 AM - 9:00 AM', '8:00 - 9:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
+(5, 'T2', 'TIME', '9:00 AM - 10:00 AM', '9:00 - 10:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
+(6, 'T3', 'TIME', '10:00 AM - 11:00 AM', '10:00 - 11:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
+(7, 'T4', 'TIME', '11:00 AM - 0:00 PM', '11:00 - 12:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
+(8, 'T5', 'TIME', '1:00 PM - 2:00 PM', '13:00 - 14:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
+(9, 'T6', 'TIME', '2:00 PM - 3:00 PM', '14:00 - 15:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
+(10, 'T7', 'TIME', '3:00 PM - 4:00 PM', '15:00 - 16:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
+(11, 'T8', 'TIME', '4:00 PM - 5:00 PM', '16:00 - 17:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
+(12, 'M', 'GENDER', 'Male', 'Nam', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
+(13, 'F', 'GENDER', 'Female', 'Nữ', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
+(14, 'O', 'GENDER', 'Other', 'Khác', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
+(15, 'S1', 'STATUS', 'Unconfimred', 'Chưa xác nhận', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
+(16, 'S2', 'STATUS', 'Registered', 'Đã đăng ký', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
+(17, 'S3', 'STATUS', 'Done', 'Đã nhận xong', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
+(18, 'S4', 'STATUS', 'Cancel', 'Đã hủy', '0000-00-00 00:00:00', '0000-00-00 00:00:00');
 
 --
 -- Chỉ mục cho các bảng đã đổ

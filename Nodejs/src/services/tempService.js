@@ -33,6 +33,7 @@ let createNewTemp = (data) => {
                 await db.Temp.create({
                     productId: data.productId,
                     giverId: data.giverId,
+                    recipientId: '',
                     date: data.date,
                     timeType: data.timeType,
                     

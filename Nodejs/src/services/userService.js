@@ -1,7 +1,8 @@
 import db from "../models/index";
 import bcrypt from "bcryptjs";
 // import { Model } from "sequelize/types";
-
+const Sequelize = require("sequelize");
+const Op = Sequelize.Op;
 let handleUserLogin = (email, password) => {
     return new Promise(async(resolve,reject) => {
         try{
@@ -62,10 +63,38 @@ let checkUserEmail = (userEmail) => {
     })
 }
 
+let searchUser = (search) => {
+    return new Promise (async (resolve , reject) => {
+        try {
+            let data = await db.User.findAll({
+                where: {
+                    email : {
+                        [Op.like]: `%${search}%` 
+                    }      
+                },
+                include: [
+                    {
+                        model: db.Allcode, as: 'roleIdData' , attributes: ['valueVi', 'valueEn']
+                    },
+                    {
+                        model: db.Allcode, as: 'genderData' , attributes: ['valueVi', 'valueEn']
+                    },  
+                ],
+                raw: true,
+                nest: true,
+            })
+            resolve(data)
+        } catch (error) {
+            reject(error)
+        }
+       // console.log("search", search)
+    })
+}
+
 let getAllUsers = (userId) => {
     return new Promise(async(resolve, reject) => {
         try{
-            let users = '';
+            let users = ''
             if(userId === 'ALL') {
                 users = await db.User.findAll({
                     include: [
@@ -87,10 +116,21 @@ let getAllUsers = (userId) => {
             if(userId && userId !== 'ALL') {
                 users = await db.User.findOne({
                     where: { id: userId},
+                    include: [
+                        {
+                            model: db.Allcode, as: 'roleIdData' , attributes: ['valueVi', 'valueEn']
+                        },
+                        {
+                            model: db.Allcode, as: 'genderData' , attributes: ['valueVi', 'valueEn']
+                        }
+                    ],
+                    raw: true,
+                    nest: true,
                     attributes:{
                         exclude: ['password']
                     }
                 })
+
             }
             resolve(users)
         }catch(e) {
@@ -140,6 +180,7 @@ let hashUserPassword = (password) => {
 }
 
 let createNewUser = (data) => {
+    console.log('data', data)
     return new Promise(async (resolve, reject) =>{
         try {
             let check = await checkUserEmail(data.email);
@@ -152,7 +193,7 @@ let createNewUser = (data) => {
             }
             else{
                 let hashPasswordFromBcrypt = await hashUserPassword(data.password);
-                await db.User.create({
+                let user = await db.User.create({
                     email: data.email,
                     password: hashPasswordFromBcrypt,
                     firstName: data.firstName,
@@ -162,6 +203,13 @@ let createNewUser = (data) => {
                     gender: data.gender,
                     roleId: data.roleId,
                     image: data.avatar
+                })
+                await db.Address.create({
+                    userId: user.id,
+                    address_name: data.address,
+                    ward_name: data.ward_name,
+                    district_name: data.district_name,
+                    city_name: data.city_name  
                 })
                 resolve({
                     errCode: 0,
@@ -177,6 +225,7 @@ let createNewUser = (data) => {
 }
 
 let updateUser = (data) =>{
+    console.log(data)
     return new Promise(async (resolve, reject) =>{
         try {
             if(!data.id){
@@ -190,7 +239,12 @@ let updateUser = (data) =>{
                     where: {id: data.id},
                     raw: false
     
-                })               
+                })    
+                let address = await db.Address.findOne({
+                    where: {userId: data.id},
+                    raw: false
+    
+                })   
                 if (user) {
                     user.firstName = data.firstName,
                     user.lastName = data.lastName,
@@ -199,19 +253,21 @@ let updateUser = (data) =>{
                     user.roleId = data.roleId,
                     user.image = data.avatar,
                     user.address = data.address,
-    
-                
-                    await user.save();
-                    resolve({
-                        errCode: 0,
-                        errMessange: 'Người dùng đã được cập nhật thành công '
-                    });
-                }else {
-                    resolve({
-                        errCode: 1,
-                        errMessange: 'Người dùng không tìm thấy'
-                    });
+                    await user.save();  
                 }
+                if (address){
+                    address.userId = data.userId
+                    address.city_name = data.city_name,
+                    address.district_name = data.district_name,
+                    address.ward_name = data.ward_name
+                    address.address_name = data.address
+                    await address.save()
+                }
+                resolve({
+                    errCode: 0,
+                    errMessange: 'Người dùng đã được cập nhật thành công '
+                });
+                
             }
         } catch (error) {
             reject(error)
@@ -219,13 +275,16 @@ let updateUser = (data) =>{
     })
 }
 
-let deleteUser = (id) =>
+let deleteUser = (userId) =>
 {
     return new Promise(async(resolve, reject) =>{
         
-       let foundUser = await db.User.findOne({
-            where: {id: id}
+        let foundUser = await db.User.findOne({
+            where: {id: userId}
         })
+        // let foundAddress= await db.Address.findOne({
+        //     where: {userId: userId}
+        // })
         console.log(foundUser);
             if(!foundUser)
             {
@@ -234,9 +293,11 @@ let deleteUser = (id) =>
                         errMessage: "không có người dùng này"
                 })
             }
-             
             await db.User.destroy({
-                where: {id: id}
+                where: {id: userId}
+            });
+            await db.Address.destroy({
+                where: {userId: userId}
             });
             resolve({
                 errCode: 0,
@@ -273,6 +334,7 @@ let getAllCodeSerVice = (typeInput) => {
 
 module.exports = {
     handleUserLogin: handleUserLogin,
+    searchUser: searchUser,
     getAllUsers: getAllUsers,
     hashUserPassword:hashUserPassword,
     createNewUser:createNewUser,

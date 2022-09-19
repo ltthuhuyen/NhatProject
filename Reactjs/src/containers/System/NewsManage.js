@@ -5,17 +5,19 @@ import * as actions from "../../store/actions";
 import MarkdownIt from 'markdown-it';
 import MdEditor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css';
+import * as MdIcons from 'react-icons/md';
+import * as AiIcons from 'react-icons/ai';
+import * as BsIcons from 'react-icons/bs';
 import './News.scss';
-
+import './Manage.scss'
 import TableNews from './TableNews';
-import { LANGUAGES, CRUD_ACTIONS, CommonUtils } from '../../utils';
+import { CRUD_ACTIONS, CommonUtils } from '../../utils';
 import Lightbox from 'react-image-lightbox';
-import Header from '../Header/Header';
+import NavAdmin from '../../components/NavAdmin';
+
 
 const mdParser = new MarkdownIt(/* Markdown-it options */);
-
 class News extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -155,13 +157,43 @@ class News extends Component {
     }
 
     render() {
-        console.log('check state', this.state)
+        let { processLogout , userInfo } = this.props;
+        let imageBase64 = ''
+        if (userInfo.image) {
+            imageBase64 = new Buffer(userInfo.image, 'base64').toString('binary')  
+            } 
         return (
             <>
-            <Header />
-            <div className="container">
-                <div className="title text-center"><FormattedMessage id="manage-news.title"/></div>
-
+            <NavAdmin/>
+            <div className="main_content">
+                <div className='row header'>
+                    <div className='d-flex'>
+                        <div className="img">
+                                <img src={imageBase64} className='img-img'/>
+                            </div>
+                            <div className='profile-info'>Xin chào {userInfo && userInfo.firstName + userInfo.lastName  ? userInfo.firstName + ' ' + userInfo.lastName : '' }</div>
+                        </div>  
+                </div>
+                <div className='row title d-flex'>
+                    <div className='col-6 title-manage'>QUẢN LÝ TIN TỨC</div>
+                    <div className='serach_field-area d-flex align-items-center'>
+                        <input type="text" placeholder="Search here..."
+                            onChange={(e) => {this.handleOnChangeInput(e, 'search')}}/>
+                        <button type="search" className="btn btn-search rounded-pill"
+                            onClick = {() => this.handleSearch()}
+                        ><BsIcons.BsSearch/> Tìm</button>
+                    </div>
+                    <button 
+                        className='col-1 btn btn-create '
+                        onClick={this.handleAddNewUser}
+                        >
+                        <MdIcons.MdOutlineCreate/> <FormattedMessage id='manage-user.add'/>
+                    </button>
+                </div> 
+            </div>
+         
+                
+            <div  data-aos="fade-up" className="container">
                 <div className="row row1-news ">
                     <div className="col-3 img-news">
                         <label >
@@ -229,7 +261,7 @@ class News extends Component {
                         }
                     </button>
                 </div>
-                <TableNews
+                <TableNews 
                     handleEditFromParent={this.handleEditFromParent}
                     action= {this.state.action}
                 />
@@ -250,7 +282,8 @@ const mapStateToProps = state => {
     return {
         // teachers: state.news.teachers,
         // language: state.app.language,
-        listNews: state.news.News
+        listNews: state.news.News,
+        userInfo: state.user.userInfo,
     };
 };
 

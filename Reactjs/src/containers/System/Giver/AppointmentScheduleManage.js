@@ -5,9 +5,8 @@ import { FormattedMessage } from 'react-intl'
 import DatePicker from '../../../components/Input/DatePicker';
 import * as actions from "../../../store/actions"
 import { LANGUAGES , dateFormat} from '../../../utils';
-import Home from '../../HomePage/Home'
+// import Header from '../../Header/Giver/Header';
 import './AppointmentScheduleManage.scss'
-import { getAllProducts } from '../../../services/productService'
 import {  saveBulkScheduleAppoinment } from '../../../services/appointmentService';
 import { toast } from 'react-toastify'
 import _, { result } from 'lodash'
@@ -26,6 +25,7 @@ class AppointmentScheduleManage extends Component {
             statusType: '',
             date: '',
             timeType: '',
+            
            
         }
     }
@@ -36,29 +36,17 @@ class AppointmentScheduleManage extends Component {
         
     }
 
-    // buildDataInputSelect = (inputData) => {
-    //     let result = [];
-    //     if(inputData && inputData.length > 0){
-    //         inputData.map((item , index) => {
-    //             let object = {};
-    //             object.label = item.product_name;
-    //             object.value = item.productId;
-    //             result.push(object);
-    //         })
-         
-    //     }
-    //     console.log('inputData', result)
-    //     return result;
-       
-    // }
     componentDidUpdate(prevProps){
         if (prevProps.allTime !== this.props.allTime) {
             let dataTime = this.props.allTime
-            if(dataTime && dataTime.length >0 ){
-                dataTime = dataTime.map(item => ({ item, isSelected: false}))
+            if (dataTime && dataTime.length >0 ){
+                dataTime = dataTime.map(item => { 
+                    item.isSelected = false;
+                    return item;
+                })
             }
             this.setState({
-                rangeTime: this.props.allTime
+                rangeTime: dataTime
             })
         }
         if (prevProps.allProduct !== this.props.allProduct) {
@@ -82,10 +70,10 @@ class AppointmentScheduleManage extends Component {
     }
 
     handleOnChangeDataPicker =(date) => {
-       this.setState({
-           currentDate:moment( date[0]).format(dateFormat.SEND_TO_SERVER)
-           
-       })
+        this.setState({
+            currentDate:moment( date[0]).format(dateFormat.SEND_TO_SERVER)
+            
+        })
       // console.log('currentDate', this.state.currentDate)
     }
 
@@ -98,20 +86,26 @@ class AppointmentScheduleManage extends Component {
     }
 
     handleClickSchedule = (time) => {
-        // console.log('time', time)
-        // // let {rangeTime} = this.state ;
-        // // if(rangeTime && rangeTime.length > 0){
-        // //     rangeTime = rangeTime.map(item => {
-        // //         if(item.id === time.id) item.isSelected =  !item.isSelected;
-        // //         return item; 
-               
-        // //     })
-        
-            this.setState({
-                timeType: time.keyMap
+        let { rangeTime }  = this.state;
+        console.log("rangeTime", rangeTime)
+        if (rangeTime && rangeTime.length >0){
+            let data = rangeTime 
+            data = data.map(item => {
+                if (item.id === time.id)  item.isSelected = !item.isSelected;
+                return item;
+                
             })
-     
-        
+
+           
+            this.setState({
+                timeType: time.keyMap,
+               // rangeTime: rangeTime
+               
+            }) 
+            console.log('time', time)
+        }
+            
+         
     }
     
     handleConfirm = async () => {
@@ -141,8 +135,10 @@ class AppointmentScheduleManage extends Component {
     }
 
     render() {
-        let {rangeTime, arrTemps } = this.state;
-        let {language} = this.props;
+        
+        let { rangeTime } = this.state;
+        console.log('rangeTime1', rangeTime)
+        let { language } = this.props;
         if(this.props.userInfo)
         {
             this.state.giverId = this.props.userInfo.id;
@@ -152,10 +148,10 @@ class AppointmentScheduleManage extends Component {
         // console.log("check temps", this.props.temps)
         return (
             <>
-                <div className="title text-center">
-                    <FormattedMessage id='manage-schedule.title'/>
-                </div>
                 <div className='schedule'> 
+                    <div className="title text-center">
+                    ĐẶT LỊCH THU GOM
+                    </div>
                     <div className='row '>
                         <div className='col-3 form-group'></div>
                         <div className='col-6 form-group'>
@@ -175,7 +171,7 @@ class AppointmentScheduleManage extends Component {
                             { rangeTime && rangeTime.length > 0 &&
                                 rangeTime.map((item , index) => {
                                     return (
-                                        <button 
+                                        <button
                                             className= {
                                                 item.isSelected === true  ? 'btn btn-schedule active' : 'btn btn-schedule' }
                                             key={index}

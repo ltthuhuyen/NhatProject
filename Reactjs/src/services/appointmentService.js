@@ -20,6 +20,10 @@ const saveBulkScheduleAppoinment = (data) => {
     return axios.post('/api/create-new-schedule', data)
 }
 
+const saveUpdateStaticS2 = (inputData) => {
+    return axios.put('/api/update-status-s2', inputData)
+        
+}
 
 const saveUpdateStatic = (inputData) => {
     return axios.put('/api/update-status', inputData)
@@ -30,6 +34,7 @@ export {
     getAllTemps,
     deleteTempSerVice,
     saveBulkScheduleAppoinment,
+    saveUpdateStaticS2,
     saveUpdateStatic
    
 }

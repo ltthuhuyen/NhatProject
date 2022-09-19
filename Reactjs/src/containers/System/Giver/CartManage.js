@@ -2,12 +2,10 @@ import React, { Component } from 'react';
 import { connect } from "react-redux";
 import { Link, Redirect, Route, Switch } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl'
-import DatePicker from '../../../components/Input/DatePicker';
 import * as actions from "../../../store/actions"
 import * as AiIcons from 'react-icons/ai';
-import { LANGUAGES , dateFormat} from '../../../utils';
 import './CartManage.scss';
-import { getAllProducts } from '../../../services/productService'
+import Header from '../../Header/Giver/Header'
 import { getAllTemps, deleteTempSerVice, saveBulkScheduleAppoinment } from '../../../services/appointmentService';
 import { toast } from 'react-toastify'
 import _, { result } from 'lodash'
@@ -78,18 +76,6 @@ class CartManage extends Component {
         }
     }  
        
-    
-    // getAllProductsFromReact = async () => {
-    //     let response = await getAllProducts('ALL');
-    //     if(response && response.errCode == 0){
-    //         this.setState({
-    //             arrTemps: response.products
-    //         })
-    //     }
-    // }
-  
-
-    
     handleClickGive = async () => {
         let {productId} = this.state;
      
@@ -111,8 +97,7 @@ class CartManage extends Component {
         
         let response = await saveBulkScheduleAppoinment({
             arrSchedule: result
-            // if(response && response.errCode ==0)
-          
+            
         });   
     }
 
@@ -128,11 +113,12 @@ class CartManage extends Component {
         console.log("Check giverId", this.state.giverId)
         return (
             <>
-                <div className="container">
+                <Header />
+                <div className="container-cart">
                     <div className="title text-center">
                         <FormattedMessage id='manage-collection-form.title'/>
                     </div>
-                    <div className="table">
+                    <div className="table-cart">
                     <Table bordered>
                         <thead className='thead'>
                             <tr>
@@ -164,7 +150,7 @@ class CartManage extends Component {
                     <div className="row text-center">
                         <div className='col-md-6'>
                             <button className='btn btn-booking'>
-                                <Link className='link' to = "/home"><FormattedMessage id="common.choose-continue"/></Link>
+                                <Link className='link' to = "/giver/home"><FormattedMessage id="common.choose-continue"/></Link>
                             </button>
                         </div>
                         <div className='col-md-6'>

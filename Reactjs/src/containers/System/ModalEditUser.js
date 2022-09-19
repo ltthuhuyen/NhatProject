@@ -6,11 +6,15 @@ import { FormattedMessage } from 'react-intl';
 import {CRUD_ACTIONS, LANGUAGES , CommonUtils} from "../../utils"
 import * as actions from "../../store/actions"
 import './Create.scss'
+import {getAllCities , getAllDistricts , getAllWards, } from '../../services/addressService'
+
+
 class ModalEditUser extends Component {
 
     constructor(props){
         super(props);
         this.state = {
+            userData: {},
             genderArr: [],
             roleArr: [],
             previewImgURL: '',
@@ -22,15 +26,26 @@ class ModalEditUser extends Component {
             phone: '',
             gender: '',
             roleId: '',
-            address: '',
             avatar: '',
-            action: ''
+            action: '',
+            arrCities: [],
+            arrDistricts: [], 
+            arrWards: [],
+            citiesId: '',
+            districts:[],
+            wards: [],
+            city_name: '',
+            district_name: '',
+            ward_name: '',
+            address_name: ''
         }
     }
    
     componentDidMount() {
         let user = this.props.currentUser;
-        console.log('user', user)
+        this.getAllCitiesFromReact()
+        this.getAllDistrictsFromReact()
+        this.getAllWardFromReact()
         this.props.getGenderStart();
         this.props.getRoleStart();
         let imageBase64 = '';
@@ -42,20 +57,23 @@ class ModalEditUser extends Component {
             // lấy giá trị hiện tại
             this.setState({
                 id: user.id,
-                email: user.email,
+                email: user.userData.email,
                 password: 'HARDCODES',
-                firstName: user.firstName,
-                lastName: user.lastName,
-                phone: user.phone,
-                address: user.address,
-                gender: user.gender,
-                roleId: user.roleId,
-                address: user.address,
+                firstName: user.userData.firstName,
+                lastName: user.userData.lastName,
+                phone: user.userData.phone,
+                address: user.userData.address,
+                gender: user.userData.gender,
+                roleId: user.userData.roleId,
                 avatar: '',
                 previewImgURL: imageBase64,
+                city_name: user.city_name,
+                district_name: user.district_name,
+                ward_name: user.ward_name,
+                address_name: user.address,
                 action: CRUD_ACTIONS.EDIT
 
-            } )
+            })
 
         }
         console.log('didmount edit modal' , this.props.currentUser)
@@ -71,17 +89,80 @@ class ModalEditUser extends Component {
             let arrGenders = this.props.genderRedux
             this.setState({
                 genderArr: arrGenders,
-                gender: arrGenders && arrGenders.length > 0 ? arrGenders[0].key : ''
+                // gender: arrGenders && arrGenders.length > 0 ? arrGenders[0].key : ''
             })
         }
         if (prevProps.roleRedux !== this.props.roleRedux) {
             let arrRoles = this.props.roleRedux
             this.setState({
                 roleArr: arrRoles,
-                role: arrRoles && arrRoles.length > 0 ? arrRoles[0].key : ''
+                // role: arrRoles && arrRoles.length > 0 ? arrRoles[0].key : ''
             })
         }
     }
+
+    getAllCitiesFromReact = async () => {
+        let response = await getAllCities();
+        if(response){
+            this.setState({
+                arrCities: response
+            })
+        }
+    }
+
+    getAllDistrictsFromReact = async () => {
+        let response = await getAllDistricts();
+        if(response){
+            this.setState({
+                arrDistricts: response
+            })
+        }
+    }
+
+    getAllWardFromReact = async () => {
+        let response= await getAllWards();
+        if(response){
+            this.setState({
+                arrWards: response
+            })
+        }
+    }
+    
+    handleClickCity = (e) => {
+        let {arrCities , arrDistricts} = this.state;
+        const idx = e.target.value;
+        let kq = arrDistricts.filter(item => item.province_code == idx);
+        let kq2 = arrCities.filter(item => item.code == idx);
+        this.setState({
+            districts: kq,
+            city_name:  kq2[0].name
+        })
+       
+           
+    }    
+
+    handleClickDistrict = (e) => {
+        let {arrDistricts , arrWards} = this.state;
+        const idx = e.target.value;
+        let kq = arrWards.filter(item => item.district_code == idx);
+        let kq2 = arrDistricts.filter(item => item.code == idx)
+        this.setState({
+            wards: kq,
+            district_name: kq2[0].name
+        })
+       
+    }   
+
+    handleClickWard = (e) => {
+        let {arrWards} = this.state;
+        const idx = e.target.value;
+        let kq2 = arrWards.filter(item => item.code == idx)
+        this.setState({
+            ward_name: kq2[0].name
+        })
+        
+    }
+
 
     handleOnChangeInput =(e ,id) =>{
         let copyState = {...this.state};
@@ -132,9 +213,9 @@ class ModalEditUser extends Component {
         let language = this.props.language;
         let genders = this.state.genderArr;
         let roles = this.state.roleArr;
+        let { arrCities , districts , wards } = this.state
         let { email , password , firstName , lastName ,
-            phone , address
-        } = this.state
+            phone , address , gender, roleId , city_name, district_name , ward_name}  = this.state
         return (
             <Modal 
                 isOpen={this.props.isOpen} 
@@ -166,7 +247,7 @@ class ModalEditUser extends Component {
                                         onChange={(e) => {this.handleOnChangeInput(e, 'password')}}
                                         value={password}
                                         disabled
-                                   />
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -193,7 +274,7 @@ class ModalEditUser extends Component {
                                 <label for=""> <FormattedMessage id="manage-user.gender"/> </label>
                                 <select id="gender" class="form-control"
                                     onChange={(e) => {this.handleOnChangeInput(e, 'gender')}}
-                                    value={this.props.currentUser.gender}
+                                    value={gender}   
                                 >
                                     {genders && genders.length > 0 && 
                                         genders.map((item, index) => {
@@ -220,7 +301,7 @@ class ModalEditUser extends Component {
                                 <label for="inputState"> <FormattedMessage id="manage-user.roleID"/> </label>
                                 <select id="roleId" class="form-control"
                                     onChange={(e) => {this.handleOnChangeInput(e, 'roleId')}}
-                                    value ={this.props.currentUser.roleId}
+                                    value ={roleId}
                                 >
                                     { roles && roles.length > 0 && 
                                         roles.map((item, index) => {
@@ -233,7 +314,6 @@ class ModalEditUser extends Component {
                                 </select>
                             </div>
                             <div class="form-group col-md-4">
-                                <label for="inputZip"> <FormattedMessage id="manage-user.image"/> </label>
                                 <div className="preview-img-container">
                                     <input id="previewImg" type="file" accept='image/*' hidden
                                         onChange={(event) => this.handleOnchangeImage(event)}
@@ -246,17 +326,74 @@ class ModalEditUser extends Component {
                                 </div>
                             </div>
                         </div>
-                        <div className="form-row">
-                            <div className="form-group input-container col-12">
-                                <label for=""> <FormattedMessage id="manage-user.address"/> </label>
-                                <input 
-                                    type="text" 
-                                    className="form-control" 
-                                    onChange={(e) => {this.handleOnChangeInput(e, 'address')}}
-                                    value={address}
-                                />
-                            </div>
+                        <div className='form-row'>
+                        <div className='col-3'>
+                            <label >Thành phố</label>
+                            <select id="citiesId" class="form-control"
+                                onChange={(e) => this.handleClickCity(e, 'citiesId')}
+
+                            >
+                            <option selected>{city_name}</option>
+                            { arrCities && arrCities.length > 0 && 
+                                arrCities.map((item, index) => {
+                                    return (
+                                        <option key= {index} value={item.code}>
+                                            {item.name}
+                                        </option>)
+                                })
+                            }
+                            </select>
                         </div>
+                        <div className='col-3'>
+                            <label >Quận</label>
+                            <select id="districtId" class="form-control"
+                                onChange={(e) => this.handleClickDistrict(e, 'districtId')}
+                                value= {district_name}
+                            >
+                            <option selected>{district_name}</option>
+                            { districts && districts.length > 0 && 
+                                districts.map((item, index) => {
+                                    return (
+                                        <>
+                                        <option key= {index} value={item.code}>
+                                            {item.name}
+                                        </option>
+                                        </>
+                                        )
+                                })
+                            }
+                            </select>
+                        </div>
+                        <div className='col-3'>
+                            <label >Phường</label>
+                            <select id="wardId" class="form-control"
+                                onChange={(e) => {this.handleClickWard(e, 'wardId')}}
+                                value={ward_name}
+                            >
+                            <option selected>{ward_name}</option>
+                            { wards && wards.length > 0 && 
+                                wards.map((item, index) => {
+                                    return (
+                                        <>
+                                        <option key= {index} value={item.code}>
+                                            {item.name}
+                                        </option>
+                                        </>
+                                        )
+                                })
+                            }
+                            </select>
+                        </div>
+                        <div className='col-3'>
+                            <label for="inputAddress">Địa chỉ</label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                onChange={(e) => {this.handleOnChangeInput(e, 'address')}}
+                                value={address}
+                             />
+                        </div>
+                    </div>
                         <button type="submit" class="btn btn-save" 
                             onClick = {() => this.handleSaveUser()}>
                             <FormattedMessage id="manage-user.save"/>
@@ -278,7 +415,8 @@ const mapStateToProps = state => {
         language: state.app.language,
         genderRedux: state.admin.genders,
         isLoadingGender: state.admin.isLoadingGender,
-        roleRedux: state.admin.roles
+        roleRedux: state.admin.roles,
+      
     };
 };
 
@@ -286,6 +424,7 @@ const mapDispatchToProps = dispatch => {
     return {
         getGenderStart: () => dispatch(actions.fetchGenderStart()),
         getRoleStart: () => dispatch(actions.fetchRoleStart()),
+        doEditUser: (inputData) => dispatch(actions.doEditUser(inputData))
        
     };
 };

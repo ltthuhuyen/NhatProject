@@ -27,6 +27,44 @@ let createNewSchedule = (data) => {
 
 }
 
+let updateStatusS2 = (data) => {
+    return new Promise(async (resolve, reject) =>{
+        console.log('data updateStatusS2', data)
+        try {
+            if(!data.id){
+                resolve({
+                    errCode: 2,
+                    errMessage: 'Thiếu các thông số bắt buộc'
+                })
+            }
+            else{
+                let schedule = await db.Schedule.findOne({
+                    where: {id: data.id},
+                    raw: false
+                }) 
+                console.log("check schedule",schedule)
+                if (schedule) {
+                    schedule.statusType = 'S2',
+                    schedule.recipientId = data.recipientId
+                    await schedule.save();
+                    resolve({
+                        errCode: 0,
+                        errMessange: 'Sản phẩm đã được cập nhật thành công '
+                    });
+                }else {
+                    resolve({
+                        errCode: 1,
+                        errMessange: 'Không tìm thấy sản phẩm'
+                    });
+                }              
+                
+            }
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
 let updateStatus = (data) => {
     return new Promise(async (resolve, reject) =>{
         console.log("check data",data)
@@ -45,6 +83,7 @@ let updateStatus = (data) => {
                 console.log("check schedule",schedule)
                 if (schedule) {
                     schedule.statusType = data.status,
+                    schedule.recipientId = data.recipientId
                     await schedule.save();
                     resolve({
                         errCode: 0,
@@ -66,6 +105,7 @@ let updateStatus = (data) => {
 
 module.exports ={
     createNewSchedule: createNewSchedule,
-    updateStatus:updateStatus
+    updateStatusS2: updateStatusS2,
+    updateStatus: updateStatus
   
 }

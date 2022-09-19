@@ -1,43 +1,36 @@
 
 
 .modal .modal-dialog .modal-content .modal-header{
-    background-color: black;
+    background-color: rgb(9, 116, 32);
 }
 
-.container{
-  
+.container-cart{
+    margin-top: 150px;
     max-width: 100%;
-    font-size: 15px;
     text-align: center;
+    .title {
+        font-size: 25px;
+        font-weight: 320;
+        margin-top: 20px;
+        color:  rgb(9, 116, 32);
+    }
     .btn{
         padding: auto;
         height: 40px;
         text-decoration: none;
     }
-    .btn-create{ 
-        line-height: 0px;
-        margin-left: 1210px;
+   
+    .table-cart{
+        justify-content: center;
+        position: absolute;
+        left: 5%;
+        width: 90%;
         margin-top: 20px;
-        padding: 8px;
-        color: rgb(158, 205, 247);
-        border: 1px solid rgb(158, 205, 247);
-        &:hover{
-            color:rgb(234, 250, 255);
-            background-color: #c0cdd6;
-            border: 1px solid #c0cdd6;
-    
-        }
-    }
-    .table{
-        background-color: white;
-        width: 1300px;
-        margin: 0 50px;
-        margin-top: 10px;
         border: 1px solid #ffffff;
 
         .thead{
-            border: 1px solid #ffffff;
-            background-color: rgb(108, 128, 145);
+          //  border: 1px solid #ffffff;
+            background-color: rgb(0, 0, 0);
             color: white;
             text-align: center;
             padding: 100px 0px;
@@ -80,29 +73,26 @@
     }
    
     .btn-booking{
-        margin-top: 20px;
-        line-height: 0px;
-        padding: 8px;
-        // margin-left: 400px;
-        // color: rgb(158, 205, 247);
-        border: 1px solid rgb(158, 205, 247);
-        // background-color: #c0cdd6;
+        font-weight: 500;
+        width: auto;
+        justify-content: space-between;
+        margin-top: 230px;
+        border-radius: 13px;
+        background-color: rgb(226, 249, 249);
+        color: rgb(1, 113, 16);
         &:hover{
-            color:rgb(234, 250, 255);
-            background-color: #c0cdd6;
-            // border: 1px solid #c0cdd6;
+           
+        
+            background-color: #ffffff;
+            transform: scale(1.1);
+            border: 1px solid rgb(1, 113, 16);
     
         }
         .link {
-            color: rgb(158, 205, 247);
+            color: rgb(1, 113, 16);
             text-decoration: none;
             
-            &:hover{
-                color:rgb(234, 250, 255);
-                background-color: #c0cdd6;
-                border: 1px solid #c0cdd6;
-        
-            }
+            
         }
        
     }
