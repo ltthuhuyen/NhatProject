@@ -7,7 +7,6 @@ import _ from 'lodash'
 import Lightbox from 'react-image-lightbox';
 import {CRUD_ACTIONS, CommonUtils} from "../../utils"
 import { FormattedMessage } from 'react-intl';
-import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import * as BsIcons from "react-icons/bs";
 import * as MdIcons from "react-icons/md";
@@ -29,15 +28,14 @@ class ModalEditProduct extends Component {
         let imageBase64 = '';
         if (product.image){
             imageBase64 = new Buffer(product.image, 'base64').toString('binary')
-           
         }
         if (product && !_.isEmpty(product)){
             // lấy giá trị hiện tại
             this.setState({
                 id: product.id,
                 product_name: product.product_name,
-                image: '',
-                previewImgURL: imageBase64,
+                image: imageBase64,
+                // previewImgURL: imageBase64,
                 description: product.description
             })
 
@@ -54,12 +52,12 @@ class ModalEditProduct extends Component {
         copyState[id] = e.target.value;
         this.setState({
             ...copyState
-        }, () => {
-            // console.log('check good state' , this.state)
-        } )
+        })
     }
+
     handleOnchangeImage = async (event) =>{
         let data = event.target.files;
+        console.log('data', data)
         let file = data[0];
         if(file) {
             let base64 = await CommonUtils.getBase64(file);
@@ -84,17 +82,12 @@ class ModalEditProduct extends Component {
         }
         return isValid
     }   
-
+ 
     handleSaveProduct = () => {
-        let isValid = this.checkValideInput();
-        if (isValid === true){
-        // call API edit user
-            this.props.editProduct(this.state)
-        }
+        this.props.editProduct(this.state)
     }
 
     render() {
-       // console.log('check child props', this.props);
        let { product_name , description } = this.state
         return (
             <Modal 
@@ -107,41 +100,43 @@ class ModalEditProduct extends Component {
                 <ModalHeader toggle={() => {this.toggle()}}><FormattedMessage id="manage-product.edit"/></ModalHeader>
                 <ModalBody>
                     <form className='form-create-edit'>
-                        <div className="form-row">
-                            <div className="input-container col-7 ">
-                                <Grid item xs={8}>
-                                    <TextField
-                                        label="Tên sản phẩm"
-                                        color="success"
-                                        multiline
-                                        value={product_name}
-                                        onChange={(e) => {this.handleOnChangeInput(e, 'product_name')}}
-                                    />
-                                </Grid>
+                    <div className='form-row'>
+                            <div className="col-8">
+                                <label >Tên sản phẩm</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    value={product_name}
+                                    onChange={(e) => {this.handleOnChangeInput(e, 'product_name')}}
+                                    
+                                />
                             </div>
-                            <div class="form-group col-md-5">
+                            
+                            <div className="col-4">
                                 <div className="preview-img-container">
-                                    <input id="previewImg" type="file" accept='image/*' hidden
+                                    <input id="previewImg" type="file" hidden
                                         onChange={(event) => this.handleOnchangeImage(event)}
                                     />
                                     <label className="upload-file" htmlFor="previewImg"><BsIcons.BsCamera size={'20px'}/> Tải ảnh<i className="fas fa-upload"></i></label>
                                     <div className='preview-image'
-                                        style ={{ backgroundImage: `url(${this.state.previewImgURL})` }}
+                                        style ={{ backgroundImage: `url(${this.state.image})` }}
                                         onClick= {() => this.openPreviewImage()}>
+                                        {/* <img src={thisimage} className='img-img'/> */}
                                     </div>
+                                   
                                 </div>
                             </div>
                         </div>
                         <div className='form-row'>
-                            <div class="form-group col-md-12">
-                                <Grid item xs={12}>
-                                    <TextField
-                                        label="Mô tả sản phẩm"
-                                        color="success"
-                                        value={description}
-                                        onChange={(e) => {this.handleOnChangeInput(e, 'description')}}
-                                    />
-                                </Grid>
+                            <div className="col-12">
+                                <label >Mô tả sản phẩm</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    value={description}
+                                    onChange={(e) => {this.handleOnChangeInput(e, 'description')}}
+                                    
+                                />
                             </div>
                         </div>
                         <button type="submit" class="btn btn-save" 

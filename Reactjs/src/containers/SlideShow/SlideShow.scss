@@ -1,41 +1,10 @@
+.slide-show{
+    margin: 30px 150px;
 
-.slick-arrow{
-    position: absolute;
-    background-color: #f2f6fe;
-    border-radius: 50%;
-    padding: 4px;
-    display: flex;
-    top: 15% ;
-    height: 150px;
-    width: 10px;
-    margin: 160px 40px;
-    z-index: 12;
-    color: black !important;
-}
-.slick-arrow:hover {
-    background-color: #2cccff;
-    color: white;
-}
-.slick-dots {
-    position: absolute;
-    bottom: 10px;
-    left: 10%;
-    transform: translate(-50%, 0);
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    gap: 0 20px;
-}
-.slick-dots button {
-    font-size: 0;
-    width: 20px;
-    height: 20px;
-    border-radius: 100rem;
-    background-color: #eee;
-    border: none;
-    outline: none;
-    transition: all 0.2s linear;
-}
-.slick-dots .slick-active button {
-background-color: #2cccff;
+    .img-wrap img {
+        height: 350px;
+        object-fit: cover;
+        width: 100%; 
+        
+    }
 }

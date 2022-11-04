@@ -1,16 +1,14 @@
-import React, { Component } from 'react';
-// import { FormattedMessage } from 'react-intl';
-import { connect } from 'react-redux';
-import { Button,Modal, ModalHeader, ModalBody, ModalFooter} from 'reactstrap';
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { Modal, ModalHeader, ModalBody } from 'reactstrap'
 import {emitter} from '../../utils/emitter'
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl'
 import './Create.scss'
 import * as actions from "../../store/actions"
-import * as HiIcons from 'react-icons/hi';
+import * as HiIcons from 'react-icons/hi'
 import {LANGUAGES , CommonUtils} from "../../utils"
-import {getAllCities , getAllDistricts , getAllWards, } from '../../services/addressService'
-import { faArrowUp19 } from '@fortawesome/free-solid-svg-icons';
-
+import { getAllCities , getAllDistricts , getAllWards } from '../../services/addressService'
+import { toast } from 'react-toastify'
 
 class ModalUser extends Component {
     constructor(props){
@@ -23,7 +21,7 @@ class ModalUser extends Component {
             email: '',
             password: '',
             firstName: '',
-            avatar: '',
+            image: '',
             lastName: '',
             gender: '',
             phone: '',
@@ -52,17 +50,17 @@ class ModalUser extends Component {
                 gender: '',
                 roleId: '',
                 address: '',
-                avatar: ''
+                image: ''
             })
         })
     }
 
-    componentDidMount() {
-        this.getAllCitiesFromReact()
-        this.getAllDistrictsFromReact()
-        this.getAllWardFromReact()
-        this.props.getGenderStart();
-        this.props.getRoleStart();
+    async componentDidMount() {
+        await this.getAllCitiesFromReact()
+        await this.getAllDistrictsFromReact()
+        await this.getAllWardFromReact()
+        await this.props.getGenderStart();
+        await this.props.getRoleStart();
     }
 
     componentDidUpdate(prevProps, prevState, snapshot){
@@ -156,7 +154,7 @@ class ModalUser extends Component {
             let objectUrl = URL.createObjectURL(file);
             this.setState({
                 previewImgURL: objectUrl,
-                avatar: base64
+                image: base64
             })
         }
     }
@@ -166,9 +164,6 @@ class ModalUser extends Component {
         copyState[id] = e.target.value;
         this.setState({
             ...copyState
-         }, () => {
-            console.log('check good state' , this.state)
-
         } )
     }
 
@@ -179,7 +174,7 @@ class ModalUser extends Component {
             console.log('input',this.state[arrInput[i]])
             if (!this.state[arrInput[i]]){
                 isValid = false;
-                alert('Đối số không hợp lệ ' + arrInput[i]);
+                toast.error('Đối số không hợp lệ ' + arrInput[i]);
                 break;
             }
         }
@@ -188,18 +183,15 @@ class ModalUser extends Component {
 
    
     handleSaveUser = () => {
-        let isValid = this.checkValideInput()
-        if(isValid === false) return ;
-        this.props.createNewUser ({
+        this.props.createNewuser ({
             email: this.state.email,
             password: this.state.password,
             firstName: this.state.firstName,
             lastName: this.state.lastName,
             phone: this.state.phone,
-            address: this.state.address,
             gender: this.state.gender,
             roleId: this.state.roleId,
-            avatar: this.state.avatar,
+            image: this.state.image,
             city_name: this.state.city_name,
             district_name: this.state.district_name,
             ward_name: this.state.ward_name,
@@ -222,11 +214,8 @@ class ModalUser extends Component {
         let roles = this.state.roleArr;
         let arrCities = this.state.arrCities;
         let { email , password , firstName , lastName ,
-             phone , address , districts , wards, diachi
+             phone , address , districts , wards
         } = this.state
-       
-       
-     
         return (
             <Modal 
                 isOpen={this.props.isOpen} 
@@ -340,7 +329,7 @@ class ModalUser extends Component {
                             onChange={(e) => this.handleClickCity(e, 'citiesId')}
 
                             >
-                            <option selected>Chọn thành phố</option>
+                            <option>Chọn thành phố</option>
                             { arrCities && arrCities.length > 0 && 
                                 arrCities.map((item, index) => {
                                     return (
@@ -356,7 +345,7 @@ class ModalUser extends Component {
                             <select id="districtId" class="form-control"
                                 onChange={(e) => this.handleClickDistrict(e, 'districtId')}
                             >
-                            <option selected>Chọn quận huyện</option> 
+                            <option>Chọn quận huyện</option> 
                             { districts && districts.length > 0 && 
                                 districts.map((item, index) => {
                                     return (
@@ -375,7 +364,7 @@ class ModalUser extends Component {
                             <select id="wardId" class="form-control"
                                 onChange={(e) => {this.handleClickWard(e, 'wardId')}}
                             >
-                            <option selected>Chọn xã phường</option> 
+                            <option>Chọn xã phường</option> 
                             { wards && wards.length > 0 && 
                                 wards.map((item, index) => {
                                     return (

@@ -1,0 +1,33 @@
+.introduce{
+    margin: 70px 200px 100px 200px;
+    .title-introduce{
+        text-align: center;
+        font-family: monospace;
+        font-weight: 500;
+        color: #333333;
+        font-size: 50px;
+    }
+    .line{
+        margin-left: 530px;
+        margin-bottom: 50px;
+        text-align: center;
+        border-style: solid;
+        border-color: #222222;
+        height: 3px;
+        width: 80px;
+
+    }
+    .row{
+        span{
+            font-size: 18.5px;
+            margin-bottom: 0.9rem;
+        }
+        .img .img-pro{
+            border: 2px solid #eaf6c4;
+            border-radius: 20px;
+            height: 290px;
+            width: 100%;
+            overflow: hidden;
+        }
+    }
+}

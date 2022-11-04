@@ -6,27 +6,25 @@
     font-family: monospace;
 }
 .login-background{
+    max-width: 100%;;
     font-weight: 400;
     font-family: monospace;
     font-size: 16px;
     height: 73vh;
-    // background: rgb(236, 249, 250);
     .imgLogin{
         height: 73vh;
-        width: 60%;
+        // width: 100%;
     }
     .login-container{
         height: 73vh;
-        width: 350px;
-        // margin: 10px;
-        margin-left: 55px;
+        width: 300px;
         border-left: 2px solid rgb(53, 52, 52) ;
         border-right: 2px solid rgb(53, 52, 52) ;
         border-top: 6px  solid rgb(53, 52, 52);
         border-bottom: 6px  solid rgb(53, 52, 52);
         border-radius: 65px;
         background: rgb(255, 255, 255);
-        // box-shadow: 1px 1px rgb(187, 50, 50);
+
     }
 
     .login-content{
@@ -69,9 +67,13 @@
             
         }
         .forgot-password{
-            margin-left: 180px;
+            margin-left: 160px;
             font-size: 14px;
             color: #7ed500;
+            .link-forgot-password{
+                text-decoration: none;
+                color: #7ed500;
+            }
         }
        
     }

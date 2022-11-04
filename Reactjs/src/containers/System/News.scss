@@ -1,8 +1,11 @@
 .modal .modal-dialog .modal-content .modal-header{
-    background-color: black;
+    background-color: #7ed000;
+    color: #FFF;
+    font-family: monospace;
 }
-.container{
-    max-width: auto;
+.news-container{
+    margin: 0 100px 0 200px;
+    max-width: 100%;
     .title{
         max-width: auto;
         font-size: 15px;
@@ -15,7 +18,7 @@
     }
     .row1-news{
         width: auto;
-        margin: 0 0 0 300px;
+        margin: 0 0 0 200px;
         margin-top: 20px;
         .img-news{
             border-radius: 10px black;
@@ -36,7 +39,7 @@
     }
     .news-about-editor {
         max-width: 89%;
-        margin: 0 22px 0 320px;
+        margin: 0 20px 0 215px;
         margin-top: 20px;
     }
     .img-img{
@@ -131,24 +134,55 @@
         }
         
     }
-    .btn-save{
-        width: 60px;
-        color: rgb(158, 205, 247);
-        line-height: 100%;
-        border: 1px solid rgb(158, 205, 247);
-        background-color: rgb(253, 253, 253);
-        margin-left: 1230px;
-        margin-bottom: 30px;
-        padding: 8px;
-        &:hover{
-            color:rgb(234, 250, 255);
-            background-color: #c0cdd6;
-            border: 1px solid #c0cdd6;
-        }
+    .btn-save {
+        width: auto;
+        padding: 5px 20px;
+        margin: 30px 0px 30px 1135px;
+        border-radius: 10px;
+        background-color: #e2f9f9;
+        color: #017110;
     }
     .table {
-        max-width: 88%;
-        margin: 0 0 0 160px;
+        // // max-width: 97%;
+        // margin: 0 0 0 115px;
+        text-align: center;
+        justify-content: center;
+        position: absolute;
+        left: 21%;
+        width: 88%;
+        background-color: white;
+        border-radius: 10px;
+        .thead{
+            max-width: 88%;
+        }
+        .tbody{
+            .btn-edit {
+                background-color: white;
+                color: rgb(245, 221, 7);
+                border: 1px solid rgb(245, 221, 7);
+                font-size: 18px;
+            
+                &:hover{
+                    color: white;
+                    background-color: rgb(255, 251, 7)
+                }
+            }
+            .btn-delete {
+                background-color: white;
+                color: #dc3545;
+                border: 1px solid #dc3545;
+                font-size: 18px;
+                &:hover{
+                    color: white;
+                    background-color: #fc394d;
+                }
+            }
+            :hover{
+                background-color:#F5FFFA;
+            }
+           
+        }
+        
     }
     
 }

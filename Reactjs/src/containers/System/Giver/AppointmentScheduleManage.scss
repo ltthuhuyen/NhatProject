@@ -1,39 +1,76 @@
-
+.modal-content{
+    border: none;
+    border-radius: 10px;
+}
 .schedule{
-    // margin: 40px 100px;
-    margin-left: 80px;
-    .title {
-        font-size: 25px;
-        font-weight: 320;
-        margin-top: 200px;
-        color:  rgb(9, 116, 32);
+    // display: flex;
+    // align-items: center;
+    // justify-content: center;
+    // flex-direction: column;
+    margin: 20px 210px 0 210px;
+    .title-schedule {
+        text-align: center;
+        font-family: monospace;
+        font-weight: 500;
+        color: #333333;
+        font-size: 45px;
     }
-    .date{
-        width: 590px;
+
+    .line {
+        margin-left: 530px;
+        margin-bottom: 50px;
+        text-align: center;
+        border-style: solid;
+        border-color: #222222;
+        height: 3px;
+        width: 80px;
+
+    }
+    select{
+        width: 380px;
+        border: none;
+        outline: none;
+        margin: 10px 0px;
+        border-bottom: 1px solid #288500;
+    }
+    input{
+        border: none;
+        outline: none;
+        margin: 10px 0px;
+        border-bottom: 1px solid #288500;
+    }
+    .btn-create-address{
+        width: auto;
+        margin: 40px 0 0 32px ;
+        padding: 8px;
+        border-radius: 13px;
+        background: #8CC63E;
+        color: #FFF; 
+        &:hover{
+            transform: scale(1.02);
+            color: rgb(1, 113, 16);
+            background-color: #FFF;
+            border: 1px solid rgb(1, 113, 16);
+    
+        }
     }
     .btn-schedule{
-        gap: 50px;
         flex-wrap: wrap;
-        width: 270px;
+        width: 220px;
         border: 1px solid rgb(1, 113, 16);
-        margin-bottom: 10px;
-        margin-right:50px;
-        padding: 0px 10px;
+        margin: 5px 25px;
         color: rgb(1, 113, 16); 
         &.active{
-            background-color: rgb(226, 249, 249);
-            color: rgb(1, 113, 16); 
-            // color:rgb(234, 250, 255);
-            border: 1px solid rgb(1, 113, 16);
+            background: #8CC63E;
+            color: #FFF; 
     
         }
     }
     
     .btn-confirm{
-        margin-top: 70px;
-        line-height: 0px;
+        margin: 25px 0 60px 0;
         font-weight: 500;
-        margin-left: 160px;
+        margin-left: 170px;
         border-radius: 13px;
         background-color: rgb(226, 249, 249);
         color: rgb(1, 113, 16);

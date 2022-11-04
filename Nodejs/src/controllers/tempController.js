@@ -4,7 +4,6 @@ import tempService from '../services/tempService'
 
 let  handleCreateTemp = async (req, res) =>{
     let message = await tempService.createNewTemp(req.body);
-    console.log(message);
     return res.status(200).json(message);
 }
 
@@ -28,14 +27,26 @@ let handleGetAllTemps = async(req, res) => {
 }
 
 
-let handleDeleteTemp  = async (req, res) =>{
-    if (!req.body.id) {
+let handleDeleteProductInTemp  = async (req, res) =>{
+    if (!req.body.productId) {
         return res.status(200).json({
             errCode: 1,
-            errMessage: 'Không tìm thấy sản phẩm'
+            errMessage: 'Không tìm thấy sản phẩm để xóa'
         });
     }
-    let message = await tempService.deleteTemp(req.body.id);
+    let message = await tempService.deleteProductInTemp(req.body.productId);
+    return res.status(200).json(message);
+  
+}
+
+let handleDeleteAllTempOfGiver  = async (req, res) =>{
+    if (!req.body.giverId) {
+        return res.status(200).json({
+            errCode: 1,
+            errMessage: 'Không tìm thấy sản phẩm để xóa'
+        });
+    }
+    let message = await tempService.deleteAllTempOfGiver(req.body.giverId);
     return res.status(200).json(message);
   
 }
@@ -53,6 +64,7 @@ let handleDeleteTemp  = async (req, res) =>{
 module.exports ={
     handleCreateTemp: handleCreateTemp,
     handleGetAllTemps: handleGetAllTemps,
-    handleDeleteTemp: handleDeleteTemp
+    handleDeleteProductInTemp: handleDeleteProductInTemp,
+    handleDeleteAllTempOfGiver: handleDeleteAllTempOfGiver
     // handleUpdateStatus: handleUpdateStatus
 }

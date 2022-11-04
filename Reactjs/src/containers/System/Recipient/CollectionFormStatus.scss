@@ -1,28 +1,55 @@
+.collection-form{
+    // margin: 190px 170px 0 170px;
+    margin: 190px 200px;
+    .title-collection-form{
+        text-align: center;
+        font-family: monospace;
+        font-weight: 500;
+        color: #333333;
+        font-size: 50px;
+    }
+    .line{
+        margin-left: 530px;
+        margin-bottom: 50px;
+        text-align: center;
+        border-style: solid;
+        border-color: #222222;
+        height: 3px;
+        width: 80px;
+
+    }
+}
 .container-collection-form-status{
-    margin:  190px 170px 0px 170px;
     padding: 80px 70px;
     align-items: center;
-    justify-content: space-around;
-    a{  
-        margin-left: 50px;
-        text-decoration: none;
-        color: black;
-        .icon{
-            font-size: 19px;
-            margin-right: 10px;
-            color: rgb(9, 116, 32);
+    .wrapper-link {
+            // padding-bottom: 2px;
+            border-bottom: 1px solid #F8F8FF;
+    
+            a {
+                margin-left: 50px;
+                text-decoration: none;
+                color: #646363;
+    
+    
+                .icon {
+                    font-size: 19px;
+                    margin-right: 10px;
+    
+                }
+            }
         }
-    }  
     .div-content{
         margin-left: 90px;
-        .icon{
+        .icon {
             font-size: 19px;
             margin-right: 10px;
-            color: rgb(9, 116, 32);
+            color: #646363;
         }
-        a{
+    
+        a {
             text-decoration: none;
-            color: black;
+            color: #646363;
         }
     }
     .title {
@@ -30,7 +57,6 @@
         margin-left: 32%;
         margin-top: 5%;
         font-size: 30px;
-        // font-family: Century Gothic;
         font-family: Courier New;
         padding: 10px 0px;
         text-align: center;
@@ -39,13 +65,13 @@
         background-color: #7ed000;
     }
     .row{
-        // font-family: monospace;
         .collection-form{
+            font-size: 14px;
             border-radius: 15px;
             border: 3px solid  rgb(246, 248, 247) ;
             background-color: #F5FFFA;
             margin: 50px 40px;
-            padding: 20px 30px;
+            padding: 40px 30px;
             &:hover{
                 transform: scale(1.05);
                 background-color:  #fbf5f7;
@@ -60,30 +86,26 @@
                 height: 100px; 
             
             }
-            .info-giver{
-                // font-style: italic;
-                font-size: 16px;
-                
+            .info-giver-recipient{
                 .icon{
                     margin: 3px 6px 0px 0px ;
-                    color:#4c9a17;
+                    color:#8CC63E;
                 }
             }
             .info-collection{
                 .info{
-                    font-family: monospace;
-                    color:#4c9a17;
+                    color:#8CC63E;
                    
                 }
                 .icon{
-                    margin-bottom: 6px;
-                    color:#4c9a17;
+                    margin-bottom: 10px;
+                    color:#8CC63E;
                 }
                 .status-s2{
                     font-family: Courier New;
-                    font-size: 14px;
-                    // font-weight: 700;
+                    font-size: 13px;
                     color: black;
+                    width: fit-content;
                     background: #FFFF00;
                     padding: 0px 5px;
                     .icon{
@@ -92,22 +114,22 @@
                         background: yellow;
                     }
                 }
-                .status-s3{
+                .status-s4{
                     font-family: Courier New;
-                    font-size: 14px;
-                    // font-weight: 700;
+                    font-size: 13px;
                     color: #fff;
                     background: #7ed000;
                     padding: 0px 5px;
                     .icon{
+                        font-size: 15px;
                         margin-top:5px;
                         color: #fff;
                         background: #7ed000 ;
                     }
                 }
-                .status-s4{
+                .status-s5{
                     font-family: Courier New;
-                    font-size: 14px;
+                    font-size: 13px;
                     // font-weight: 700;
                     color: #fff;
                     background: #ee4a4a;
@@ -132,21 +154,26 @@
                     }
                 }
                 .update-status{
-                    margin-left: 510px;
+                    right: 400px;
+                    position: absolute;
+                        
                     .btn-update-status{
                         margin-left: 15px;
                         border-radius: 13px;
                         background-color: rgb(226, 249, 249);
                         color: rgb(1, 113, 16);
-                        &:hover{
-                            background-color: #ffffff;
-                            transform: scale(1.1);
-                            border: 1px solid rgb(1, 113, 16);
+                    //     &:hover{
+                    //         position: fixed;
+                    //             right: 0;
+                    //             width: auto;
+                    //         background-color: #ffffff;
+                    //         // transform: scale(1.1);
+                    //         border: 1px solid rgb(1, 113, 16);
                         
-                    }
+                    // }
                 }
                 
-            }
+                 }
         }
            
         }

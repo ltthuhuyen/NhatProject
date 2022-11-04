@@ -1,29 +1,34 @@
-import React, { Component } from 'react';
-import { Link, Redirect } from 'react-router-dom';
-import { connect } from 'react-redux';
-import Header from '../Header/Giver/Header'
-import Container from '../Container/Container';
-import News from '../News/News';
-import Footer from '../Footer/Footer';
-import * as actions from "../../store/actions";
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import * as actions from "../../store/actions"
 import { changeLanguageApp } from '../../store/actions'
-import '../Header/Giver/Header.scss';
+import Header from '../Header/Giver/Header'
+import Banner from '../Banner/Banner'
+import SlideShow from '../SlideShow/SlideShow'
+import Introduce from '../Introduce/Introduce'
+import Container from '../Container/Container'
+import News from '../News/News'
+import Footer from '../Footer/Footer'
+import ScrollUp from '../../components/ScrollUp'
+
 class HomePage extends Component {
-    changeLanguage = (language) => {
-        this.props.changeLanguageAppRedux(language)
-    }
+  
     
     render() {
         const { processLogout , isLoggedIn } = this.props;
         let language = this.props.language;
         console.log(isLoggedIn)
         return (
-          <div>
+            <div>
+                <ScrollUp />   
                 <Header />
+                <Banner />
+                <SlideShow />
+                <Introduce />
                 <Container />
                 <News />
-                <Footer />    
-          </div>
+                <Footer /> 
+            </div>
         );
     }
 }

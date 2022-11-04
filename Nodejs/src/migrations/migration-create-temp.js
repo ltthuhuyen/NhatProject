@@ -18,6 +18,10 @@ module.exports = {
             allowNull: false,
             type: Sequelize.INTEGER
         },
+        addressId: {
+            allowNull: false,
+            type: Sequelize.INTEGER
+        },
         // recipientId: {
         //     allowNull: false,
         //     type: Sequelize.INTEGER

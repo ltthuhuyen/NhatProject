@@ -1,0 +1,126 @@
+.user-info {
+    margin: 190px 200px;
+    .title-user-info{
+        text-align: center;
+        font-family: monospace;
+        font-weight: 500;
+        color: #333333;
+        font-size: 45px;
+    }
+    .line{
+        margin-left: 530px;
+        margin-bottom: 50px;
+        text-align: center;
+        border-style: solid;
+        border-color: #222222;
+        height: 3px;
+        width: 80px;
+
+    }
+    .user-info-content{
+        padding: 15px 150px 10px 150px;
+        border-radius: 10px;
+        align-items: center;
+        .account {
+            .link-homepage{
+                text-decoration: none;
+                color: #646363;
+                .icon {
+              
+                }
+                .text {
+                    margin: 3px 20px 0 3px;
+                }
+            }
+               
+        }
+        .row{
+          //  padding: 3px 0;
+           
+            .img{
+                .img-pro {
+                    height: 100px;
+                    width: 100%;
+                    overflow: hidden;
+                }
+                .img-pro img{
+                    height: 120px; 
+                
+                }
+            }
+            .info{
+                margin: 15px 30px;
+                color: #288500;
+                .icon{
+                    margin-bottom: 9px;
+                }
+            }
+                           .btn-edit {
+                               background-color: white;
+                               color: rgb(245, 221, 7);
+                               border: 1px solid rgb(245, 221, 7);
+                               font-size: 15px;
+            
+                               &:hover {
+                                   color: white;
+                                   background-color: rgb(255, 251, 7)
+                               }
+                           }
+            
+                           .btn-delete {
+                               background-color: white;
+                               color: #dc3545;
+                               border: 1px solid #dc3545;
+                               font-size: 18px;
+            
+                               &:hover {
+                                   color: white;
+                                   background-color: #fc394d;
+                               }
+                           }
+
+        }
+    }
+}
+
+.form-change-password {
+
+    // width: 50%;
+    font-family: monospace;
+
+    .forgot-input {
+        font-family: monospace;
+        font-size: 14px;
+        padding: 19px 20px;
+        .label {
+            color: #7ed500;
+            margin-bottom: 0.5rem;
+        }
+        .icon {
+            margin-right: 10px;
+        }
+        input {
+            width: 100%;
+            font-size: 16px;
+            border: none;
+            outline: none;
+            border-bottom: 1px solid #288500;
+                &:hover {
+                    height: 34px;
+                    border-radius: 10px;
+                    border: 1px solid rgb(51, 51, 51);
+                }
+        }
+
+    }
+
+    .btn-confirm {
+        margin-left: 350px;
+        font-size: 14px;
+        display: flex;
+        justify-content: flex-end;
+        border-radius: 25px;
+        color: rgb(255, 255, 255);
+        background: -webkit-linear-gradient(left, #7ed000, #7ed400, rgb(55, 163, 21));
+    }
+}

@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
         Temp.belongsTo(models.User, { foreignKey: 'giverId', targetKey: 'id', as: 'giverTemp' })
+        Temp.belongsTo(models.Address, { foreignKey: 'addressId', targetKey: 'id', as: 'addressTemp' })
         // Temp.belongsTo(models.User, { foreignKey: 'recipientId', targetKey: 'id', as: 'recipientTemp' })
         Temp.belongsTo(models.Product, { foreignKey: 'productId', targetKey: 'id', as: 'productTemp' })
         Temp.belongsTo(models.Allcode, { foreignKey: 'statusType', targetKey: 'keyMap', as: 'statusTypeTemp' })
@@ -22,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
         date: DataTypes.STRING,
         timeType: DataTypes.STRING,
         giverId: DataTypes.INTEGER,
+        addressId: DataTypes.INTEGER,
         // recipientId: DataTypes.INTEGER,
         productId: DataTypes.INTEGER,
         statusType: DataTypes.STRING

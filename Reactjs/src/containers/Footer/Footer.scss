@@ -1,12 +1,6 @@
 .bg-footer {
-    width: 100%;
-    margin-top: 200px;
-   
-    // background:#7ed000;
-    
-   // background-color: rgb(226, 249, 249);
+    max-width: 100%;
    .title-footer{
-    // background: #7ed000;
     background:  #eaf6c4;
     color:  #0c9344;
     padding: 90px;
@@ -16,21 +10,16 @@
     text-align: center;
    }
     .row{
-        // background:#F0FFF0;
-        background: #fff;
+        max-width: 100%;
+        background:#fff;
         padding: 40px 130px;
         .title{
-             font-family: monospace;
-             // color: rgb(69, 172, 9);
+            font-family: monospace;
          }
          
         
         .content{
-             // font-style: italic;
-             // font-family: monospace;
-            //  text-decoration: none;
-             // color: rgb(0, 158, 250);
-             color: rgb(0, 21, 255);
+            color: rgb(0, 21, 255);
             .icon{
                  font-size: 18px;
                  color: rgb(63, 62, 62);

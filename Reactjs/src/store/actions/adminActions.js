@@ -166,8 +166,11 @@ export const createNewUser = (data) => {
             if (res && res.errCode === 0) {
                 toast.success('Thêm người dùng thành công!')
                 dispatch(saveUserSuccess(res.data));
-            } else {
-                dispatch(saveUserFailded());
+            } else if ( res && res.errCode === 1) {
+                toast.error('Email này đã tồn tại')
+            }
+            else if ( res && res.errCode === 2 ) {
+                toast.error('Vui lòng điền đầy đủ thông tin')
             }
         } catch (e) {
             dispatch(saveUserFailded())

@@ -1,0 +1,19 @@
+.scroll-up{
+    border: 1px solid red;
+    .btn-scroll-up{
+        border-radius: 3px;
+        color: #FFF;
+        background: greenyellow;
+        font-size: 25px;
+        padding: auto;
+        opacity: 0.4;
+        margin: 0 0 20px 1440px;
+        position: fixed;
+        top: 90vh;
+        z-index: 1001;
+        display: block;
+        &:hover{
+            opacity: none;
+        }
+    }
+}

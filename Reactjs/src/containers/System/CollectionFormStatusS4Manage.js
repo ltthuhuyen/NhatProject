@@ -1,160 +1,226 @@
-
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import { connect } from "react-redux";
-import { FormattedMessage } from 'react-intl'
-import * as BsIcons from 'react-icons/bs';
+import { FormattedMessage } from "react-intl";
+import * as BsIcons from "react-icons/bs";
 import * as actions from "../../store/actions";
-import { Table } from 'reactstrap';
-import './Manage.scss';
-import { withRouter } from 'react-router';
-import {getSuccessedCollectionForm} from '../../services/collectionformService'
-import NavAdmin from '../../components/NavAdmin';
+import { Table } from "reactstrap";
+import "./Manage.scss";
+import { withRouter } from "react-router";
+import { getSuccessedCollectionForm } from "../../services/collectionformService";
+import NavAdmin from "../../components/NavAdmin";
 
 class CollectionFormStatusS4Manage extends Component {
-    constructor(props){
-        super(props);
-        this.state = {
-            arrCollectionForms: [],
-            statusArr: [],
-            status: '',
-            statusType: ''
-        }
-    }
-    handleOnChangeInput = (e, id) => {
-        let copyState = {...this.state};
-        copyState[id] = e.target.value;
-        this.setState({
-            ...copyState
-         }, () => {
-            console.log('check good state' , this.state)
-        } )
-    }
-
-    componentDidMount(){
-        this.getCollectionFormStatusS4();    
-        this.props.getStatusStart();
-        
-
-    }
-    
-    getCollectionFormStatusS4 = async () => {
-        let response = await getSuccessedCollectionForm('ALL');
-        console.log('collection-form-S4', response)
-        if(response && response.errCode == 0){
-            this.setState({
-                arrCollectionFormsStatusS4: response.appointments
-            })
-            
-        }
+  constructor(props) {
+    super(props);
+    this.state = {
+      arrCollectionForms: [],
+      statusArr: [],
+      status: "",
+      statusType: "",
+      currentPage: 1,
+      todosPerPage: 10,
+    };
+    this.handleClick = this.handleClick.bind(this);
+  }
+  handleOnChangeInput = (e, id) => {
+    let copyState = { ...this.state };
+    copyState[id] = e.target.value;
+    this.setState(
+      {
+        ...copyState,
+      },
+      () => {
+        console.log("check good state", this.state);
       }
+    );
+  };
 
-    componentDidUpdate(prevProps, prevState, snapshot){
-        if (prevProps.statusRedux !== this.props.statusRedux) {
-            let arrStatuses = this.props.statusRedux
-            console.log(arrStatuses)
-            this.setState({
-                statusArr: arrStatuses,
-                status: arrStatuses && arrStatuses.length > 0 ? arrStatuses[0].keyMap: ''
-            })
-        }
+  componentDidMount() {
+    this.getCollectionFormStatusS4();
+    this.props.getStatusStart();
+  }
+
+  getCollectionFormStatusS4 = async () => {
+    let response = await getSuccessedCollectionForm("ALL");
+    console.log("collection-form-S4", response);
+    if (response && response.errCode == 0) {
+      this.setState({
+        arrCollectionFormsStatusS4: response.appointments,
+      });
     }
+  };
 
-    handleLook = async (schedule) => {
-        console.log(schedule)
-        this.props.history.push(`/system/collection-form-detail/${schedule.id}`);
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps.statusRedux !== this.props.statusRedux) {
+      let arrStatuses = this.props.statusRedux;
+      console.log(arrStatuses);
+      this.setState({
+        statusArr: arrStatuses,
+        status:
+          arrStatuses && arrStatuses.length > 0 ? arrStatuses[0].keyMap : "",
+      });
     }
+  }
 
-    render() {
-        let arrCollectionFormsStatusS4 = this.state.arrCollectionFormsStatusS4
-        console.log('arrCollectionFormsStatusS4', arrCollectionFormsStatusS4)
-        const { processLogout , userInfo } = this.props;
-        let imageBase64 =''
-        if (userInfo.image) {
-        imageBase64 = new Buffer(userInfo.image, 'base64').toString('binary')  
-        }   
-        return (
-            <>  
-            <NavAdmin />
-            <div className="main_content">
-                <div className='row header'>
-                    <div className='d-flex'>
-                        <div className="img">
-                            <img src={imageBase64} className='img-img'/>
-                        </div>
-                        <div className='profile-info'>Xin chào {userInfo && userInfo.firstName + userInfo.lastName  ? userInfo.firstName + ' ' + userInfo.lastName : '' }</div>
-                    </div>  
-                </div>
-                <div className='row title d-flex'>
-                    <div className='col-10 title-manage'>ĐƠN THU GOM MỚI </div>
-                    <div className='serach_field-area d-flex align-items-center'>
-                        <input type="text" placeholder="Search here..."
-                            onChange={(e) => {this.handleOnChangeInput(e, 'search')}}/>
-                        <button type="search" className="btn btn-search rounded-pill"
-                            onClick = {() => this.handleSearch()}
-                        ><BsIcons.BsSearch/> Tìm</button>
-                    </div>
-                </div>
-                <div className='row content'>
-                    <div className="table">
-                    <Table >
-                        <thead className='thead'>
-                            <tr>
-                                <th scope="col">ID</th>
-                                <th scope="col"colspan='3'>Thông tin người cho</th>
-                                <th scope="col">Sản phẩm</th>
-                                {/* <th scope="col">Ngày thu gom</th>
+  handleClick(event) {
+    this.setState({
+      currentPage: Number(event.target.id),
+    });
+  }
+
+  handleLook = async (schedule) => {
+    console.log(schedule);
+    this.props.history.push(`/system/collection-form-detail/${schedule.id}`);
+  };
+
+  render() {
+    let arrCollectionFormsStatusS4 = this.state.arrCollectionFormsStatusS4;
+    let { currentPage, todosPerPage } = this.state;
+    const indexOfLastTodo = currentPage * todosPerPage;
+    const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
+    const currentTodos = arrCollectionFormsStatusS4.slice(
+      indexOfFirstTodo,
+      indexOfLastTodo
+    );
+
+    const pageNumbers = [];
+    for (
+      let i = 1;
+      i <= Math.ceil(arrCollectionFormsStatusS4.length / todosPerPage);
+      i++
+    ) {
+      pageNumbers.push(i);
+    }
+    const { processLogout, userInfo } = this.props;
+    let imageBase64 = "";
+    if (userInfo.image) {
+      imageBase64 = new Buffer(userInfo.image, "base64").toString("binary");
+    }
+    return (
+      <>
+        <NavAdmin />
+        <div className="main_content">
+          <div className="row header">
+            <div className="d-flex">
+              <div className="img">
+                <img src={imageBase64} className="img-img" />
+              </div>
+              <div className="profile-info">
+                Xin chào{" "}
+                {userInfo && userInfo.firstName + userInfo.lastName
+                  ? userInfo.firstName + " " + userInfo.lastName
+                  : ""}
+              </div>
+            </div>
+          </div>
+          <div className="row title d-flex">
+            <div className="col-10 title-manage">ĐƠN ĐÃ THU GOM </div>
+            <div className="serach_field-area d-flex align-items-center">
+              <input
+                type="text"
+                placeholder="Search here..."
+                onChange={(e) => {
+                  this.handleOnChangeInput(e, "search");
+                }}
+              />
+              <button
+                type="search"
+                className="btn btn-search rounded-pill"
+                onClick={() => this.handleSearch()}
+              >
+                <BsIcons.BsSearch /> Tìm
+              </button>
+            </div>
+          </div>
+          <div className="row content">
+            <div className="table">
+              <Table>
+                <thead className="thead">
+                  <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col" colspan="3">
+                      Thông tin người cho
+                    </th>
+                    <th scope="col">Sản phẩm</th>
+                    {/* <th scope="col">Ngày thu gom</th>
                                 <th scope="col">Thời gian</th> */}
-                                <th scope="col">Người nhận thu gom</th>
-                                <th scope="col">Trạng thái</th>
-                                <th scope="col">Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody className='tbody'>
-                        {
-                                arrCollectionFormsStatusS4 && arrCollectionFormsStatusS4.map((item, index) => {
-                                
-                                return (
-                                    <tr key={index}>
-                                        <td>{item.id}</td>
-                                        <td>{item.giverData.firstName} {item.giverData.lastName}</td>
-                                        <td>{item.giverData.email}</td>
-                                        <td>{item.giverData.phone}</td>
-                                        <td>{item.productData.product_name}</td>
-                                        {/* <td>{item.date}</td>
+                    <th scope="col">Người nhận thu gom</th>
+                    <th scope="col">Trạng thái</th>
+                    <th scope="col">Hành động</th>
+                  </tr>
+                </thead>
+                <tbody className="tbody">
+                  {currentTodos &&
+                    currentTodos.map((item, index) => {
+                      return (
+                        <tr key={index}>
+                          <td>{item.id}</td>
+                          <td>
+                            {item.giverData.firstName} {item.giverData.lastName}
+                          </td>
+                          <td>{item.giverData.email}</td>
+                          <td>{item.giverData.phone}</td>
+                          <td>{item.productData.product_name}</td>
+                          {/* <td>{item.date}</td>
                                         <td>{item.timeTypeData.valueVi}</td>  */}
-                                        <td>{item.recipientData.firstName} {item.recipientData.lastName}</td>
-                                        <td>{item.statusTypeData.valueVi}</td>
-                                    
-                                        <td><button type="button" className="btn btn-detail px-2 " onClick={() => this.handleLook(item)}><BsIcons.BsInfoCircle/> Chi tiết</button></td>
-                                    </tr>
-                                        )
-                                })
-                            }
-                        </tbody>
-                    </Table>
-                    </div>
-                </div>
-               
-            </div>  
-            </>
-        );
-    }
+                          <td>
+                            {item.recipientData.firstName}{" "}
+                            {item.recipientData.lastName}
+                          </td>
+                          <td>{item.statusTypeData.valueVi}</td>
+
+                          <td>
+                            <button
+                              type="button"
+                              className="btn btn-detail px-2 "
+                              onClick={() => this.handleLook(item)}
+                            >
+                              <BsIcons.BsInfoCircle /> Chi tiết
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </Table>
+            </div>
+          </div>
+          <div className="row btn-pageNumber d-flex">
+            {pageNumbers.map((number) => {
+              return (
+                <button
+                  className="btn btn-prev-next d-flex"
+                  key={number}
+                  id={number}
+                  onClick={this.handleClick}
+                >
+                  {number}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </>
+    );
+  }
 }
 
-const mapStateToProps = state => {
-    return {
-        language: state.app.language,
-        systemMenuPath: state.app.systemMenuPath,
-        statusRedux: state.admin.statuses,
-        isLoggedIn: state.user.isLoggedIn,
-        userInfo: state.user.userInfo,
-    };
+const mapStateToProps = (state) => {
+  return {
+    language: state.app.language,
+    systemMenuPath: state.app.systemMenuPath,
+    statusRedux: state.admin.statuses,
+    isLoggedIn: state.user.isLoggedIn,
+    userInfo: state.user.userInfo,
+  };
 };
 
-const mapDispatchToProps = dispatch => {
-    return {
-        getStatusStart: () => dispatch(actions.fetchStatusStart()),
-    };
+const mapDispatchToProps = (dispatch) => {
+  return {
+    getStatusStart: () => dispatch(actions.fetchStatusStart()),
+  };
 };
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(CollectionFormStatusS4Manage));
+export default withRouter(
+  connect(mapStateToProps, mapDispatchToProps)(CollectionFormStatusS4Manage)
+);

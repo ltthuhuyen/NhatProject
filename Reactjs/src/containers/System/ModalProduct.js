@@ -56,9 +56,7 @@ class ModalProduct extends Component {
         copyState[id] = e.target.value;
         this.setState({
             ...copyState
-        }, () => {
-            // console.log('check good state' , this.state)
-        } )
+        })
     }
 
     checkValideInput = () => {
@@ -76,8 +74,6 @@ class ModalProduct extends Component {
     }   
 
     handleSaveProduct = () => {
-        let isValid = this.checkValideInput()
-        if(isValid === false) return ;
         this.props.createNewproduct({
             product_name: this.state.product_name,
             image: this.state.image,
@@ -119,6 +115,7 @@ class ModalProduct extends Component {
                                     
                                 />
                             </div>
+                            
                             <div className="col-4">
                                 <div className="preview-img-container">
                                     <input id="previewImg" type="file" hidden

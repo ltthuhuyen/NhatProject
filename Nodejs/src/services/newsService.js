@@ -1,6 +1,6 @@
 import db from '../models/index'
 
-let GetAllNews = (id) => {
+let getAllNews = (id) => {
     return new Promise( async (resolve, reject) => {
         try {
             let news = ''
@@ -23,13 +23,39 @@ let GetAllNews = (id) => {
     })
 }
 
-let CreateNews = (data) => {
+let checkNews = (check) => {
+    return new Promise(async(resolve, reject) => {
+        try {
+            let news = await db.News.findOne({
+                where: {title: check}
+            })
+            if(news) {
+                resolve(true)
+            }
+            else {
+                resolve(false)
+            }
+        } catch(e) {
+            reject(e);
+        }
+    })
+}
+
+
+let createNews = (data) => {
     return new Promise( async(resolve, reject)=>{
         try {
-            if (!data.title && !data.avatar && !data.description) {
+            let check = await checkNews(data.title);
+            if (check === true){
                 resolve({
                     errCode: 1,
-                    errMessage: "Missing parameter"
+                    errMessange:'Tin tức này đã tồn tại '
+                })
+            }
+            else if (!data.title || !data.description || !data.contentHTML || !data.contentMarkdown) {
+                resolve({
+                    errCode: 2,
+                    errMessage: "Vui lòng điền đầy đủ thông tin"
                 })
             } else {
                 await db.News.create({
@@ -41,7 +67,7 @@ let CreateNews = (data) => {
                 })
                 resolve({
                     errCode: 0,
-                    errMessage: "save news succeed"
+                    errMessage: "Thêm thành công"
                 })
             }
         } catch (e) {
@@ -50,60 +76,72 @@ let CreateNews = (data) => {
     })
 }
 
-let DeleteNews = (id) => {
+let deleteNews = (id) => {
     return new Promise(async (resolve, reject) => {
         let news = await db.News.findOne({
             where: {ID: id}
         })
         if (!news) {
             resolve({
-                errCode: 2,
-                errMessage: `The news is't exit`
+                errCode: 1,
+                errMessage: `Không tìm thấy tin tức`
             })
         }
-        await db.News.destroy({
-            where: {ID: id}
-        })
-        resolve({
-            errCode: 0,
-            message: 'the news is deleted'
-        })
+        else{
+            await db.News.destroy({
+                where: {ID: id}
+            })
+            resolve({
+                errCode: 0,
+                message: 'Xóa thành công'
+            })
+        }
+     
     })
 }
 
-let EditNews = (newsData) => {
+let editNews = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!newsData.ID) {
-                resolve({
-                    errCode: 2,
-                    errMessage: `Missing required parameters`
-                });
-            }
-            let news = await db.News.findOne({
-                where: { ID: newsData.ID },
-                raw: false
-            })
-            if (news) {
-                news.contentHTML = newsData.contentHTML,
-                news.contentMarkdown = newsData.contentMarkdown,
-                news.description = newsData.description,
-                news.title = newsData.title;
-                if (news.avatar) {
-                    news.avatar = newsData.avatar;
-                }
-                await news.save()
-                resolve({
-                    errCode: 0,
-                    message: 'update the user succeeds'
-                })
-            } else {
+            if (!data.ID) {
                 resolve({
                     errCode: 1,
-                    errMessage: `user's not found!`
+                    errMessage: 'Không tìm thấy tin tức'
                 });
             }
-        } catch (e) {
+            else if (!data.title && !data.avatar && !data.description && !data.contentHTML && !data.contentMarkdown) {
+                resolve({
+                    errCode: 1,
+                    errMessage: "Vui lòng điền đầy đủ thông tin"
+                })
+            } 
+            else {
+                let news = await db.News.findOne({
+                    where: { ID: data.ID },
+                    raw: false
+                })
+                if (news) {
+                    news.contentHTML = data.contentHTML,
+                    news.contentMarkdown = data.contentMarkdown,
+                    news.description = data.description,
+                    news.title = data.title;
+                    if (news.avatar) {
+                        news.avatar = data.avatar;
+                    }
+                    await news.save()
+                    resolve({
+                        errCode: 0,
+                        message: 'Sửa tin tức thành công'
+                    })
+                } else {
+                    resolve({
+                        errCode: 1,
+                        errMessage: 'Không tìm thấy tin tức'
+                    });
+                }
+            }     
+        }   
+        catch (e) {
             reject(e)
         }
     })
@@ -111,8 +149,8 @@ let EditNews = (newsData) => {
 
 
 module.exports = {
-    GetAllNews: GetAllNews,
-    CreateNews: CreateNews,
-    DeleteNews: DeleteNews,
-    EditNews: EditNews
+    getAllNews: getAllNews,
+    createNews: createNews,
+    deleteNews: deleteNews,
+    editNews: editNews
 }

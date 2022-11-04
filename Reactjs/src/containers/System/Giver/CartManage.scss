@@ -1,61 +1,44 @@
-
-
-.modal .modal-dialog .modal-content .modal-header{
-    background-color: rgb(9, 116, 32);
-}
-
 .container-cart{
-    margin-top: 150px;
+    margin: 20px 150px 130px 150px;
     max-width: 100%;
     text-align: center;
-    .title {
-        font-size: 25px;
-        font-weight: 320;
-        margin-top: 20px;
-        color:  rgb(9, 116, 32);
+    .title-cart{
+        text-align: center;
+        font-family: monospace;
+        font-weight: 500;
+        color: #333333;
+        font-size: 45px;
     }
-    .btn{
-        padding: auto;
-        height: 40px;
-        text-decoration: none;
-    }
-   
-    .table-cart{
-        justify-content: center;
-        position: absolute;
-        left: 5%;
-        width: 90%;
-        margin-top: 20px;
-        border: 1px solid #ffffff;
+    .line{
+        margin-left: 580px;
+        margin-bottom: 50px;
+        text-align: center;
+        border-style: solid;
+        border-color: #222222;
+        height: 3px;
+        width: 80px;
 
+    }
+    .table-cart{
+        width: 100%;
         .thead{
-          //  border: 1px solid #ffffff;
             background-color: rgb(0, 0, 0);
             color: white;
             text-align: center;
             padding: 100px 0px;
+            font-weight: 200;
         }
-      
-        img.img-img {
-            width: 180px;
-            height: 150px;
-        }
-           
-     
-        .btn-edit {
-            width: 50px;
-            background-color: white;
-            color: rgb(245, 221, 7);
-            border: 1px solid rgb(245, 221, 7);
-            font-size: 20px;
-        
-            &:hover{
-                background-color: transparent;
-                color: white;
-                background-color: rgb(255, 251, 7)
+        .tbody{
+            :hover{
+                background-color:#F5FFFA;
+            }
+            img.img-img {
+                // clip-path: circle(25px);
+                border: 0.5px solid black;
+                width: 80px;
+                height: 80px;
             }
         }
-    
         .btn-delete {
             width: 50px;
             background-color: white;
@@ -75,14 +58,11 @@
     .btn-booking{
         font-weight: 500;
         width: auto;
-        justify-content: space-between;
-        margin-top: 230px;
+        margin-top: 100px;
         border-radius: 13px;
         background-color: rgb(226, 249, 249);
         color: rgb(1, 113, 16);
         &:hover{
-           
-        
             background-color: #ffffff;
             transform: scale(1.1);
             border: 1px solid rgb(1, 113, 16);
@@ -91,8 +71,7 @@
         .link {
             color: rgb(1, 113, 16);
             text-decoration: none;
-            
-            
+               
         }
        
     }

@@ -1,31 +1,36 @@
-.container-collection-form{
-    margin:  0px 170px ;
-    padding: 80px 70px;
-    align-items: center;
-    justify-content: space-around;
-    .title {
-        max-width: 40%;
-        margin-left: 32%;
-        font-size: 30px;
-        // font-family: Century Gothic;
-        font-family: Courier New;
-        padding: 10px 0px;
+.container{
+    margin: 100px 200px ;
+    .title-news{
         text-align: center;
-        color: rgb(249, 253, 251);
-        border-radius: 60px;
-        background-color: #7ed000;
+        font-family: monospace;
+        font-weight: 500;
+        color: #333333;
+        font-size: 50px;
     }
+    .line{
+        margin-left: 520px;
+        margin-bottom: 50px;
+        text-align: center;
+        border-style: solid;
+        // border-bottom-width: 5px;
+        border-color: #222222;
+        height: 3px;
+        width: 80px;
+    
+    }
+}
+.container-collection-form{
+    padding: 80px 100px;
+    font-size: 14px;
     .row{
-        // font-family: monospace;
-        background-color: #F5FFFA;
-        margin-top: 50px;
-        padding: 40px;
-        border: 1px solid  rgb(246, 248, 247) ;
-        box-shadow: 1px 1px rgb(247, 251, 251);
+        margin: 70px 0;
+        height: auto;
+        border-radius: 13px;
+        padding: 30px;
         .img-pro {
             // clip-path: circle(140px);
-            height: 220px;
-
+            height: 200px;
+            margin-top: 20px;
             width: 100%;
             overflow: hidden;
         }
@@ -35,38 +40,36 @@
         }
         .info-giver{
             padding-top: 9px;
-            font-style: italic;
-            font-size: 22px;
-            // color: #c7ff60;
-            color: #7ed000;
+            font-size: 20px;
+            font-weight: 500;
+            color: #8CC63E;
            
         }
         .info-collection{
-            font-family: monospace;
+            font-weight: 450;
             padding-bottom: 10px;
-            color:#4c9a17;
+            color: #8CC63E;
             .icon{
                 margin-bottom: 5px;
             }
         }
         &:hover{
             transform: scale(1.05);
-            // background-color: rgb(249, 248, 245);
-            background: #fbf5f7	;
+            background: rgb(249, 248, 245);
         }
         .btn-register-receive{
-            // font-family: Courier New; 
-            font-size: 18px;
-            margin-left: 270px;
+            font-size: 15px;
+            margin-left: 700px;
             padding: 9px 20px;
             border: none;
             border-radius: 13px;
-            background-color: rgb(249, 227, 227);
-            color:#4c9a17;
+            background: #8CC63E;
+            color:#FFF;
             &:hover{
+                transform: scale(1.02);
+                color: rgb(1, 113, 16);
                 background-color: #ffffff;
-                transform: scale(1.003);
-                color:#4c9a17;
+                border: 1px solid rgb(1, 113, 16);
             }
         }
     }

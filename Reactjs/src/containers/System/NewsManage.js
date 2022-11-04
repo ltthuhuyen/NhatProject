@@ -1,299 +1,235 @@
-import React, { Component } from 'react';
-import { FormattedMessage } from 'react-intl';
-import { connect } from 'react-redux';
+import React, { Component } from "react";
+import { FormattedMessage } from "react-intl";
+import { connect } from "react-redux";
 import * as actions from "../../store/actions";
-import MarkdownIt from 'markdown-it';
-import MdEditor from 'react-markdown-editor-lite';
-import 'react-markdown-editor-lite/lib/index.css';
-import * as MdIcons from 'react-icons/md';
-import * as AiIcons from 'react-icons/ai';
-import * as BsIcons from 'react-icons/bs';
-import './News.scss';
-import './Manage.scss'
-import TableNews from './TableNews';
-import { CRUD_ACTIONS, CommonUtils } from '../../utils';
-import Lightbox from 'react-image-lightbox';
-import NavAdmin from '../../components/NavAdmin';
-
+import MarkdownIt from "markdown-it";
+import MdEditor from "react-markdown-editor-lite";
+import "react-markdown-editor-lite/lib/index.css";
+import { Table } from "reactstrap";
+import { toast } from "react-toastify";
+import * as AiIcons from "react-icons/ai";
+import * as MdIcons from "react-icons/md";
+import * as BsIcons from "react-icons/bs";
+import "./Manage.scss";
+import NavAdmin from "../../components/NavAdmin";
+import { allNews, deleteNews } from "../../services/newsService";
 
 const mdParser = new MarkdownIt(/* Markdown-it options */);
-class News extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            contentMarkdown: '',
-            contentHTML: '',
-            description: '',
-            listNews: '',
-            title: '',
-            isOpen: false,
-            action: '',
-            newsID: '',
-            previewImg: '',
-            avatar: '',
-        }
-
-        
-    }
-
-    componentDidMount() {
-        this.props.allNews();
-    }
-
-    componentDidUpdate( prevProps, prevState, snapshot) {
-        if (prevProps.listNews !== this.props.listNews) {
-            this.setState({
-                action: CRUD_ACTIONS.CREATE,
-                contentMarkdown: '',
-                contentHTML: '',
-                description: '',
-                title: '',
-                previewImg: '',
-                avatar: '',
-            })
-        }
-    }
-
-    handleOnChangeImg = async (event) => {
-        let data = event.target.files;
-        let file = data[0];
-        if(file) {
-            let base64 = await CommonUtils.getBase64(file);
-            let objectURL = URL.createObjectURL(file);
-            this.setState({
-                previewImg: objectURL,
-                avatar: base64
-            })
-        }
-    }
-
-    checkValidateInput = () => {
-        let isValid = true;
-        
-        let arrCheck = ['contentMarkdown','contentHTML','description','title']
-        for (let i = 0; i < arrCheck.length; i++) {
-            if (!this.state[arrCheck[i]]) {
-                isValid = false;
-                alert('this input is required: '+ arrCheck[i]);
-                break;
-            }
-        }
-        return isValid;
-    }
-
-    handleEditorChange = ({ html, text }) => {
-        this.setState({
-            contentMarkdown: text,
-            contentHTML: html,
-        })
+class NewsManage extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      arrNews: [],
+      newsEdit: {},
+      currentPage: 1,
+      todosPerPage: 10,
     };
+    this.handleClick = this.handleClick.bind(this);
+  }
 
-    handleSaveNews = () => {
-        let isValid = this.checkValidateInput();
-        if (isValid === false) 
-            return
-        let { action } = this.state
+  async componentDidMount() {
+    await this.getAllNews();
+  }
 
-        if (action === CRUD_ACTIONS.CREATE) {
-            this.props.saveNewsStart({
-                contentHTML: this.state.contentHTML,
-                contentMarkdown: this.state.contentMarkdown,
-                description: this.state.description,
-                title: this.state.title,
-                avatar: this.state.avatar
-            })
+  getAllNews = async () => {
+    let response = await allNews("ALL");
+    if (response && response.errCode == 0) {
+      this.setState(
+        {
+          arrNews: response.news,
+        },
+        () => {
+          console.log("arrNews", this.state.arrNews);
         }
-        if (action === CRUD_ACTIONS.EDIT) {
-            this.props.editNewsStart({
-                contentHTML: this.state.contentHTML,
-                contentMarkdown: this.state.contentMarkdown,
-                description: this.state.description,
-                title: this.state.title,
-                ID: this.state.newsID,
-                avatar: this.state.avatar,
-            })
-        }
-
-        // setTimeout(() => {
-        //     this.props.allNews();
-        // },1000)
-        
-        // console.log('check state', this.state);
+      );
     }
+  };
 
-    handleOnChangeNews = (event, id) => {
-        let copyState = { ...this.state}
-        copyState[id] = event.target.value;
-        this.setState({
-            ...copyState,
-        })
+  handleClick(event) {
+    this.setState({
+      currentPage: Number(event.target.id),
+    });
+  }
+
+  handleAddNews = async () => {
+    this.props.history.push("/system/create-news");
+  };
+
+  handleEditNews = async (news) => {
+    this.props.history.push(`/system/edit-news/${news.id}`);
+  };
+
+  handleDeleteNews = async (news) => {
+    try {
+      let res = await deleteNews(news.id);
+      if (res && res.errCode === 0) {
+        toast.success("Xóa tin tức thành công");
+        await this.getAllNews();
+        this.props.history.push("/system/news-manage");
+      } else {
+        toast.error("Xóa tin tức không thành công");
+      }
+    } catch (e) {
+      toast.error("Xóa tin tức không thành công");
     }
+  };
 
-    handleEditFromParent = (news) => {
-        let imageBase64 = '';
-        if (news.avatar) {
-            imageBase64 = new Buffer(news.avatar, 'base64').toString('binary')  
-        }
+  render() {
+    let { processLogout, userInfo } = this.props;
+    let { arrNews } = this.state;
+    let { currentPage, todosPerPage } = this.state;
+    const indexOfLastTodo = currentPage * todosPerPage;
+    const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
+    const currentTodos = arrNews.slice(indexOfFirstTodo, indexOfLastTodo);
 
-        this.setState({
-            contentMarkdown: news.contentMarkdown,
-            contentHTML: news.contentHTML,
-            description: news.description,
-            title: news.title,
-            action: CRUD_ACTIONS.EDIT,
-            newsID: news.id,
-            avatar: imageBase64,
-            previewImg: imageBase64,
-        })
+    const pageNumbers = [];
+    for (let i = 1; i <= Math.ceil(arrNews.length / todosPerPage); i++) {
+      pageNumbers.push(i);
     }
-
-    openPreviewImage = () => {
-        if (!this.state.previewImg) {
-            return;
-        }
-        this.setState({
-            isOpen: true,
-        })
+    let imageBase64 = "";
+    if (userInfo.image) {
+      imageBase64 = new Buffer(userInfo.image, "base64").toString("binary");
     }
-
-    render() {
-        let { processLogout , userInfo } = this.props;
-        let imageBase64 = ''
-        if (userInfo.image) {
-            imageBase64 = new Buffer(userInfo.image, 'base64').toString('binary')  
-            } 
-        return (
-            <>
-            <NavAdmin/>
-            <div className="main_content">
-                <div className='row header'>
-                    <div className='d-flex'>
-                        <div className="img">
-                                <img src={imageBase64} className='img-img'/>
-                            </div>
-                            <div className='profile-info'>Xin chào {userInfo && userInfo.firstName + userInfo.lastName  ? userInfo.firstName + ' ' + userInfo.lastName : '' }</div>
-                        </div>  
-                </div>
-                <div className='row title d-flex'>
-                    <div className='col-6 title-manage'>QUẢN LÝ TIN TỨC</div>
-                    <div className='serach_field-area d-flex align-items-center'>
-                        <input type="text" placeholder="Search here..."
-                            onChange={(e) => {this.handleOnChangeInput(e, 'search')}}/>
-                        <button type="search" className="btn btn-search rounded-pill"
-                            onClick = {() => this.handleSearch()}
-                        ><BsIcons.BsSearch/> Tìm</button>
-                    </div>
-                    <button 
-                        className='col-1 btn btn-create '
-                        onClick={this.handleAddNewUser}
-                        >
-                        <MdIcons.MdOutlineCreate/> <FormattedMessage id='manage-user.add'/>
-                    </button>
-                </div> 
+    return (
+      <>
+        <NavAdmin />
+        <div className="main_content">
+          <div className="row header">
+            <div className="d-flex">
+              <div className="img">
+                <img src={imageBase64} className="img-img" />
+              </div>
+              <div className="profile-info">
+                Xin chào{" "}
+                {userInfo && userInfo.firstName + userInfo.lastName
+                  ? userInfo.firstName + " " + userInfo.lastName
+                  : ""}
+              </div>
             </div>
-         
-                
-            <div  data-aos="fade-up" className="container">
-                <div className="row row1-news ">
-                    <div className="col-3 img-news">
-                        <label >
-                            <FormattedMessage id="manage-news.image"/>
-                        </label>
-                        <div className="preview-img-container">
-                            <input
-                                id="previewImg"
-                                type="file" hidden
-                                onChange = {(event) => this.handleOnChangeImg(event)}
-                            />
-                            <label className="upload-file" htmlFor="previewImg"><FormattedMessage id="common.upload-image"/> <i className="fas fa-upload"></i></label>
-                            <div className="preview-img"
-                                // style={{ backgroundImage: `url(${this.state.previewImg})` }}
-                                onClick={() => this.openPreviewImage()}
+          </div>
+          <div className="row title d-flex">
+            <div className="col-6 title-manage">QUẢN LÝ TIN TỨC</div>
+            <div className="serach_field-area d-flex align-items-center">
+              <input
+                type="text"
+                placeholder="Search here..."
+                onChange={(e) => {
+                  this.handleOnChangeInput(e, "search");
+                }}
+              />
+              <button
+                type="search"
+                className="btn btn-search rounded-pill"
+                onClick={() => this.handleSearch()}
+              >
+                <BsIcons.BsSearch /> Tìm
+              </button>
+            </div>
+            <button
+              className="col-1 btn btn-create "
+              onClick={this.handleAddNews}
+            >
+              <MdIcons.MdOutlineCreate />{" "}
+              <FormattedMessage id="manage-user.add" />
+            </button>
+          </div>
+          <div className="row content">
+            <div className="table">
+              <Table>
+                <thead className="thead">
+                  <tr>
+                    <th>ID</th>
+                    <th>Tên tin tức</th>
+                    <th>Hình ảnh</th>
+                    <th>Mô tả</th>
+                    <th>ContentHTML</th>
+                    <th>Sửa</th>
+                    <th>Xóa</th>
+                  </tr>
+                </thead>
+                <tbody className="tbody">
+                  {currentTodos &&
+                    currentTodos.length > 0 &&
+                    currentTodos.map((item, index) => {
+                      let imageBase64 = "";
+                      if (item.avatar) {
+                        imageBase64 = new Buffer(
+                          item.avatar,
+                          "base64"
+                        ).toString("binary");
+                      }
+                      return (
+                        <tr key={index}>
+                          <td>{item.id}</td>
+                          <td>{item.title}</td>
+                          <td>
+                            <div className="img">
+                              <img
+                                src={imageBase64}
+                                className="img-img"
+                                alt=" "
+                              />
+                            </div>
+                          </td>
+                          <td>{item.description}</td>
+                          <td>{item.contentHTML}</td>
+                          <td>
+                            <button
+                              className="btn btn-edit"
+                              onClick={() => this.handleEditNews(item)}
                             >
-                                <img src={this.state.avatar} className='img-img'/>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-4 form-group">
-                        <label>
-                            <FormattedMessage id="manage-news.name"/>
-                        </label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            // placeholder="Tiêu đề"
-                            value={this.state.title}
-                            onChange={(event) => {this.handleOnChangeNews(event, 'title')}}
-                        />
-                    </div>
-                    <div className="col-5 form-group">
-                        <label >
-                            <FormattedMessage id="manage-news.description"/>
-                        </label>
-                        <textarea className="form-control"  rows="4"
-                            onChange={(event) => this.handleOnChangeNews(event, 'description')}
-                            value={this.state.description}
-                        >
-                        </textarea>
-                    </div>
-                </div>
-                <div className="news-about-editor mt-3">
-                    {/* <label style={{fontSize: "18px", fontWeight: "bold"}}>
-                        <FormattedMessage id="news.tintuc" />
-                    </label> */}
-                    <MdEditor
-                        style={{ height: '300px' }}
-                        renderHTML={text => mdParser.render(text)}
-                        onChange={this.handleEditorChange}
-                        value={this.state.contentMarkdown}
-                    />
-                </div>
-                <div
-                    className="btn  mt-3"
-                    onClick={() => this.handleSaveNews()}
-                >
-                    <button
-                        className={ this.state.action === CRUD_ACTIONS.EDIT?"btn btn-save":"btn btn-save" }
-                    >
-                        {this.state.action === CRUD_ACTIONS.EDIT?
-                            <FormattedMessage id="common.save" /> :
-                            <FormattedMessage id="common.save"/>
-                        }
-                    </button>
-                </div>
-                <TableNews 
-                    handleEditFromParent={this.handleEditFromParent}
-                    action= {this.state.action}
-                />
-                {this.state.isOpen === true &&
-                    <Lightbox
-                        mainSrc={this.state.previewImg}
-                        onCloseRequest={() => this.setState({ isOpen: false })}
-                    />
-                }
+                              <AiIcons.AiOutlineEdit />
+                            </button>
+                          </td>
+                          <td>
+                            <button
+                              className="btn btn-delete"
+                              onClick={() => this.handleDeleteNews(item)}
+                            >
+                              <AiIcons.AiOutlineDelete />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </Table>
             </div>
-            </>
-        );
-    }
-
+          </div>
+          <div className="row btn-pageNumber d-flex">
+            {pageNumbers.map((number) => {
+              return (
+                <button
+                  className="btn btn-prev-next d-flex"
+                  key={number}
+                  id={number}
+                  onClick={this.handleClick}
+                >
+                  {number}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </>
+    );
+  }
 }
 
-const mapStateToProps = state => {
-    return {
-        // teachers: state.news.teachers,
-        // language: state.app.language,
-        listNews: state.news.News,
-        userInfo: state.user.userInfo,
-    };
+const mapStateToProps = (state) => {
+  return {
+    // teachers: state.news.teachers,
+    // language: state.app.language,
+    listNews: state.news.News,
+    userInfo: state.user.userInfo,
+  };
 };
 
-const mapDispatchToProps = dispatch => {
-    return {
-        saveNewsStart: (data) => dispatch(actions.saveNewsStart(data)),
-        editNewsStart: (data) => dispatch(actions.editNewsStart(data)),
-        allNews: () => dispatch(actions.getAllNews()),
-        
-    };
+const mapDispatchToProps = (dispatch) => {
+  return {
+    saveNewsStart: (data) => dispatch(actions.saveNewsStart(data)),
+    editNewsStart: (data) => dispatch(actions.editNewsStart(data)),
+  };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(News);
+export default connect(mapStateToProps, mapDispatchToProps)(NewsManage);

@@ -1,86 +1,84 @@
 @import "../../styles/common.scss";
-.slide-show{
-    margin: 210px 50px 50px 50px;
-}
-.img-wrap{
-    margin-top: 100px;
-    height: 510px;
-    width: auto;
-}
-.img-wrap img {
-    height: 500px; 
-    width: 100%;
-}
-.container-product{
-    margin:  0px 170px ;
-    padding: 80px 70px;
-    align-items: center;
-    justify-content: space-around;
-   
-    .title {
-        max-width: 40%;
-        margin-left: 32%;
-        font-size: 30px;
-        // font-family: Century Gothic;
-        font-family: Courier New;
-        padding: 10px 0px;
+
+.container{
+    margin: 100px 200px;
+    .title-news{
         text-align: center;
-        color: rgb(249, 253, 251);
-        border-radius: 60px;
-        background-color: #7ed000;
-    }
-    .row{
-        padding: 10px;
         font-family: monospace;
-        .product{
-            border: 3px solid  rgb(246, 248, 247) ;
-            background-color: #F5FFFA;
-            margin: 50px 40px;
-            //padding: 10px;
-           
-            &:hover{
-                transform: scale(1.05);
-                background-color: rgb(249, 248, 245);
-            }
-           
-        }
-        .description-pro{
-            color: rgb(9, 116, 32);
-            margin-top: 40px;
-        }
-        .product-name{
-            margin-top: 10px;
-            margin-left: 15px;
-            font-size: 17px;
-            font-weight: 100px;
+        font-weight: 500;
+        color: #333333;
+        font-size: 50px;
+    }
+    .line{
+        margin-left: 520px;
+        margin-bottom: 50px;
+        text-align: center;
+        border-style: solid;
+        // border-bottom-width: 5px;
+        border-color: #222222;
+        height: 3px;
+        width: 80px;
+    
+    }
+    .container-product{
+        padding: 30px;
+        align-items: center;
+        justify-content: space-around;
+        .row{
+            padding: 10px;
             font-family: monospace;
-            height: 50px;
-            opacity: 1;
-            width: auto;
-            border-radius: 13px;
-            background-color: rgb(226, 249, 249);
-            color: rgb(1, 113, 16);
-            &:hover{
-                transform: scale(1.02);
-                background-color: #ffffff;
-                border: 1px solid rgb(1, 113, 16);
-           }
+            .product{
+                border: 3px solid #eaf6c4 ;
+                background: #eaf6c4;
+                margin: 50px 40px;
+                &:hover{
+                    transform: scale(1.05);
+                    border: 3px solid  rgb(249, 248, 245); ;
+                    background-color: rgb(249, 248, 245);
+                }
+               
+            }
+            .description-pro{
+                color: rgb(9, 116, 32);
+                margin-top: 40px;
+            }
+            .product-name{
+                margin-top: 10px;
+                margin-left: 15px;
+                font-size: 17px;
+                font-weight: 100px;
+                font-family: monospace;
+                height: 50px;
+                width: auto;
+                border-radius: 13px;
+                background: #8CC63E;
+                color: #FFF;
+                // background-color: rgb(255, 255, 255);
+                // color: rgb(1, 113, 16);
+                &:hover{
+                    transform: scale(1.02);
+                    color: rgb(1, 113, 16);
+                    background-color: #FFF;
+                    border: 1px solid rgb(1, 113, 16);
+               }
+            }
         }
+        .img-pro {
+            border: 1px solid  rgb(9, 116, 32);
+            border-radius: 30px;
+            height: 210px;
+            // clip-path: circle(95px);
+            width: 100%;
+            overflow: hidden;
+        }
+        .img-pro img{
+            height: 300px; 
+        
+        }
+        
     }
-    .img-pro {
-        border: 1px solid  rgb(9, 116, 32);
-        border-radius: 30px;
-        height: 210px;
-        // clip-path: circle(95px);
-        width: 100%;
-        overflow: hidden;
-    }
-    .img-pro img{
-        height: 300px; 
-    
-    }
-    
 }
+
 
 
 

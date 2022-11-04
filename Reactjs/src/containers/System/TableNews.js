@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
-import './Manage.scss';
+import { toast } from 'react-toastify'
 import * as actions from "../../store/actions";
-import { Table } from 'reactstrap';
 import * as AiIcons from 'react-icons/ai';
 import MarkdownIt from 'markdown-it';
 import MdEditor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css';
-import './News.scss'
+// import './Manage.scss';
+//import './News.scss'
+import { allNews, deleteNews} from '../../services/newsService';
 
 // Register plugins if required
 // MdEditor.use(YOUR_PLUGINS_HERE);
@@ -16,24 +17,17 @@ import './News.scss'
 // Initialize a markdown parser
 const mdParser = new MarkdownIt(/* Markdown-it options */);
 
-// Finish!
-function handleEditorChange({ html, text }) {
-  console.log('handleEditorChange', html, text);
-};
-
-
 class TableNews extends Component {
-
-
     constructor(props) {
         super(props);
         this.state = {
-            newsReducer: []
+            arrNews: [],
+            newsEdit: {}
         }
     }
 
-    componentDidMount() {
-        this.props.allNews();
+    async componentDidMount() { 
+        await this.getAllNews()
     }
 
     componentDidUpdate( prevProps, prevState, snapshot) {
@@ -44,23 +38,45 @@ class TableNews extends Component {
         }
     }
 
-    handleDeleteNews= (news) => {
-        this.props.deleteNews(news.id)
+    getAllNews = async () => {
+        let response = await allNews("ALL");
+        if(response && response.errCode == 0){
+            this.setState({
+                arrNews: response.news
+            }, () => {
+                console.log('arrNews', this.state.arrNews)
+            })
+        }
+    }
+    
+    handleEditNews = async (news) => {
+        this.props.history.push(`/system/edit-news/${news.id}`);
     }
 
-    handleEditNews= (news) => {
-        this.props.handleEditFromParent(news)
+    handleDeleteNews = async (news) => {
+        try {
+            let res = await deleteNews(news.id);
+            if (res && res.errCode === 0) {
+                toast.success("Xóa tin tức thành công");
+                await this.getAllNews();
+                this.props.history.push('/system/news-manage');
+            } else {
+                toast.error("Xóa tin tức không thành công");
+            }
+        } catch (e) {
+            toast.error("Xóa tin tức không thành công");
+        }
+        
     }
 
     render() {
-        let arrNews = this.state.newsReducer;
+        let {arrNews} = this.state;
         return (
             <React.Fragment>
                 <div className="table">
-                <Table bordered>
                     <thead className='thead'>
                         <tr>
-                            <th>STT</th>
+                            <th>ID</th>
                             <th>Tên tin tức</th> 
                             <th>Hình ảnh</th>    
                             <th>Mô tả</th>
@@ -69,7 +85,7 @@ class TableNews extends Component {
                             <th>Xóa</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className='tbody'>
                     {arrNews && arrNews.length > 0 &&
                         arrNews.map((item, index) => {
                             let imageBase64 = '';
@@ -94,7 +110,6 @@ class TableNews extends Component {
                         })
                     }        
                     </tbody>
-                </Table>
                 </div>       
             </React.Fragment>
         );
@@ -110,10 +125,11 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        allNews: () => dispatch(actions.getAllNews()),
+        // allNews: () => dispatch(actions.getAllNews()),
         deleteNews: (id) => dispatch(actions.DeleteNewStart(id)),
         // editTeacherStart: (data) => dispatch(actions.editTeacherStart(data))
     };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(TableNews);
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(TableNews));
