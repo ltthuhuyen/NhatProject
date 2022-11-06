@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
   class Appreciate extends Model {
     static associate(models) {
       Appreciate.belongsTo(models.Submission, {
-        foreignKey: "submissId",
+        foreignKey: "submissionId",
         targetKey: "id",
         as: "submissionData",
       });

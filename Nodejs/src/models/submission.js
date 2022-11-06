@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
         as: "participantData",
       });
       Submission.hasMany(models.Appreciate, {
-        foreignKey: "submissId",
+        foreignKey: "submissionId",
         as: "submissionData",
       });
     }

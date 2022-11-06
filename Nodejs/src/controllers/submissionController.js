@@ -21,7 +21,6 @@ let handleCountSubmission = async (req, res) => {
 let handleCreateSubmission = async (req, res) => {
   try {
     let data = req.body;
-    console.log(data);
     let message = await submissionService.createNewSubmission(data);
     return res.status(200).json(message);
   } catch (e) {

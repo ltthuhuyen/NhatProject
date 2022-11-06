@@ -1,8 +1,8 @@
 import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
+import { history } from "../redux";
 import { Route, Switch } from "react-router-dom";
 import { ConnectedRouter as Router } from "connected-react-router";
-import { history } from "../redux";
 import { ToastContainer } from "react-toastify";
 import {
   userIsAuthenticated,

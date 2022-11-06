@@ -1,20 +1,61 @@
 import { use } from "express/lib/router";
 import appreciateService from "../services/appreciateService";
 
-let handleCreateAppreciate = async (req, res) => {
-  try {
-    let data = req.body;
-    console.log(data);
-    let message = await appreciateService.createNewAppreciate(data);
-    return res.status(200).json(message);
-  } catch (e) {
+let handleCountAppreciate = async (req, res) => {
+  let id = req.query.id; //all, id
+  if (!id) {
     return res.status(200).json({
-      errCode: -1,
-      errMessage: "Error from server",
+      errCode: 0,
+      errMessage: "Missing required parmeters",
+      appreciates: [],
     });
   }
+  let appreciates = await appreciateService.countAppreciateBySubmission(id);
+  return res.status(200).json({
+    errCode: 0,
+    errMessage: "Ok",
+    appreciates,
+  });
+};
+
+let handleGetAllAppreciateBySubmission = async (req, res) => {
+  let id = req.body; //all, id
+  if (!id) {
+    return res.status(200).json({
+      errCode: 0,
+      errMessage: "Missing required parmeters",
+      appreciates: [],
+    });
+  }
+  let appreciates = await appreciateService.getAllAppreciateBySubmission(id);
+  return res.status(200).json({
+    errCode: 0,
+    errMessage: "Ok",
+    appreciates,
+  });
+};
+
+let handleCreateAppreciate = async (req, res) => {
+  let data = req.body;
+  let message = await appreciateService.createNewAppreciate(data);
+  return res.status(200).json(message);
+};
+
+let handleDeleteAppreciate = async (req, res) => {
+  let id = req.body.id;
+  if (!id) {
+    return res.status(200).json({
+      errCode: 1,
+      errMessage: "Không tìm thấy đánh giá",
+    });
+  }
+  let message = await appreciateService.deleteAppreciate(id);
+  return res.status(200).json(message);
 };
 
 module.exports = {
+  handleCountAppreciate: handleCountAppreciate,
+  handleGetAllAppreciateBySubmission: handleGetAllAppreciateBySubmission,
   handleCreateAppreciate: handleCreateAppreciate,
+  handleDeleteAppreciate: handleDeleteAppreciate,
 };

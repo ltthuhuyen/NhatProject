@@ -5,6 +5,8 @@ import { dateFormat } from "../../../utils";
 import moment from "moment";
 import * as BiIcons from "react-icons/bi";
 import * as BsIcons from "react-icons/bs";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import Header from "../../Header/Giver/Header";
 import Banner from "../../Banner/Banner";
 import Footer from "../../Footer/Footer";
@@ -15,6 +17,12 @@ import {
   allSubmissionsByCompetition,
   countSubmissionsByCompetition,
 } from "../../../services/submissionService";
+import {
+  countAppreciateBySubmission,
+  allApprecicateBySubmission,
+  createAppreciate,
+  deleteAppreciate,
+} from "../../../services/appreciateService";
 
 class Submission extends Component {
   constructor(props) {
@@ -25,9 +33,12 @@ class Submission extends Component {
       arrCompetitions: [],
       arrSubmissionsByCompetition: [],
       countSubmission: [],
+      countAppreciate: [],
       newsDetail: {},
       currentDate: "",
       isShow: true,
+      isClickHeart: "",
+      appreciateOfReviewer: [],
     };
   }
 
@@ -35,6 +46,8 @@ class Submission extends Component {
     await this.getCompetitionsFromReact();
     await this.countAllSubmissionsByCompetitiveFromReact();
     await this.getAllSubmissionsByCompetitiveFromReact();
+    await this.countAllAppreciateBySubmissionFromReact();
+    await this.getAllAppreciateBySubmissionFromReact();
   }
 
   getCompetitionsFromReact = async () => {
@@ -45,7 +58,6 @@ class Submission extends Component {
     ) {
       let competitionID = this.props.match.params.id;
       let res = await allCompetitions(competitionID);
-      console.log("res", res);
       if (res && res.errCode === 0) {
         this.setState({
           arrCompetitions: res.competitions,
@@ -114,15 +126,144 @@ class Submission extends Component {
     });
   }
 
+  countAllAppreciateBySubmissionFromReact = async () => {
+    let allSubmissionsByCompetition = this.state.arrSubmissionsByCompetition;
+    for (let i = 0; i < allSubmissionsByCompetition.length; i++) {
+      let res = await countAppreciateBySubmission(
+        allSubmissionsByCompetition[i].id
+      );
+
+      if (res && res.errCode === 0) {
+        this.setState({
+          countAppreciate: res.appreciates,
+        });
+      }
+    }
+  };
+
+  getAllAppreciateBySubmissionFromReact = async () => {
+    let allSubmissionsByCompetition = this.state.arrSubmissionsByCompetition;
+    let reviewerId = this.props.userInfo.id;
+    for (let i = 0; i < allSubmissionsByCompetition.length; i++) {
+      let res = await allApprecicateBySubmission({
+        submissionId: allSubmissionsByCompetition[i].id,
+        reviewerId: reviewerId,
+      });
+      if (res && res.errCode === 0) {
+        this.setState({
+          appreciateOfReviewer: res.appreciates,
+        });
+      }
+    }
+  };
+
+  // handleHeart = async (submission) => {
+  //   console.log("submission", submission);
+  //   let submissionId = submission.id;
+  //   let reviewerId = this.props.userInfo.id;
+  //   this.setState(
+  //     {
+  //       isClickHeart: true,
+  //     },
+  //     () => {
+  //       console.log("isClickHeart", this.state.isClickHeart);
+  //     }
+  //   );
+  //   if (this.state.isClickHeart === true) {
+  //     let res = await createAppreciate({
+  //       submissionId: submissionId,
+  //       reviewerId: reviewerId,
+  //     });
+  //     this.getAllAppreciateBySubmissionFromReact();
+  //   } else {
+  //     let appreciateOfReviewer = this.state.appreciateOfReviewer;
+  //     for (let i = 0; i < appreciateOfReviewer.length; i++) {
+  //       let appreciateId = appreciateOfReviewer[i].id;
+  //       let res = await deleteAppreciate(appreciateId);
+  //       console.log("xóa ", appreciateId);
+  //       this.getAllAppreciateBySubmissionFromReact();
+  //     }
+  //   }
+  // };
+
+  //  {appreciateOfReviewer &&
+  //                           appreciateOfReviewer
+  //                             .map(
+  //                               (appreciateOfReviewer) =>
+  //                                 appreciateOfReviewer.reviewerId
+  //                             )
+  //                             .includes(userInfo.id)}
+  //                         ? (
+  //                         {appreciateOfReviewer &&
+  //                           appreciateOfReviewer.map(
+  //                             (appreciateOfReviewer, index) => {
+  //                               return (
+  //                                 <FavoriteBorderIcon
+  //                                   className="icon text-black ml-1"
+  //                                   onClick={(e) =>
+  //                                     this.handleHeart(appreciateOfReviewer)
+  //                                   }
+  //                                 />
+  //                               );
+  //                             }
+  //                           )}
+  //                         ) : ( "" )
+
+  handleHeart = async (submission) => {
+    let submissionId = submission.id;
+    let appreciateOfReviewer = this.state.appreciateOfReviewer;
+    if (appreciateOfReviewer.length > 0) {
+      let appreciate = appreciateOfReviewer.filter(
+        (item) => item.submissionId == submissionId
+      );
+      for (let i = 0; i < appreciate.length; i++) {
+        this.setState({
+          isClickHeart: false,
+          appreciateId: appreciate[i].id,
+        });
+        let res = await deleteAppreciate(this.state.appreciateId);
+        this.getAllAppreciateBySubmissionFromReact();
+        this.props.history.push(
+          `/submission-by-competition/${submission.competitionId}`
+        );
+      }
+    } else {
+      let submissionId = submission.id;
+      let reviewerId = this.props.userInfo.id;
+      this.setState({
+        isClickHeart: true,
+      });
+
+      let res = await createAppreciate({
+        submissionId: submissionId,
+        reviewerId: reviewerId,
+      });
+      this.getAllAppreciateBySubmissionFromReact();
+      this.props.history.push(
+        `/submission-by-competition/${submission.competitionId}`
+      );
+    }
+  };
+
+  handleUnHeart = async (appreciate) => {
+    let appreciateId = appreciate.id;
+    let res = await deleteAppreciate(appreciateId);
+    console.log("xóa ", appreciateId);
+    this.getAllAppreciateBySubmissionFromReact();
+  };
+
   render() {
+    let userInfo = this.props.userInfo;
+    let { isClickHeart } = this.state;
     let {
       arrCompetitions,
       arrSubmissions,
       arrSubmissionsByCompetition,
       participantData,
       countSubmission,
+      countAppreciate,
+      appreciateOfReviewer,
     } = this.state;
-    console.log("countSubmission", countSubmission);
 
     let imageBase64 = "";
     if (arrCompetitions?.avatar) {
@@ -253,6 +394,34 @@ class Submission extends Component {
                               </div>
                             </div>
                           </div>
+
+                          <div className="d-flex">
+                            {countAppreciate &&
+                              countAppreciate.map((countAppreciate, index) => {
+                                return (
+                                  <div className="text-red bg-black">
+                                    {countAppreciate.count}
+                                  </div>
+                                );
+                              })}
+                            {appreciateOfReviewer.map(
+                              (appreciateOfReviewer) =>
+                                appreciateOfReviewer.reviewerId
+                            ) ? (
+                              <FavoriteBorderIcon
+                                className="icon text-black ml-1"
+                                onClick={(e) => this.handleHeart(item)}
+                                activeStyle={{
+                                  color: "red",
+                                }}
+                              />
+                            ) : (
+                              <FavoriteBorderIcon
+                                className="icon text-black ml-1"
+                                onClick={(e) => this.handleHeart(item)}
+                              />
+                            )}
+                          </div>
                         </div>
                       );
                     })}
@@ -272,6 +441,7 @@ class Submission extends Component {
 const mapStateToProps = (state) => {
   return {
     // news: state.news.News,
+    userInfo: state.user.userInfo,
   };
 };
 

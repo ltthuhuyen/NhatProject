@@ -1,53 +1,84 @@
 import db from "../models/index";
 import Sequelize from "sequelize";
 
-let countSubmission = (id) => {
+let countAppreciateBySubmission = (submissionId) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let submissions = "";
-      if (id === "ALL") {
-        submissions = await db.Submission.findAll({
-          attributes: [[Sequelize.fn("count", Sequelize.col("id")), "count"]],
+      let appreciates = "";
+      if (submissionId === "ALL") {
+        appreciates = await db.Appreciate.findAll({
+          group: "submissionId",
+          attributes: [
+            "submissionId",
+            [Sequelize.fn("count", Sequelize.col("id")), "count"],
+          ],
         });
       }
 
-      // if (competitionId && competitionId !== "ALL") {
-      //   submissions = await db.Submission.findAll({
-      //     where: { competitionId: competitionId },
-      //     group: "competitionId",
-      //     attributes: [
-      //       "competitionId",
-      //       [Sequelize.fn("count", Sequelize.col("id")), "count"],
-      //     ],
-      //   });
-      // }
+      if (submissionId && submissionId !== "ALL") {
+        appreciates = await db.Appreciate.findAll({
+          where: { submissionId: submissionId },
+          group: "submissionId",
+          attributes: [
+            "submissionId",
+            [Sequelize.fn("count", Sequelize.col("id")), "count"],
+          ],
+        });
+      }
 
-      // let submissions = await db.Submission.findAll({
+      // let appreciates = await db.Submission.findAll({
       //     group: "competitionId",
       //     attributes: [
       //     "competitionId",
       //     [Sequelize.fn("count", Sequelize.col("id")), "count"],
       //     ],
       // });
-      resolve(submissions);
+      resolve(appreciates);
     } catch (error) {
       reject(error);
     }
   });
 };
 
-let createNewAppreciate = (data) => {
+let checkAppreciate = (checkSubmission, checkReviewer) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!data.submissionId || !data.reviewerId) {
+      let submissionID = await db.Appreciate.findOne({
+        where: { submissionId: checkSubmission },
+      });
+      let reviewerID = await db.Appreciate.findOne({
+        where: { reviewerId: checkReviewer },
+      });
+      if (submissionID && reviewerID) {
+        resolve(true);
+      } else {
+        resolve(false);
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+let createNewAppreciate = (data) => {
+  console.log("create", data);
+  return new Promise(async (resolve, reject) => {
+    try {
+      let check = await checkAppreciate(data.submissionId, data.reviewerId);
+      if (check == true) {
         resolve({
           errCode: 1,
+          errMessange: "Không được đánh giá nữa",
+        });
+      } else if (!data.submissionId || !data.reviewerId) {
+        resolve({
+          errCode: 2,
           errMessange: "Vui lòng điền đầy đủ thông tin",
         });
       } else {
         await db.Appreciate.create({
-          competitionId: data.competitionId,
-          participantId: data.participantId,
+          submissionId: data.submissionId,
+          reviewerId: data.reviewerId,
         });
         resolve({
           errCode: 0,
@@ -60,34 +91,63 @@ let createNewAppreciate = (data) => {
   });
 };
 
-let getAllSubmissions = (submissionId) => {
+let getAllAppreciateBySubmission = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let submissions = "";
-      if (submissionId === "ALL") {
-        submissions = await db.Submission.findAll({
+      let appreciates = "";
+      if (data.submissionId && data.reviewerId) {
+        appreciates = await db.Appreciate.findAll({
+          where: {
+            submissionId: data.submissionId,
+            reviewerId: data.reviewerId,
+          },
           include: [
             {
-              model: db.Competition,
-              as: "competitionData",
+              model: db.Submission,
+              as: "submissionData",
             },
             {
               model: db.User,
-              as: "participantData",
+              as: "reviewerData",
             },
           ],
           raw: true,
           nest: true,
         });
       }
-      resolve(submissions);
+      resolve(appreciates);
     } catch (error) {
       reject(error);
     }
   });
 };
 
+let deleteAppreciate = (id) => {
+  console.log("xóa", id);
+  return new Promise(async (resolve, reject) => {
+    let appreciate = await db.Appreciate.findOne({
+      where: { ID: id },
+    });
+    if (!appreciate) {
+      resolve({
+        errCode: 1,
+        errMessage: `Không tìm thấy đáng giá`,
+      });
+    } else {
+      await db.Appreciate.destroy({
+        where: { ID: id },
+      });
+      resolve({
+        errCode: 0,
+        message: "Xóa thành công",
+      });
+    }
+  });
+};
+
 module.exports = {
-  countSubmission: countSubmission,
+  countAppreciateBySubmission: countAppreciateBySubmission,
+  getAllAppreciateBySubmission: getAllAppreciateBySubmission,
   createNewAppreciate: createNewAppreciate,
+  deleteAppreciate: deleteAppreciate,
 };

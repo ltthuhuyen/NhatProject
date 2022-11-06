@@ -106,9 +106,10 @@ class Header extends Component {
     let { isShowNotification } = this.state;
     let language = this.props.language;
     let imageBase64 = "";
-    if (userInfo.image) {
-      imageBase64 = new Buffer(userInfo.image, "base64").toString("binary");
-    }
+    // console.log("userInfo", userInfo.image);
+    // if (userInfo.image) {
+    //   imageBase64 = new Buffer(userInfo.image, "base64").toString("binary");
+    // }
     return (
       <div>
         <div className="home-header">

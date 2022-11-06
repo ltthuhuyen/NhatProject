@@ -122,11 +122,6 @@ class DetailCollectionForm extends Component {
     }
   };
 
-  handleReturn = (e) => {
-    console.log("h");
-    this.props.history.go(1);
-  };
-
   render() {
     let {
       giverData,
@@ -309,11 +304,6 @@ class DetailCollectionForm extends Component {
                     </div>
                   );
                 })}
-            </div>
-            <div className="">
-              <button className="btn " onClick={(e) => this.handleReturn(e)}>
-                Trở về
-              </button>
             </div>
           </div>
         </div>

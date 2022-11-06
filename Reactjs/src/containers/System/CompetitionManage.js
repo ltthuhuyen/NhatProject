@@ -105,22 +105,22 @@ class CompetitionManage extends Component {
   render() {
     let { processLogout, userInfo } = this.props;
     let { arrCompetitions } = this.state;
-    let { currentPage, todosPerPage } = this.state;
-    const indexOfLastTodo = currentPage * todosPerPage;
-    const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
-    const currentTodos = arrCompetitions.slice(
-      indexOfFirstTodo,
-      indexOfLastTodo
-    );
+    // let { currentPage, todosPerPage } = this.state;
+    // const indexOfLastTodo = currentPage * todosPerPage;
+    // const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
+    // const currentTodos = arrCompetitions.slice(
+    //   indexOfFirstTodo,
+    //   indexOfLastTodo
+    // );
 
-    const pageNumbers = [];
-    for (
-      let i = 1;
-      i <= Math.ceil(arrCompetitions.length / todosPerPage);
-      i++
-    ) {
-      pageNumbers.push(i);
-    }
+    // const pageNumbers = [];
+    // for (
+    //   let i = 1;
+    //   i <= Math.ceil(arrCompetitions.length / todosPerPage);
+    //   i++
+    // ) {
+    //   pageNumbers.push(i);
+    // }
     let imageBase64 = "";
     if (userInfo.image) {
       imageBase64 = new Buffer(userInfo.image, "base64").toString("binary");
@@ -177,15 +177,15 @@ class CompetitionManage extends Component {
                     <th>Tên cuộc thi</th>
                     <th>Hình ảnh</th>
                     <th>Mô tả</th>
-                    <th>ContentHTML</th>
+                    {/* <th>ContentHTML</th> */}
                     <th>Sửa</th>
                     <th>Xóa</th>
                   </tr>
                 </thead>
                 <tbody className="tbody">
-                  {currentTodos &&
-                    currentTodos.length > 0 &&
-                    currentTodos.map((item, index) => {
+                  {arrCompetitions &&
+                    arrCompetitions.length > 0 &&
+                    arrCompetitions.map((item, index) => {
                       let imageBase64 = "";
                       if (item.avatar) {
                         imageBase64 = new Buffer(
@@ -207,7 +207,7 @@ class CompetitionManage extends Component {
                             </div>
                           </td>
                           <td>{item.description}</td>
-                          <td>{item.contentHTML}</td>
+                          {/* <td>{item.contentHTML}</td> */}
                           <td>
                             <button
                               className="btn btn-edit"
@@ -231,7 +231,7 @@ class CompetitionManage extends Component {
               </Table>
             </div>
           </div>
-          <div className="row btn-pageNumber d-flex">
+          {/* <div className="row btn-pageNumber d-flex">
             {pageNumbers.map((number) => {
               return (
                 <button
@@ -244,7 +244,7 @@ class CompetitionManage extends Component {
                 </button>
               );
             })}
-          </div>
+          </div> */}
         </div>
       </>
     );

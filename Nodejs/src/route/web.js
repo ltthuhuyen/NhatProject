@@ -201,9 +201,21 @@ let initWebRoutes = (app) => {
   );
 
   // Đánh giá
+  router.get(
+    "/api/count-appreciates",
+    appreciateController.handleCountAppreciate
+  );
+  router.post(
+    "/api/get-all-appreciates-by-submissions",
+    appreciateController.handleGetAllAppreciateBySubmission
+  );
   router.post(
     "/api/create-new-appreciate",
     appreciateController.handleCreateAppreciate
+  );
+  router.delete(
+    "/api/delete-appreciate",
+    appreciateController.handleDeleteAppreciate
   );
 
   router.get("https://provinces.open-api.vn/api/");
