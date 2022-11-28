@@ -41,7 +41,7 @@ let initWebRoutes = (app) => {
   router.put("/api/edit-user-info", userController.handleEditUserInfo);
   router.delete("/api/delete-user", userController.handleDeleteUser);
   router.get("/api/get-user-role", userController.handleGetUsersRole);
-
+  router.post("/api/user-statistic", userController.handleUserStatistic);
   // Product
   router.get("/api/search-product", searchController.handleSearchProduct);
   router.post(
@@ -69,99 +69,167 @@ let initWebRoutes = (app) => {
     scheduleController.handleCreateSchedule
   );
   router.get(
-    "/api/get-all-apointmenpts",
+    "/api/get-all-schedule",
+    appointmentController.handleGetAllSchedules
+  );
+  router.get(
+    "/api/get-all-appointment",
     appointmentController.handleGetAllAppointments
   );
   router.get(
-    "/api/get-apointmenpts-status-s1",
-    appointmentController.handleAppointmentsNew
-  );
-  router.get(
-    "/api/get-apointmenpts-status-s2",
-    appointmentController.handleAppointmentsStatusS2
-  );
-  router.get(
-    "/api/get-apointmenpts-status-s3",
-    appointmentController.handleAppointmentsStatusS3
-  );
-  router.get(
-    "/api/get-apointmenpts-status-s4",
-    appointmentController.handleAppointmentsStatusS4
-  );
-  router.get(
-    "/api/get-apointmenpts-status-s5",
-    appointmentController.handleAppointmentsStatusS5
-  );
-  router.get(
-    "/api/get-apointmenpt-of-giver",
-    appointmentController.handleAppointmentsOfGiver
-  );
-  router.get(
-    "/api/get-apointmenpt-of-giver-status-s1",
-    appointmentController.handleAppointmentsOfGiverStatusS1
-  );
-  router.get(
-    "/api/get-apointmenpt-of-giver-status-s2",
-    appointmentController.handleAppointmentsOfGiverStatusS2
-  );
-  router.get(
-    "/api/get-apointmenpt-of-giver-status-s3",
-    appointmentController.handleAppointmentsOfGiverStatusS3
-  );
-  router.get(
-    "/api/get-apointmenpt-of-giver-status-s4",
-    appointmentController.handleAppointmentsOfGiverStatusS4
-  );
-  router.get(
-    "/api/get-apointmenpt-of-giver-status-s5",
-    appointmentController.handleAppointmentsOfGiverStatusS5
-  );
-  router.get(
-    "/api/get-apointmenpt-of-recipient",
-    appointmentController.handleAppointmentsOfRecipient
-  );
-  router.get(
-    "/api/get-apointmenpt-of-recipient-status-s2",
-    appointmentController.handleAppointmentsOfRecipientStatusS2
-  );
-  router.get(
-    "/api/get-apointmenpt-of-recipient-status-s3",
-    appointmentController.handleAppointmentsOfRecipientStatusS3
+    "/api/get-schedule-status",
+    appointmentController.handleGetScheduleByStatus
   );
   router.post(
-    "/api/all-apointmenpt-of-recipient-status-s3-by-curentDate",
-    appointmentController.handleAppointmentsOfRecipientStatusS3ByDate
+    "/api/get-schedule-between-two-status",
+    appointmentController.handleGetScheduleBetweenTwoStatus
   );
 
-  router.get(
-    "/api/get-apointmenpt-of-recipient-status-s4",
-    appointmentController.handleAppointmentsOfRecipientStatusS4
+  router.post(
+    "/api/get-schedule-of-giver",
+    appointmentController.handleScheduleOfGiver
   );
-  router.get(
-    "/api/get-apointmenpt-of-recipient-status-s5",
-    appointmentController.handleAppointmentsOfRecipientStatusS5
+  router.post(
+    "/api/get-all-appointment-by-schedule-by-status-by-recipientDate",
+    appointmentController.handleGetAllAppointmentsByScheduleByStatusByRecipientDate
   );
-  router.get(
-    "/api/get-all-collects-by-address",
-    appointmentController.handleGetAllCollectsByAddress
+  router.post(
+    "/api/register-collect-form",
+    appointmentController.handleRegisterCollect
   );
-  router.get(
+  router.post(
+    "/api/get-appointment-of-recipient-status",
+    appointmentController.handleAppointmentsOfRecipientStatus
+  );
+  router.put(
+    "/api/update-registration-status",
+    scheduleController.handleUpdateRegistrationStatus
+  );
+  router.put("/api/update-status", scheduleController.handleUpdateStatus);
+  router.put(
+    "/api/update-receivedDate",
+    scheduleController.handleUpdateReceivedDate
+  );
+
+  // router.get(
+  //   "/api/get-appointment-status-s2",
+  //   appointmentController.handleAppointmentsStatusS2
+  // );
+  // router.get(
+  //   "/api/get-appointment-status-s3",
+  //   appointmentController.handleAppointmentsStatusS3
+  // );
+  // router.get(
+  //   "/api/get-appointment-status-s4",
+  //   appointmentController.handleAppointmentsStatusS4
+  // );
+  // router.get(
+  //   "/api/get-appointment-status-s5",
+  //   appointmentController.handleAppointmentsStatusS5
+  // );
+  // router.get(
+  //   "/api/get-appointment-of-giver",
+  //   appointmentController.handleAppointmentsOfGiver
+  // );
+  // router.get(
+  //   "/api/get-appointment-of-giver-status-s1",
+  //   appointmentController.handleAppointmentsOfGiverStatusS1
+  // );
+  // router.get(
+  //   "/api/get-appointment-of-giver-status-s2",
+  //   appointmentController.handleAppointmentsOfGiverStatusS2
+  // );
+  // router.get(
+  //   "/api/get-appointment-of-giver-status-s3",
+  //   appointmentController.handleAppointmentsOfGiverStatusS3
+  // );
+  // router.get(
+  //   "/api/get-appointment-of-giver-status-s4",
+  //   appointmentController.handleAppointmentsOfGiverStatusS4
+  // );
+  // router.get(
+  //   "/api/get-appointment-of-giver-status-s5",
+  //   appointmentController.handleAppointmentsOfGiverStatusS5
+  // );
+  // router.get(
+  //   "/api/get-appointment-of-recipient",
+  //   appointmentController.handleAppointmentsOfRecipient
+  // );
+  // router.get(
+  //   "/api/get-appointment-of-recipient-status-s2",
+  //   appointmentController.handleAppointmentsOfRecipientStatusS2
+  // );
+  // router.get(
+  //   "/api/get-appointment-of-recipient-status-s3",
+  //   appointmentController.handleAppointmentsOfRecipientStatusS3
+  // );
+  // router.post(
+  //   "/api/all-appointment-of-recipient-status-s3-by-curentDate",
+  //   appointmentController.handleAppointmentsOfRecipientStatusS3ByDate
+  // );
+
+  // router.get(
+  //   "/api/get-appointment-of-recipient-status-s4",
+  //   appointmentController.handleAppointmentsOfRecipientStatusS4
+  // );
+
+  // router.get(
+  //   "/api/get-all-collects-by-address",
+  //   appointmentController.handleGetAllCollectsByAddress
+  // );
+
+  router.post(
     "/api/get-all-collects-by-date",
     appointmentController.handleGetAllCollectsByDate
   );
+
+  router.post(
+    "/api/get-all-collects-status-by-currentDate",
+    appointmentController.handleGetAllCollectsStatusByCurrentDate
+  );
+
+  router.post(
+    "/api/collect-form-statistic-by-currentDate",
+    appointmentController.handleCollectFormStatisticByCurrentDate
+  );
+  router.post(
+    "/api/collect-form-statistic",
+    appointmentController.handleCollectFormStatistic
+  );
+  router.post(
+    "/api/collect-form-statistic-by-status-of-currentDate",
+    appointmentController.handleCollectFormStatisticByStatusOfCurrentDate
+  );
+
+  // router.get(
+  //   "/api/collect-form-status-s3-expire",
+  //   appointmentController.handleAppointmentsStatusS3Expire
+  // );
+
+  router.get(
+    "/api/get-thongke-theo-tuan",
+    appointmentController.handleThongketheotuan
+  );
+
   router.post(
     "/api/search-collects-by-address",
     searchController.handleSearchCollectionByAddress
   );
 
-  router.put("/api/update-status-s2", scheduleController.handleUpdateStatusS2);
-  router.put("/api/update-status", scheduleController.handleUpdateStatus);
+  // .
 
+  // Tin tức
+  router.get("/api/search-news", searchController.handleSearchNews);
   router.post("/api/create-new-news", newsController.handleCreateNews);
   router.get("/api/get-all-news", newsController.handleGetAllNews);
   router.put("/api/edit-news", newsController.handleEditNews);
   router.delete("/api/delete-news", newsController.handleDeleteNews);
 
+  // Cuộc thi
+  router.get(
+    "/api/search-competitive",
+    searchController.handleSearchCompetitive
+  );
   router.post(
     "/api/create-new-competition",
     competitionController.handleCreateCompetition
@@ -199,15 +267,23 @@ let initWebRoutes = (app) => {
     "/api/count-all-submission-by-competition",
     submissionController.handleCountAllSubmissionsByCompetition
   );
+  router.delete(
+    "/api/delete-submission",
+    submissionController.handleDeleteSubmission
+  );
 
   // Đánh giá
   router.get(
     "/api/count-appreciates",
     appreciateController.handleCountAppreciate
   );
-  router.post(
+  router.get(
     "/api/get-all-appreciates-by-submissions",
     appreciateController.handleGetAllAppreciateBySubmission
+  );
+  router.post(
+    "/api/get-all-appreciates-of-reviewer-by-submissions",
+    appreciateController.handleGetAllAppreciateOfReviewerBySubmission
   );
   router.post(
     "/api/create-new-appreciate",

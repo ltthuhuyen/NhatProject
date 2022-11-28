@@ -5,7 +5,8 @@ import { dateFormat } from "../../../utils";
 import moment from "moment";
 import * as BsIcons from "react-icons/bs";
 import * as MdIcons from "react-icons/md";
-import Header from "../../Header/Giver/Header";
+import HeaderR2 from "../../Header/Giver/Header";
+import HeaderR3 from "../../Header/Recipient/Header";
 import Banner from "../../Banner/Banner";
 import Footer from "../../Footer/Footer";
 import ScrollUp from "../../../components/ScrollUp";
@@ -79,20 +80,42 @@ class Competition extends Component {
   };
 
   handleSeeSubmission = (competition) => {
-    this.props.history.push(`/submission-by-competition/${competition.id}`);
+    let userInfo = this.props.userInfo;
+    if (!userInfo) {
+      this.props.history.push(`/submission-by-competition/${competition.id}`);
+    } else if (userInfo && userInfo.roleId === "R2") {
+      this.props.history.push(
+        `/giver/submission-by-competition/${competition.id}`
+      );
+    } else if (userInfo && userInfo.roleId === "R3") {
+      this.props.history.push(
+        `/recipient/submission-by-competition/${competition.id}`
+      );
+    }
   };
 
   handleCreateSubmission = (competition) => {
-    this.props.history.push(`/giver/create-submission/${competition.id}`);
+    let userInfo = this.props.userInfo;
+    if (userInfo && userInfo.roleId === "R2") {
+      this.props.history.push(
+        `/giver/submission-by-competition/${competition.id}`
+      );
+    } else if (userInfo && userInfo.roleId === "R3") {
+      this.props.history.push(
+        `/recipient/submission-by-competition/${competition.id}`
+      );
+    }
   };
 
   render() {
     let { arrCompetitions, countSubmission } = this.state;
+    let userInfo = this.props.userInfo;
 
     return (
       <>
         <ScrollUp />
-        <Header />
+        {!userInfo || userInfo.roleId === "R2" ? <HeaderR2 /> : <HeaderR3 />}
+
         <Banner />
         <div className="competition">
           <div className="title-competition">CUỘC THI</div>
@@ -177,6 +200,7 @@ class Competition extends Component {
 
 const mapStateToProps = (state) => {
   return {
+    userInfo: state.user.userInfo,
     // news: state.news.News,
   };
 };

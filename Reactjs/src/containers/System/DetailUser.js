@@ -24,7 +24,15 @@ import * as FiIcons from "react-icons/fi";
 import { emitter } from "../../utils/emitter";
 import { toast } from "react-toastify";
 import NavAdmin from "../../components/NavAdmin";
-//import { Navigate } from "react-router-dom";
+import moment from "moment";
+import { dateFormat } from "../../utils";
+import CustomScrollbars from "../../components/CustomScrollbars";
+import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import CloseIcon from "@mui/icons-material/Close";
+import {
+  getAllCollectionForm,
+  getCollectionFormStatusByCurrentDate,
+} from "../../services/collectionformService";
 
 class DetailUser extends Component {
   constructor(props) {
@@ -41,14 +49,21 @@ class DetailUser extends Component {
       arrSearchUser: [],
       arrAddresses: [],
       userData: {},
+      arrCollectionForms: [],
+      isShowNotification: false,
     };
   }
 
-  componentDidMount() {
-    this.getAllUsersFromReact();
-    this.getAllAddressFromReact();
+  async componentDidMount() {
+    await this.getAllUsersFromReact();
+    await this.getAllAddressFromReact();
+    await this.getAllCollectionFormReact();
+    await this.getAllCollectFormStatusByCurrentDateFromReact();
   }
 
+  async componentDidUpdate(prevProps, prevState, snapshot) {
+    console.log("update");
+  }
   getAllUsersFromReact = async () => {
     if (
       this.props.match &&
@@ -60,6 +75,7 @@ class DetailUser extends Component {
       if (response && response.errCode === 0) {
         this.setState({
           arrUsers: response.users,
+          imgUser: response.users.image,
         });
       }
     }
@@ -74,35 +90,53 @@ class DetailUser extends Component {
       let userId = this.props.match.params.id;
       let response = await getAllAddressOfUser(userId);
       if (response) {
-        this.setState(
-          {
-            arrAddresses: response.addresses,
-          },
-          () => {
-            console.log("arrAddresses", this.state.arrAddresses);
-          }
-        );
+        this.setState({
+          arrAddresses: response.addresses,
+        });
       }
     }
+  };
+
+  getAllCollectionFormReact = async () => {
+    let response = await getAllCollectionForm("ALL");
+    if (response && response.errCode == 0) {
+      this.setState({
+        arrCollectionForms: response.appointments,
+      });
+    }
+  };
+
+  getAllCollectFormStatusByCurrentDateFromReact = async () => {
+    let today = new Date();
+    let response = await getCollectionFormStatusByCurrentDate({
+      date: moment(today).format(dateFormat.FORMAT_DATE),
+      status: "S1",
+    });
+
+    if (response) {
+      this.setState({
+        arrCollectsStatusByCurrentDate: response.collects,
+      });
+    }
+  };
+
+  handleNotifications = () => {
+    this.setState({
+      isShowNotification: !this.state.isShowNotification,
+    });
   };
 
   handleOnChangeInput = (e, id) => {
     let copyState = { ...this.state };
     copyState[id] = e.target.value;
-    this.setState(
-      {
-        ...copyState,
-      },
-      () => {
-        console.log("check good state", this.state);
-      }
-    );
+    this.setState({
+      ...copyState,
+    });
   };
 
   handleSearch = async (search) => {
     this.props.history.push(`/system/search-user/${this.state.search}`);
     let response = await searchUser(this.state.search);
-    console.log("response searchUser", response);
     if (response) {
       this.setState({
         arrSearchUser: response.data,
@@ -156,7 +190,6 @@ class DetailUser extends Component {
   };
 
   doEditUser = async (user) => {
-    console.log(user);
     try {
       let res = await editUserService(user);
       if (res && res.errCode === 0) {
@@ -177,24 +210,35 @@ class DetailUser extends Component {
   };
 
   handleDeleteAddress = async (address) => {
-    try {
-      let res = await deleteAddressSerVice(address.id);
-      if (res && res.errCode === 0) {
-        toast.success("Xóa địa chỉ người dùng thành công!");
-        await this.getAllAddressFromReact();
-      } else {
-        alert(res.errMessange);
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    console.log("address", address.userId);
+    // try {
+    //   let res = await deleteAddressSerVice(address.id);
+    //   if (res && res.errCode === 0) {
+    //     toast.success("Xóa địa chỉ người dùng thành công!");
+    //     await this.getAllAddressFromReact();
+    //   } else {
+    //     alert(res.errMessange);
+    //   }
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
   render() {
-    let { arrUsers, arrAddresses } = this.state;
+    let {
+      arrUsers,
+      imgUser,
+      arrAddresses,
+      arrCollectionForms,
+      arrCollectsStatusByCurrentDate,
+      isShowNotification,
+      currentDateTimeStop,
+    } = this.state;
+    currentDateTimeStop = moment(currentDateTimeStop);
     let imageUser;
-    if (arrUsers.image) {
-      imageUser = new Buffer(arrUsers.image, "base64").toString("binary");
+    if (imgUser) {
+      imageUser = new Buffer(imgUser, "base64").toString("binary");
     }
+
     const { processLogout, userInfo } = this.props;
     let imageBase64 = "";
     if (userInfo.image) {
@@ -218,93 +262,263 @@ class DetailUser extends Component {
             />
           )}
 
-          <div className="row header">
-            <div className="d-flex">
-              <div className="img">
-                <img src={imageBase64} className="img-img" />
-              </div>
-              <div className="profile-info">
-                Xin chào{" "}
-                {userInfo && userInfo.firstName + userInfo.lastName
-                  ? userInfo.firstName + " " + userInfo.lastName
-                  : ""}
+          <div className="container-fluid ">
+            <div className=" header_right justify-content-between align-items-center">
+              <div className="d-flex">
+                <div className="d-flex wrapper-welcome">
+                  <div
+                    className="btn btn-logout"
+                    onClick={(e) => this.handleNotifications(e)}
+                  >
+                    <NotificationsNoneIcon />
+                    {isShowNotification ? (
+                      <div className="wrapper-notification shadow rounded">
+                        <div className="title-notification">
+                          Thông báo
+                          <CloseIcon
+                            className="icon-close"
+                            onClick={(e) => this.handleNotifications(e)}
+                          />
+                        </div>
+                        <CustomScrollbars style={{ height: "180px" }}>
+                          {arrCollectsStatusByCurrentDate.length > 0 &&
+                            arrCollectsStatusByCurrentDate.map(
+                              (item, index) => {
+                                let t = moment(item.createdAt);
+                                let tt = moment(`${t}`);
+                                return (
+                                  <>
+                                    <div
+                                      className="info-notification"
+                                      onClick={(e) =>
+                                        this.handleDetailCollectForm(item)
+                                      }
+                                    >
+                                      {item.giverData.firstName} {""}
+                                      {item.giverData.lastName}{" "}
+                                      <div>
+                                        đặt lịch thu gom{" "}
+                                        {item.productData.product_name} {""}
+                                        tại {item.addressData.address_name} {""}
+                                        {item.addressData.ward_name}
+                                        {/* {currentDateTimeStop} */}
+                                        {/* {item.createdAt} */}
+                                      </div>
+                                      <div className="text-minutes">
+                                        {currentDateTimeStop.diff(
+                                          tt,
+                                          "minutes"
+                                        ) > 60 ? (
+                                          <>
+                                            {Math.floor(
+                                              currentDateTimeStop.diff(
+                                                tt,
+                                                "minutes"
+                                              ) / 60
+                                            )}{" "}
+                                            giờ trước
+                                          </>
+                                        ) : (
+                                          <>
+                                            {currentDateTimeStop.diff(tt)} phút
+                                            trước
+                                          </>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </>
+                                );
+                              }
+                            )}
+                        </CustomScrollbars>
+                      </div>
+                    ) : (
+                      ""
+                    )}
+                  </div>
+                  <div className="img">
+                    <img src={imageBase64} className="img-img" />
+                  </div>
+                  <div className="profile-info">
+                    {userInfo && userInfo.firstName + userInfo.lastName
+                      ? userInfo.firstName + " " + userInfo.lastName
+                      : ""}
+                  </div>
+                  <div className="btn btn-logout" onClick={processLogout}>
+                    <FiIcons.FiLogOut />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          <div className="row title d-flex">
-            <div className="col-10 title-manage">CHI TIẾT NGƯỜI DÙNG</div>
-            <div className="serach_field-area d-flex align-items-center">
-              <input
-                type="text"
-                placeholder="Search here..."
-                onChange={(e) => {
-                  this.handleOnChangeInput(e, "search");
-                }}
-              />
+          <div className="wrapper-manage shadow-sm ">
+            <div className="row title d-flex">
+              <div className="col-10 title-manage">CHI TIẾT NGƯỜI DÙNG</div>
+              <div className="serach_field-area d-flex align-items-center">
+                <input
+                  type="text"
+                  placeholder="Search here..."
+                  onChange={(e) => {
+                    this.handleOnChangeInput(e, "search");
+                  }}
+                />
+                <button
+                  type="search"
+                  className="btn btn-search rounded-pill"
+                  onClick={() => this.handleSearch()}
+                >
+                  <BsIcons.BsSearch /> Tìm
+                </button>
+              </div>
               <button
-                type="search"
-                className="btn btn-search rounded-pill"
-                onClick={() => this.handleSearch()}
+                className="col-1 btn btn-create "
+                onClick={this.handleAddNewUser}
               >
-                <BsIcons.BsSearch /> Tìm
+                <MdIcons.MdOutlineCreate />{" "}
+                <FormattedMessage id="manage-user.add" />
               </button>
             </div>
-            <button
-              className="col-1 btn btn-create "
-              onClick={this.handleAddNewUser}
-            >
-              <MdIcons.MdOutlineCreate />{" "}
-              <FormattedMessage id="manage-user.add" />
-            </button>
-          </div>
 
-          <div className="row content">
-            <div className="table">
-              <Table>
-                <thead className="thead">
-                  <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Họ tên</th>
-                    <th scope="col">SĐT</th>
-                    <th scope="col">Địa chỉ</th>
-                    <th scope="col">Hành động</th>
-                  </tr>
-                </thead>
-                <tbody className="tbody">
+            <div className="row content">
+              <div className="detail shadow">
+                <div className="d-flex">
+                  <div className="col-4">
+                    <div className="img">
+                      <img src={imageUser} className="img-img" />
+                    </div>
+                  </div>
+                  <div className="col-8 mt-3">
+                    <p className="d-flex">
+                      <div className="lable"> ID:</div>
+                      <div className="text"> {arrUsers.id}</div>
+                    </p>
+                    <p className="d-flex">
+                      <div className="lable"> Email:</div>
+                      <div className="text"> {arrUsers.email}</div>
+                    </p>
+                    <p className="d-flex">
+                      <div className="lable"> Họ tên:</div>
+                      <div className="text">
+                        {arrUsers.firstName} {arrUsers.lastName}
+                      </div>
+                    </p>
+                    <p className="d-flex">
+                      <div className="lable"> Số điện thoại:</div>
+                      <div className="text">{arrUsers.phone}</div>
+                    </p>
+                  </div>
+                </div>
+                <p className="mt-2">
+                  <div className="lable ml-0">Địa chỉ</div>
                   {arrAddresses &&
-                    arrAddresses.map((item, index) => (
-                      <tr>
-                        <td>{arrUsers.id}</td>
-                        <td>{arrUsers.email}</td>
-                        <td>
-                          {arrUsers.firstName} {arrUsers.lastName}
-                        </td>
-                        <td>{arrUsers.phone}</td>
-                        <td>
-                          {item.address_name} - {item?.ward_name} -{" "}
-                          {item?.district_name} - {item?.city_name}
-                        </td>
-                        <td className="z-index">
-                          <button
-                            type="button"
-                            className="btn btn-edit mx-2 "
-                            onClick={() => this.handleEditUser(item)}
-                          >
-                            <AiIcons.AiOutlineEdit />
-                          </button>
-                          <button
-                            type="button"
-                            className="btn btn-delete  "
-                            onClick={() => this.handleDeleteAddress(item)}
-                          >
-                            <AiIcons.AiOutlineDelete />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </Table>
+                    arrAddresses.map((item, index) => {
+                      console.log("item", item);
+                      return (
+                        <p className="d-flex">
+                          <div className="col-10 mt-2">
+                            {item.address_name} - {item?.ward_name} -{" "}
+                            {item?.district_name} - {item?.city_name}
+                          </div>
+                          <div className="col-2 z-index d-flex">
+                            <button
+                              type="button"
+                              className="btn btn-edit mx-2 "
+                              onClick={() => this.handleEditUser(item)}
+                            >
+                              <AiIcons.AiOutlineEdit />
+                            </button>
+                            {arrCollectionForms &&
+                            arrCollectionForms
+                              .map(
+                                (arrCollectionForms) =>
+                                  arrCollectionForms.giverId
+                              )
+                              .includes(item.userId) ? (
+                              <>
+                                {" "}
+                                <button
+                                  type="button"
+                                  className="btn btn-delete  "
+                                  onClick={() => this.handleDeleteAddress(item)}
+                                  disabled
+                                >
+                                  <AiIcons.AiOutlineDelete />
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                {arrCollectionForms &&
+                                arrCollectionForms
+                                  .map(
+                                    (arrCollectionForms) =>
+                                      arrCollectionForms.recipientId
+                                  )
+                                  .includes(item.userId) ? (
+                                  <>
+                                    {" "}
+                                    <button
+                                      type="button"
+                                      className="btn btn-delete  "
+                                      onClick={() =>
+                                        this.handleDeleteAddress(item)
+                                      }
+                                      disabled
+                                    >
+                                      <AiIcons.AiOutlineDelete />
+                                    </button>
+                                  </>
+                                ) : (
+                                  <>
+                                    {" "}
+                                    <button
+                                      type="button"
+                                      className="btn btn-delete  "
+                                      onClick={() =>
+                                        this.handleDeleteAddress(item)
+                                      }
+                                    >
+                                      <AiIcons.AiOutlineDelete />
+                                    </button>
+                                  </>
+                                )}
+                              </>
+                            )}
+
+                            {/* <button
+                              type="button"
+                              className="btn btn-delete  "
+                              onClick={() => this.handleDeleteAddress(item)}
+                              disabled={arrCollectionForms
+                                .map(
+                                  (arrCollectionForms) =>
+                                    arrCollectionForms.giverId ||
+                                    arrCollectionForms.recipientId
+                                )
+                                .includes(item.userId)}
+                              // {console.log(item.userId)}
+                            >
+                              <AiIcons.AiOutlineDelete />
+                            </button> */}
+                            {/* <button
+                              type="button"
+                              className="btn btn-delete  "
+                              onClick={() => this.handleDeleteAddress(item)}
+                              // disabled={arrCollectionForms
+                              //   .map(
+                              //     (arrCollectionForms) =>
+                              //       arrCollectionForms.giverId ||
+                              //       arrCollectionForms.recipientId
+                              //   )
+                              //   .includes(item.userId)}
+                            >
+                              <AiIcons.AiOutlineDelete />
+                            </button> */}
+                          </div>
+                        </p>
+                      );
+                    })}
+                </p>
+              </div>
             </div>
           </div>
         </div>

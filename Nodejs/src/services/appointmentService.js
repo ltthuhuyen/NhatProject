@@ -1,9 +1,10 @@
 import db from "../models/index";
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
-import appointmentService from "./appointmentService";
+import moment from "moment";
+import scheduleService from "./scheduleService";
 
-let getAllAppointments = (appointmentId) => {
+let getAllSchedules = (appointmentId) => {
   return new Promise(async (resolve, reject) => {
     try {
       let appointments = "";
@@ -15,10 +16,6 @@ let getAllAppointments = (appointmentId) => {
               as: "giverData",
             },
             {
-              model: db.User,
-              as: "recipientData",
-            },
-            {
               model: db.Product,
               as: "productData",
             },
@@ -30,17 +27,12 @@ let getAllAppointments = (appointmentId) => {
               model: db.Allcode,
               as: "timeTypeData",
             },
-            {
-              model: db.Allcode,
-              as: "statusTypeData",
-            },
           ],
 
           raw: true,
           nest: true,
         });
       }
-
       if (appointmentId && appointmentId !== "ALL") {
         appointments = await db.Schedule.findOne({
           where: { id: appointmentId },
@@ -50,10 +42,6 @@ let getAllAppointments = (appointmentId) => {
               as: "giverData",
             },
             {
-              model: db.User,
-              as: "recipientData",
-            },
-            {
               model: db.Product,
               as: "productData",
             },
@@ -67,7 +55,7 @@ let getAllAppointments = (appointmentId) => {
             },
             {
               model: db.Allcode,
-              as: "statusTypeData",
+              as: "statusData",
             },
           ],
 
@@ -82,15 +70,204 @@ let getAllAppointments = (appointmentId) => {
   });
 };
 
-// all đơn thu gom vừa mới tạo có status = 'chưa xác nhận'
-let getAppointmentsNew = (appointmentId) => {
+let getAllAppointments = (appointment) => {
   return new Promise(async (resolve, reject) => {
     try {
       let appointments = "";
-      if (appointmentId) {
+      if (appointment === "ALL") {
+        appointments = await db.Collectionform.findAll({
+          include: [
+            {
+              model: db.User,
+              as: "recipientData",
+            },
+            {
+              model: db.Allcode,
+              as: "statusTypeData",
+            },
+            {
+              model: db.Schedule,
+              as: "scheduleData",
+              include: [
+                {
+                  model: db.User,
+                  as: "giverData",
+                },
+                {
+                  model: db.Product,
+                  as: "productData",
+                },
+                {
+                  model: db.Address,
+                  as: "addressData",
+                },
+                {
+                  model: db.Allcode,
+                  as: "timeTypeData",
+                },
+                {
+                  model: db.Allcode,
+                  as: "statusData",
+                },
+              ],
+            },
+          ],
+          raw: true,
+          nest: true,
+        });
+      }
+      if (appointment && appointment !== "ALL") {
+        appointments = await db.Collectionform.findOne({
+          where: { id: appointment },
+
+          include: [
+            {
+              model: db.User,
+              as: "recipientData",
+            },
+            {
+              model: db.Allcode,
+              as: "statusTypeData",
+            },
+            {
+              model: db.Schedule,
+              as: "scheduleData",
+              include: [
+                {
+                  model: db.User,
+                  as: "giverData",
+                },
+                {
+                  model: db.Address,
+                  as: "addressData",
+                },
+                {
+                  model: db.Product,
+                  as: "productData",
+                },
+                {
+                  model: db.Allcode,
+                  as: "timeTypeData",
+                },
+                {
+                  model: db.Allcode,
+                  as: "statusData",
+                },
+              ],
+            },
+          ],
+          raw: true,
+          nest: true,
+        });
+      }
+      resolve(appointments);
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+// all đơn thu gom theo trang thái
+let getScheduleByStatus = (status) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let appointments = "";
+
+      if (status) {
         appointments = await db.Schedule.findAll({
           where: {
-            statusType: "S1",
+            statusType: status,
+          },
+          include: [
+            {
+              model: db.User,
+              as: "giverData",
+            },
+
+            {
+              model: db.Product,
+              as: "productData",
+            },
+            {
+              model: db.Address,
+              as: "addressData",
+            },
+            {
+              model: db.Allcode,
+              as: "timeTypeData",
+            },
+            {
+              model: db.Allcode,
+              as: "statusData",
+            },
+          ],
+
+          raw: true,
+          nest: true,
+        });
+      }
+      resolve(appointments);
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+let getScheduleBetweenTwoStatus = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let appointments = "";
+
+      if (data) {
+        appointments = await db.Schedule.findAll({
+          where: {
+            statusType: {
+              [Op.or]: [data.status1, data.status2],
+            },
+          },
+          include: [
+            {
+              model: db.User,
+              as: "giverData",
+            },
+
+            {
+              model: db.Product,
+              as: "productData",
+            },
+            {
+              model: db.Address,
+              as: "addressData",
+            },
+            {
+              model: db.Allcode,
+              as: "timeTypeData",
+            },
+            {
+              model: db.Allcode,
+              as: "statusData",
+            },
+          ],
+
+          raw: true,
+          nest: true,
+        });
+      }
+      resolve(appointments);
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+let getScheduleOfGiver = (schedule) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let appointments = "";
+      if (schedule.giverId && !schedule.status) {
+        appointments = await db.Schedule.findAll({
+          where: {
+            giverId: schedule.giverId,
           },
           include: [
             {
@@ -98,10 +275,6 @@ let getAppointmentsNew = (appointmentId) => {
               as: "giverData",
             },
             {
-              model: db.User,
-              as: "recipientData",
-            },
-            {
               model: db.Product,
               as: "productData",
             },
@@ -115,29 +288,17 @@ let getAppointmentsNew = (appointmentId) => {
             },
             {
               model: db.Allcode,
-              as: "statusTypeData",
+              as: "statusData",
             },
           ],
-
           raw: true,
           nest: true,
         });
-      }
-      resolve(appointments);
-    } catch (e) {
-      reject(e);
-    }
-  });
-};
-
-let getAppointmentStatusS2 = (appointmentId) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let appointments = "";
-      if (appointmentId) {
+      } else if (schedule.giverId && schedule.status) {
         appointments = await db.Schedule.findAll({
           where: {
-            statusType: "S2",
+            giverId: schedule.giverId,
+            statusType: schedule.status,
           },
           include: [
             {
@@ -145,10 +306,6 @@ let getAppointmentStatusS2 = (appointmentId) => {
               as: "giverData",
             },
             {
-              model: db.User,
-              as: "recipientData",
-            },
-            {
               model: db.Product,
               as: "productData",
             },
@@ -162,10 +319,9 @@ let getAppointmentStatusS2 = (appointmentId) => {
             },
             {
               model: db.Allcode,
-              as: "statusTypeData",
+              as: "statusData",
             },
           ],
-
           raw: true,
           nest: true,
         });
@@ -178,126 +334,409 @@ let getAppointmentStatusS2 = (appointmentId) => {
   });
 };
 
-let getAppointmentStatusS3 = (appointmentId) => {
+let getAllAppointmentsByScheduleByStatusByReceivedDate = (appointment) => {
   return new Promise(async (resolve, reject) => {
     try {
       let appointments = "";
-      if (appointmentId) {
-        appointments = await db.Schedule.findAll({
+      if (
+        appointment.scheduleId &&
+        !appointment.recipientId &&
+        !appointment.status &&
+        !appointment.receivedDate
+      ) {
+        appointments = await db.Collectionform.findAll({
           where: {
-            statusType: "S3",
+            scheduleId: appointment.scheduleId,
+          },
+
+          include: [
+            {
+              model: db.User,
+              as: "recipientData",
+            },
+            {
+              model: db.Allcode,
+              as: "statusTypeData",
+            },
+            {
+              model: db.Schedule,
+              as: "scheduleData",
+              include: [
+                {
+                  model: db.User,
+                  as: "giverData",
+                },
+                {
+                  model: db.Product,
+                  as: "productData",
+                },
+                {
+                  model: db.Address,
+                  as: "addressData",
+                },
+                {
+                  model: db.Allcode,
+                  as: "timeTypeData",
+                },
+                {
+                  model: db.Allcode,
+                  as: "statusData",
+                },
+              ],
+            },
+          ],
+          raw: true,
+          nest: true,
+        });
+        console.log("TH1");
+      } else if (
+        appointment.scheduleId &&
+        appointment.recipientId &&
+        !appointment.status &&
+        !appointment.receivedDate
+      ) {
+        appointments = await db.Collectionform.findOne({
+          where: {
+            scheduleId: appointment.scheduleId,
+            recipientId: appointment.recipientId,
+          },
+
+          include: [
+            {
+              model: db.User,
+              as: "recipientData",
+            },
+            {
+              model: db.Allcode,
+              as: "statusTypeData",
+            },
+            {
+              model: db.Schedule,
+              as: "scheduleData",
+              include: [
+                {
+                  model: db.User,
+                  as: "giverData",
+                },
+                {
+                  model: db.Product,
+                  as: "productData",
+                },
+                {
+                  model: db.Address,
+                  as: "addressData",
+                },
+                {
+                  model: db.Allcode,
+                  as: "timeTypeData",
+                },
+                {
+                  model: db.Allcode,
+                  as: "statusData",
+                },
+              ],
+            },
+          ],
+          raw: true,
+          nest: true,
+        });
+        console.log("TH2");
+      } else if (
+        appointment.scheduleId &&
+        !appointment.recipientId &&
+        appointment.status &&
+        !appointment.receivedDate
+      ) {
+        appointments = await db.Collectionform.findOne({
+          where: {
+            scheduleId: appointment.scheduleId,
+            statusType: appointment.status,
+          },
+
+          include: [
+            {
+              model: db.User,
+              as: "recipientData",
+            },
+            {
+              model: db.Allcode,
+              as: "statusTypeData",
+            },
+            {
+              model: db.Schedule,
+              as: "scheduleData",
+              include: [
+                {
+                  model: db.User,
+                  as: "giverData",
+                },
+                {
+                  model: db.Product,
+                  as: "productData",
+                },
+                {
+                  model: db.Address,
+                  as: "addressData",
+                },
+                {
+                  model: db.Allcode,
+                  as: "timeTypeData",
+                },
+                {
+                  model: db.Allcode,
+                  as: "statusData",
+                },
+              ],
+            },
+          ],
+          raw: true,
+          nest: true,
+        });
+        console.log("TH3");
+      } else if (
+        appointment.scheduleId &&
+        appointment.recipientId &&
+        appointment.status &&
+        !appointment.receivedDate
+      ) {
+        appointments = await db.Collectionform.findOne({
+          where: {
+            scheduleId: appointment.scheduleId,
+            recipientId: appointment.recipientId,
+            statusType: appointment.status,
+          },
+
+          include: [
+            {
+              model: db.User,
+              as: "recipientData",
+            },
+            {
+              model: db.Allcode,
+              as: "statusTypeData",
+            },
+            {
+              model: db.Schedule,
+              as: "scheduleData",
+              include: [
+                {
+                  model: db.User,
+                  as: "giverData",
+                },
+                {
+                  model: db.Product,
+                  as: "productData",
+                },
+                {
+                  model: db.Address,
+                  as: "addressData",
+                },
+                {
+                  model: db.Allcode,
+                  as: "timeTypeData",
+                },
+                {
+                  model: db.Allcode,
+                  as: "statusData",
+                },
+              ],
+            },
+          ],
+          raw: true,
+          nest: true,
+        });
+        console.log("TH4");
+      }
+
+      resolve(appointments);
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+// let getAppointmentsOfGiverStatusS1 = (giverId) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       let appointments = "";
+//       if (giverId) {
+//         appointments = await db.Schedule.findAll({
+//           where: {
+//             giverId: giverId,
+//             statusType: "S1",
+//           },
+//           include: [
+//             {
+//               model: db.User,
+//               as: "giverData",
+//             },
+//             {
+//               model: db.User,
+//               as: "recipientData",
+//             },
+//             {
+//               model: db.Product,
+//               as: "productData",
+//             },
+//             {
+//               model: db.Address,
+//               as: "addressData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "timeTypeData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "statusTypeData",
+//             },
+//           ],
+
+//           raw: true,
+//           nest: true,
+//         });
+//       }
+
+//       resolve(appointments);
+//     } catch (e) {
+//       reject(e);
+//     }
+//   });
+// };
+
+let checkCollect = (check) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let collect = await db.Collectionform.findAll({
+        where: {
+          scheduleId: check.scheduleId,
+          recipientId: check.recipientId,
+        },
+      });
+
+      if (collect && collect.length > 0) {
+        resolve(true);
+      } else {
+        resolve(false);
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+let registerCollectionForm = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let check = await checkCollect(data);
+
+      if (check === true) {
+        resolve({
+          errCode: 1,
+          errMessange: "Đăng kí này đã tồn tại ",
+        });
+      } else if (!data.scheduleId || !data.recipientId) {
+        resolve({
+          errCode: 2,
+          errMessange: "Vui lòng điền đầy đủ thông tin",
+        });
+      } else {
+        let collect = await db.Collectionform.create({
+          scheduleId: data.scheduleId,
+          recipientId: data.recipientId,
+          receivedDate: data.receivedDate,
+          registerDate: data.registerDate,
+          statusType: "No",
+        });
+        await scheduleService.updateStatusS2({
+          id: collect.scheduleId,
+        });
+
+        resolve({
+          errCode: 0,
+          errMessange: "OK",
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+let getAppointmentsOfRecipientStatus = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let appointments = "";
+      if (data.recipientId && !data.status) {
+        appointments = await db.Collectionform.findAll({
+          where: {
+            recipientId: data.recipientId,
           },
           include: [
             {
               model: db.User,
-              as: "giverData",
-            },
-            {
-              model: db.User,
               as: "recipientData",
             },
             {
-              model: db.Product,
-              as: "productData",
-            },
-            {
-              model: db.Allcode,
-              as: "timeTypeData",
-            },
-            {
-              model: db.Allcode,
-              as: "statusTypeData",
+              model: db.Schedule,
+              as: "scheduleData",
+              include: [
+                {
+                  model: db.User,
+                  as: "giverData",
+                },
+                {
+                  model: db.Product,
+                  as: "productData",
+                },
+                {
+                  model: db.Allcode,
+                  as: "timeTypeData",
+                },
+                {
+                  model: db.Allcode,
+                  as: "statusData",
+                },
+              ],
             },
           ],
-
           raw: true,
           nest: true,
         });
-      }
-
-      resolve(appointments);
-    } catch (e) {
-      reject(e);
-    }
-  });
-};
-
-let getAppointmentStatusS4 = (appointmentId) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let appointments = "";
-      if (appointmentId) {
-        appointments = await db.Schedule.findAll({
+      } else if (data.recipientId && data.status) {
+        appointments = await db.Collectionform.findAll({
           where: {
-            statusType: "S4",
+            recipientId: data.recipientId,
+            statusType: data.status,
           },
           include: [
             {
               model: db.User,
-              as: "giverData",
-            },
-            {
-              model: db.User,
               as: "recipientData",
             },
             {
-              model: db.Product,
-              as: "productData",
-            },
-            {
-              model: db.Allcode,
-              as: "timeTypeData",
-            },
-            {
-              model: db.Allcode,
-              as: "statusTypeData",
-            },
-          ],
-
-          raw: true,
-          nest: true,
-        });
-      }
-
-      resolve(appointments);
-    } catch (e) {
-      reject(e);
-    }
-  });
-};
-
-let getAppointmentStatusS5 = (appointmentId) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let appointments = "";
-      if (appointmentId) {
-        appointments = await db.Schedule.findAll({
-          where: {
-            statusType: "S5",
-          },
-          include: [
-            {
-              model: db.User,
-              as: "giverData",
-            },
-            {
-              model: db.User,
-              as: "recipientData",
-            },
-            {
-              model: db.Product,
-              as: "productData",
-            },
-            {
-              model: db.Allcode,
-              as: "timeTypeData",
-            },
-            {
-              model: db.Allcode,
-              as: "statusTypeData",
+              model: db.Schedule,
+              as: "scheduleData",
+              include: [
+                {
+                  model: db.User,
+                  as: "giverData",
+                },
+                {
+                  model: db.Product,
+                  as: "productData",
+                },
+                {
+                  model: db.Allcode,
+                  as: "timeTypeData",
+                },
+                {
+                  model: db.Allcode,
+                  as: "statusData",
+                },
+              ],
             },
           ],
-
           raw: true,
           nest: true,
         });
@@ -309,583 +748,715 @@ let getAppointmentStatusS5 = (appointmentId) => {
   });
 };
 
-let getAppointmentsOfGiver = (giverId) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let appointments = "";
-      if (giverId) {
-        appointments = await db.Schedule.findAll({
-          where: { giverId: giverId },
-          include: [
-            {
-              model: db.User,
-              as: "giverData",
-            },
-            {
-              model: db.User,
-              as: "recipientData",
-            },
-            {
-              model: db.Product,
-              as: "productData",
-            },
-            {
-              model: db.Address,
-              as: "addressData",
-            },
-            {
-              model: db.Allcode,
-              as: "timeTypeData",
-            },
-            {
-              model: db.Allcode,
-              as: "statusTypeData",
-            },
-          ],
+// let getAppointmentStatusS2 = (appointmentId) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       let appointments = "";
+//       if (appointmentId) {
+//         appointments = await db.Schedule.findAll({
+//           where: {
+//             statusType: "S2",
+//           },
+//           include: [
+//             {
+//               model: db.User,
+//               as: "giverData",
+//             },
+//             {
+//               model: db.User,
+//               as: "recipientData",
+//             },
+//             {
+//               model: db.Product,
+//               as: "productData",
+//             },
+//             {
+//               model: db.Address,
+//               as: "addressData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "timeTypeData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "statusTypeData",
+//             },
+//           ],
 
-          raw: true,
-          nest: true,
-        });
-      }
+//           raw: true,
+//           nest: true,
+//         });
+//       }
 
-      resolve(appointments);
-    } catch (e) {
-      reject(e);
-    }
-  });
-};
+//       resolve(appointments);
+//     } catch (e) {
+//       reject(e);
+//     }
+//   });
+// };
 
-let getAppointmentsOfGiverStatusS1 = (giverId) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let appointments = "";
-      if (giverId) {
-        appointments = await db.Schedule.findAll({
-          where: {
-            giverId: giverId,
-            statusType: "S1",
-          },
-          include: [
-            {
-              model: db.User,
-              as: "giverData",
-            },
-            {
-              model: db.User,
-              as: "recipientData",
-            },
-            {
-              model: db.Product,
-              as: "productData",
-            },
-            {
-              model: db.Address,
-              as: "addressData",
-            },
-            {
-              model: db.Allcode,
-              as: "timeTypeData",
-            },
-            {
-              model: db.Allcode,
-              as: "statusTypeData",
-            },
-          ],
+// let getAppointmentStatusS3 = (appointmentId) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       let appointments = "";
+//       if (appointmentId) {
+//         appointments = await db.Schedule.findAll({
+//           where: {
+//             statusType: "S3",
+//           },
+//           include: [
+//             {
+//               model: db.User,
+//               as: "giverData",
+//             },
+//             {
+//               model: db.User,
+//               as: "recipientData",
+//             },
+//             {
+//               model: db.Product,
+//               as: "productData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "timeTypeData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "statusTypeData",
+//             },
+//           ],
 
-          raw: true,
-          nest: true,
-        });
-      }
+//           raw: true,
+//           nest: true,
+//         });
+//       }
 
-      resolve(appointments);
-    } catch (e) {
-      reject(e);
-    }
-  });
-};
+//       resolve(appointments);
+//     } catch (e) {
+//       reject(e);
+//     }
+//   });
+// };
 
-let getAppointmentsOfGiverStatusS2 = (giverId) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let appointments = "";
-      if (giverId) {
-        appointments = await db.Schedule.findAll({
-          where: {
-            giverId: giverId,
-            statusType: "S2",
-          },
-          include: [
-            {
-              model: db.User,
-              as: "giverData",
-            },
-            {
-              model: db.User,
-              as: "recipientData",
-            },
-            {
-              model: db.Product,
-              as: "productData",
-            },
-            {
-              model: db.Address,
-              as: "addressData",
-            },
-            {
-              model: db.Allcode,
-              as: "timeTypeData",
-            },
-            {
-              model: db.Allcode,
-              as: "statusTypeData",
-            },
-          ],
+// let getAppointmentStatusS4 = (appointmentId) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       let appointments = "";
+//       if (appointmentId) {
+//         appointments = await db.Schedule.findAll({
+//           where: {
+//             statusType: "S4",
+//           },
+//           include: [
+//             {
+//               model: db.User,
+//               as: "giverData",
+//             },
+//             {
+//               model: db.User,
+//               as: "recipientData",
+//             },
+//             {
+//               model: db.Product,
+//               as: "productData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "timeTypeData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "statusTypeData",
+//             },
+//           ],
 
-          raw: true,
-          nest: true,
-        });
-      }
+//           raw: true,
+//           nest: true,
+//         });
+//       }
 
-      resolve(appointments);
-    } catch (e) {
-      reject(e);
-    }
-  });
-};
+//       resolve(appointments);
+//     } catch (e) {
+//       reject(e);
+//     }
+//   });
+// };
 
-let getAppointmentsOfGiverStatusS3 = (giverId) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let appointments = "";
-      if (giverId) {
-        appointments = await db.Schedule.findAll({
-          where: {
-            giverId: giverId,
-            statusType: "S3",
-          },
-          include: [
-            {
-              model: db.User,
-              as: "giverData",
-            },
-            {
-              model: db.User,
-              as: "recipientData",
-            },
-            {
-              model: db.Product,
-              as: "productData",
-            },
-            {
-              model: db.Address,
-              as: "addressData",
-            },
-            {
-              model: db.Allcode,
-              as: "timeTypeData",
-            },
-            {
-              model: db.Allcode,
-              as: "statusTypeData",
-            },
-          ],
+// let getAppointmentStatusS5 = (appointmentId) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       let appointments = "";
+//       if (appointmentId) {
+//         appointments = await db.Schedule.findAll({
+//           where: {
+//             statusType: "S5",
+//           },
+//           include: [
+//             {
+//               model: db.User,
+//               as: "giverData",
+//             },
+//             {
+//               model: db.User,
+//               as: "recipientData",
+//             },
+//             {
+//               model: db.Product,
+//               as: "productData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "timeTypeData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "statusTypeData",
+//             },
+//           ],
 
-          raw: true,
-          nest: true,
-        });
-      }
+//           raw: true,
+//           nest: true,
+//         });
+//       }
+//       resolve(appointments);
+//     } catch (e) {
+//       reject(e);
+//     }
+//   });
+// };
 
-      resolve(appointments);
-    } catch (e) {
-      reject(e);
-    }
-  });
-};
+// let getAppointmentsOfGiver = (giverId) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       let appointments = "";
+//       if (giverId) {
+//         appointments = await db.Schedule.findAll({
+//           where: { giverId: giverId },
+//           include: [
+//             {
+//               model: db.User,
+//               as: "giverData",
+//             },
+//             {
+//               model: db.User,
+//               as: "recipientData",
+//             },
+//             {
+//               model: db.Product,
+//               as: "productData",
+//             },
+//             {
+//               model: db.Address,
+//               as: "addressData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "timeTypeData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "statusTypeData",
+//             },
+//           ],
 
-let getAppointmentsOfGiverStatusS4 = (giverId) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let appointments = "";
-      if (giverId) {
-        appointments = await db.Schedule.findAll({
-          where: {
-            giverId: giverId,
-            statusType: "S4",
-          },
-          include: [
-            {
-              model: db.User,
-              as: "giverData",
-            },
-            {
-              model: db.User,
-              as: "recipientData",
-            },
-            {
-              model: db.Product,
-              as: "productData",
-            },
-            {
-              model: db.Address,
-              as: "addressData",
-            },
-            {
-              model: db.Allcode,
-              as: "timeTypeData",
-            },
-            {
-              model: db.Allcode,
-              as: "statusTypeData",
-            },
-          ],
+//           raw: true,
+//           nest: true,
+//         });
+//       }
 
-          raw: true,
-          nest: true,
-        });
-      }
+//       resolve(appointments);
+//     } catch (e) {
+//       reject(e);
+//     }
+//   });
+// };
 
-      resolve(appointments);
-    } catch (e) {
-      reject(e);
-    }
-  });
-};
+// let getAppointmentsOfGiverStatusS1 = (giverId) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       let appointments = "";
+//       if (giverId) {
+//         appointments = await db.Schedule.findAll({
+//           where: {
+//             giverId: giverId,
+//             statusType: "S1",
+//           },
+//           include: [
+//             {
+//               model: db.User,
+//               as: "giverData",
+//             },
+//             {
+//               model: db.User,
+//               as: "recipientData",
+//             },
+//             {
+//               model: db.Product,
+//               as: "productData",
+//             },
+//             {
+//               model: db.Address,
+//               as: "addressData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "timeTypeData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "statusTypeData",
+//             },
+//           ],
 
-let getAppointmentsOfGiverStatusS5 = (giverId) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let appointments = "";
-      if (giverId) {
-        appointments = await db.Schedule.findAll({
-          where: {
-            giverId: giverId,
-            statusType: "S5",
-          },
-          include: [
-            {
-              model: db.User,
-              as: "giverData",
-            },
-            {
-              model: db.User,
-              as: "recipientData",
-            },
-            {
-              model: db.Product,
-              as: "productData",
-            },
-            {
-              model: db.Address,
-              as: "addressData",
-            },
-            {
-              model: db.Allcode,
-              as: "timeTypeData",
-            },
-            {
-              model: db.Allcode,
-              as: "statusTypeData",
-            },
-          ],
+//           raw: true,
+//           nest: true,
+//         });
+//       }
 
-          raw: true,
-          nest: true,
-        });
-      }
+//       resolve(appointments);
+//     } catch (e) {
+//       reject(e);
+//     }
+//   });
+// };
 
-      resolve(appointments);
-    } catch (e) {
-      reject(e);
-    }
-  });
-};
+// let getAppointmentsOfGiverStatusS2 = (giverId) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       let appointments = "";
+//       if (giverId) {
+//         appointments = await db.Schedule.findAll({
+//           where: {
+//             giverId: giverId,
+//             statusType: "S2",
+//           },
+//           include: [
+//             {
+//               model: db.User,
+//               as: "giverData",
+//             },
+//             {
+//               model: db.User,
+//               as: "recipientData",
+//             },
+//             {
+//               model: db.Product,
+//               as: "productData",
+//             },
+//             {
+//               model: db.Address,
+//               as: "addressData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "timeTypeData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "statusTypeData",
+//             },
+//           ],
 
-let getAppointmentsOfRecipient = (recipientId) => {
-  console.log("recipientId", recipientId);
-  return new Promise(async (resolve, reject) => {
-    try {
-      let appointments = "";
-      if (recipientId) {
-        appointments = await db.Schedule.findAll({
-          where: { recipientId: recipientId },
-          include: [
-            {
-              model: db.User,
-              as: "giverData",
-            },
-            {
-              model: db.User,
-              as: "recipientData",
-            },
-            {
-              model: db.Product,
-              as: "productData",
-            },
-            {
-              model: db.Address,
-              as: "addressData",
-            },
-            {
-              model: db.Allcode,
-              as: "timeTypeData",
-            },
-            {
-              model: db.Allcode,
-              as: "statusTypeData",
-            },
-          ],
+//           raw: true,
+//           nest: true,
+//         });
+//       }
 
-          raw: true,
-          nest: true,
-        });
-      }
+//       resolve(appointments);
+//     } catch (e) {
+//       reject(e);
+//     }
+//   });
+// };
 
-      resolve(appointments);
-    } catch (e) {
-      reject(e);
-    }
-  });
-};
+// let getAppointmentsOfGiverStatusS3 = (giverId) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       let appointments = "";
+//       if (giverId) {
+//         appointments = await db.Schedule.findAll({
+//           where: {
+//             giverId: giverId,
+//             statusType: "S3",
+//           },
+//           include: [
+//             {
+//               model: db.User,
+//               as: "giverData",
+//             },
+//             {
+//               model: db.User,
+//               as: "recipientData",
+//             },
+//             {
+//               model: db.Product,
+//               as: "productData",
+//             },
+//             {
+//               model: db.Address,
+//               as: "addressData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "timeTypeData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "statusTypeData",
+//             },
+//           ],
 
-let getAppointmentsOfRecipientStatusS2 = (recipientId) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let appointments = "";
-      if (recipientId) {
-        appointments = await db.Schedule.findAll({
-          where: { recipientId: recipientId, statusType: "S2" },
-          include: [
-            {
-              model: db.User,
-              as: "giverData",
-            },
-            {
-              model: db.User,
-              as: "recipientData",
-            },
-            {
-              model: db.Product,
-              as: "productData",
-            },
-            {
-              model: db.Address,
-              as: "addressData",
-            },
-            {
-              model: db.Allcode,
-              as: "timeTypeData",
-            },
-            {
-              model: db.Allcode,
-              as: "statusTypeData",
-            },
-          ],
+//           raw: true,
+//           nest: true,
+//         });
+//       }
 
-          raw: true,
-          nest: true,
-        });
-      }
+//       resolve(appointments);
+//     } catch (e) {
+//       reject(e);
+//     }
+//   });
+// };
 
-      resolve(appointments);
-    } catch (e) {
-      reject(e);
-    }
-  });
-};
+// let getAppointmentsOfGiverStatusS4 = (giverId) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       let appointments = "";
+//       if (giverId) {
+//         appointments = await db.Schedule.findAll({
+//           where: {
+//             giverId: giverId,
+//             statusType: "S4",
+//           },
+//           include: [
+//             {
+//               model: db.User,
+//               as: "giverData",
+//             },
+//             {
+//               model: db.User,
+//               as: "recipientData",
+//             },
+//             {
+//               model: db.Product,
+//               as: "productData",
+//             },
+//             {
+//               model: db.Address,
+//               as: "addressData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "timeTypeData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "statusTypeData",
+//             },
+//           ],
 
-let getAppointmentsOfRecipientStatusS3 = (recipientId) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let appointments = "";
-      if (recipientId) {
-        appointments = await db.Schedule.findAll({
-          where: { recipientId: recipientId, statusType: "S3" },
-          include: [
-            {
-              model: db.User,
-              as: "giverData",
-            },
-            {
-              model: db.User,
-              as: "recipientData",
-            },
-            {
-              model: db.Product,
-              as: "productData",
-            },
-            {
-              model: db.Address,
-              as: "addressData",
-            },
-            {
-              model: db.Allcode,
-              as: "timeTypeData",
-            },
-            {
-              model: db.Allcode,
-              as: "statusTypeData",
-            },
-          ],
+//           raw: true,
+//           nest: true,
+//         });
+//       }
 
-          raw: true,
-          nest: true,
-        });
-      }
+//       resolve(appointments);
+//     } catch (e) {
+//       reject(e);
+//     }
+//   });
+// };
 
-      resolve(appointments);
-    } catch (e) {
-      reject(e);
-    }
-  });
-};
+// let getAppointmentsOfGiverStatusS5 = (giverId) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       let appointments = "";
+//       if (giverId) {
+//         appointments = await db.Schedule.findAll({
+//           where: {
+//             giverId: giverId,
+//             statusType: "S5",
+//           },
+//           include: [
+//             {
+//               model: db.User,
+//               as: "giverData",
+//             },
+//             {
+//               model: db.User,
+//               as: "recipientData",
+//             },
+//             {
+//               model: db.Product,
+//               as: "productData",
+//             },
+//             {
+//               model: db.Address,
+//               as: "addressData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "timeTypeData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "statusTypeData",
+//             },
+//           ],
 
-let getAppointmentsOfRecipientStatusS3ByCurrentDate = (collectionForm) => {
-  console.log(collectionForm);
-  return new Promise(async (resolve, reject) => {
-    try {
-      let appointments = "";
-      if (collectionForm.recipientId) {
-        appointments = await db.Schedule.findAll({
-          where: {
-            recipientId: collectionForm.recipientId,
-            statusType: "S3",
-            date: {
-              [Op.like]: `%${collectionForm.currentDate}%`,
-            },
-            // date: collectionForm.currentDate,
-          },
-          include: [
-            {
-              model: db.User,
-              as: "giverData",
-            },
-            {
-              model: db.User,
-              as: "recipientData",
-            },
-            {
-              model: db.Product,
-              as: "productData",
-            },
-            {
-              model: db.Address,
-              as: "addressData",
-            },
-            {
-              model: db.Allcode,
-              as: "timeTypeData",
-            },
-            {
-              model: db.Allcode,
-              as: "statusTypeData",
-            },
-          ],
+//           raw: true,
+//           nest: true,
+//         });
+//       }
 
-          raw: true,
-          nest: true,
-        });
-      }
+//       resolve(appointments);
+//     } catch (e) {
+//       reject(e);
+//     }
+//   });
+// };
 
-      resolve(appointments);
-    } catch (e) {
-      reject(e);
-    }
-  });
-};
+// let getAppointmentsOfRecipient = (recipientId) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       let appointments = "";
+//       if (recipientId) {
+//         appointments = await db.Schedule.findAll({
+//           where: { recipientId: recipientId },
+//           include: [
+//             {
+//               model: db.User,
+//               as: "giverData",
+//             },
+//             {
+//               model: db.User,
+//               as: "recipientData",
+//             },
+//             {
+//               model: db.Product,
+//               as: "productData",
+//             },
+//             {
+//               model: db.Address,
+//               as: "addressData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "timeTypeData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "statusTypeData",
+//             },
+//           ],
 
-let getAppointmentsOfRecipientStatusS4 = (recipientId) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let appointments = "";
-      if (recipientId) {
-        appointments = await db.Schedule.findAll({
-          where: { recipientId: recipientId, statusType: "S4" },
-          include: [
-            {
-              model: db.User,
-              as: "giverData",
-            },
-            {
-              model: db.User,
-              as: "recipientData",
-            },
-            {
-              model: db.Product,
-              as: "productData",
-            },
-            {
-              model: db.Address,
-              as: "addressData",
-            },
-            {
-              model: db.Allcode,
-              as: "timeTypeData",
-            },
-            {
-              model: db.Allcode,
-              as: "statusTypeData",
-            },
-          ],
+//           raw: true,
+//           nest: true,
+//         });
+//       }
 
-          raw: true,
-          nest: true,
-        });
-      }
+//       resolve(appointments);
+//     } catch (e) {
+//       reject(e);
+//     }
+//   });
+// };
 
-      resolve(appointments);
-    } catch (e) {
-      reject(e);
-    }
-  });
-};
+// let getAppointmentsOfRecipientStatusS2 = (recipientId) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       let appointments = "";
+//       if (recipientId) {
+//         appointments = await db.Schedule.findAll({
+//           where: { recipientId: recipientId, statusType: "S2" },
+//           include: [
+//             {
+//               model: db.User,
+//               as: "giverData",
+//             },
+//             {
+//               model: db.User,
+//               as: "recipientData",
+//             },
+//             {
+//               model: db.Product,
+//               as: "productData",
+//             },
+//             {
+//               model: db.Address,
+//               as: "addressData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "timeTypeData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "statusTypeData",
+//             },
+//           ],
 
-let getAppointmentsOfRecipientStatusS5 = (recipientId) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let appointments = "";
-      if (recipientId) {
-        appointments = await db.Schedule.findAll({
-          where: { recipientId: recipientId, statusType: "S5" },
-          include: [
-            {
-              model: db.User,
-              as: "giverData",
-            },
-            {
-              model: db.User,
-              as: "recipientData",
-            },
-            {
-              model: db.Product,
-              as: "productData",
-            },
-            {
-              model: db.Address,
-              as: "addressData",
-            },
-            {
-              model: db.Allcode,
-              as: "timeTypeData",
-            },
-            {
-              model: db.Allcode,
-              as: "statusTypeData",
-            },
-          ],
+//           raw: true,
+//           nest: true,
+//         });
+//       }
 
-          raw: true,
-          nest: true,
-        });
-      }
+//       resolve(appointments);
+//     } catch (e) {
+//       reject(e);
+//     }
+//   });
+// };
 
-      resolve(appointments);
-    } catch (e) {
-      reject(e);
-    }
-  });
-};
+// let getAppointmentsOfRecipientStatusS3 = (recipientId) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       let appointments = "";
+//       if (recipientId) {
+//         appointments = await db.Schedule.findAll({
+//           where: { recipientId: recipientId, statusType: "S3" },
+//           include: [
+//             {
+//               model: db.User,
+//               as: "giverData",
+//             },
+//             {
+//               model: db.User,
+//               as: "recipientData",
+//             },
+//             {
+//               model: db.Product,
+//               as: "productData",
+//             },
+//             {
+//               model: db.Address,
+//               as: "addressData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "timeTypeData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "statusTypeData",
+//             },
+//           ],
 
-// đơn thu gom theo địa chỉ
+//           raw: true,
+//           nest: true,
+//         });
+//       }
+
+//       resolve(appointments);
+//     } catch (e) {
+//       reject(e);
+//     }
+//   });
+// };
+
+// let getAppointmentsOfRecipientStatusS3ByCurrentDate = (collectionForm) => {
+//   console.log(collectionForm);
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       let appointments = "";
+//       if (collectionForm.recipientId) {
+//         appointments = await db.Schedule.findAll({
+//           where: {
+//             recipientId: collectionForm.recipientId,
+//             statusType: "S3",
+//             date: {
+//               [Op.lte]: collectionForm.currentDate,
+//             },
+//             // date: collectionForm.currentDate,
+//           },
+//           include: [
+//             {
+//               model: db.User,
+//               as: "giverData",
+//             },
+//             {
+//               model: db.User,
+//               as: "recipientData",
+//             },
+//             {
+//               model: db.Product,
+//               as: "productData",
+//             },
+//             {
+//               model: db.Address,
+//               as: "addressData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "timeTypeData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "statusTypeData",
+//             },
+//           ],
+
+//           raw: true,
+//           nest: true,
+//         });
+//       }
+
+//       resolve(appointments);
+//     } catch (e) {
+//       reject(e);
+//     }
+//   });
+// };
+
+// let getAppointmentsOfRecipientStatusS4 = (recipientId) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       let appointments = "";
+//       if (recipientId) {
+//         appointments = await db.Schedule.findAll({
+//           where: { recipientId: recipientId, statusType: "S4" },
+//           include: [
+//             {
+//               model: db.User,
+//               as: "giverData",
+//             },
+//             {
+//               model: db.User,
+//               as: "recipientData",
+//             },
+//             {
+//               model: db.Product,
+//               as: "productData",
+//             },
+//             {
+//               model: db.Address,
+//               as: "addressData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "timeTypeData",
+//             },
+//             {
+//               model: db.Allcode,
+//               as: "statusTypeData",
+//             },
+//           ],
+
+//           raw: true,
+//           nest: true,
+//         });
+//       }
+
+//       resolve(appointments);
+//     } catch (e) {
+//       reject(e);
+//     }
+//   });
+// };
+
+// // đơn thu gom theo địa chỉ
 let getAllCollectsByAddress = (addressId) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -897,10 +1468,7 @@ let getAllCollectsByAddress = (addressId) => {
               model: db.User,
               as: "giverData",
             },
-            {
-              model: db.User,
-              as: "recipientData",
-            },
+
             {
               model: db.Product,
               as: "productData",
@@ -915,7 +1483,7 @@ let getAllCollectsByAddress = (addressId) => {
             },
             {
               model: db.Allcode,
-              as: "statusTypeData",
+              as: "statusData",
             },
           ],
 
@@ -934,10 +1502,7 @@ let getAllCollectsByAddress = (addressId) => {
               model: db.User,
               as: "giverData",
             },
-            {
-              model: db.User,
-              as: "recipientData",
-            },
+
             {
               model: db.Product,
               as: "productData",
@@ -952,7 +1517,7 @@ let getAllCollectsByAddress = (addressId) => {
             },
             {
               model: db.Allcode,
-              as: "statusTypeData",
+              as: "statusData",
             },
           ],
 
@@ -967,59 +1532,21 @@ let getAllCollectsByAddress = (addressId) => {
   });
 };
 
-// đơn thu gom theo ngày
-let getAllCollectsByDate = (date) => {
+let getAllCollectsByDate = (collectForm) => {
   return new Promise(async (resolve, reject) => {
     try {
       let collects = "";
-      if (date === "ALL") {
-        collects = await db.Schedule.findAll({
-          include: [
-            {
-              model: db.User,
-              as: "giverData",
-            },
-            {
-              model: db.User,
-              as: "recipientData",
-            },
-            {
-              model: db.Product,
-              as: "productData",
-            },
-            {
-              model: db.Address,
-              as: "addressData",
-            },
-            {
-              model: db.Allcode,
-              as: "timeTypeData",
-            },
-            {
-              model: db.Allcode,
-              as: "statusTypeData",
-            },
-          ],
-
-          raw: true,
-          nest: true,
-        });
-      }
-
-      if (date && date !== "ALL") {
+      if (collectForm.date && !collectForm.status && !collectForm.recipientId) {
         collects = await db.Schedule.findAll({
           where: {
-            date: date,
+            date: collectForm.date,
           },
           include: [
             {
               model: db.User,
               as: "giverData",
             },
-            {
-              model: db.User,
-              as: "recipientData",
-            },
+
             {
               model: db.Product,
               as: "productData",
@@ -1041,6 +1568,220 @@ let getAllCollectsByDate = (date) => {
           raw: true,
           nest: true,
         });
+      } else if (
+        collectForm.date &&
+        collectForm.status &&
+        !collectForm.recipientId
+      ) {
+        collects = await db.Schedule.findAll({
+          where: {
+            date: collectForm.date,
+            statusType: collectForm.status,
+          },
+          include: [
+            {
+              model: db.User,
+              as: "giverData",
+            },
+
+            {
+              model: db.Product,
+              as: "productData",
+            },
+            {
+              model: db.Address,
+              as: "addressData",
+            },
+            {
+              model: db.Allcode,
+              as: "timeTypeData",
+            },
+            {
+              model: db.Allcode,
+              as: "statusData",
+            },
+          ],
+
+          raw: true,
+          nest: true,
+        });
+      } else if (
+        collectForm.date &&
+        collectForm.status &&
+        collectForm.recipientId
+      ) {
+        collects = await db.Schedule.findAll({
+          where: {
+            date: collectForm.date,
+            statusType: collectForm.status,
+            recipientId: collectForm.recipientId,
+          },
+          include: [
+            {
+              model: db.User,
+              as: "giverData",
+            },
+
+            {
+              model: db.Product,
+              as: "productData",
+            },
+            {
+              model: db.Address,
+              as: "addressData",
+            },
+            {
+              model: db.Allcode,
+              as: "timeTypeData",
+            },
+            {
+              model: db.Allcode,
+              as: "statusData",
+            },
+          ],
+
+          raw: true,
+          nest: true,
+        });
+      }
+      resolve(collects);
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+// // Đơn thu gom được tạo bởi ngày hiện tại theo từng trạng thái
+let getAllAppointmentsStatusByCurrentDate = (collectionForm) => {
+  console.log(collectionForm);
+  return new Promise(async (resolve, reject) => {
+    try {
+      let appointments = "";
+      if (collectionForm) {
+        appointments = await db.Schedule.findAll({
+          where: {
+            createdAt: {
+              [Op.gte]: collectionForm.currentDateBegin,
+              [Op.lte]: collectionForm.currentDateStop,
+            },
+
+            statusType: collectionForm.status,
+          },
+          include: [
+            {
+              model: db.User,
+              as: "giverData",
+            },
+
+            {
+              model: db.Product,
+              as: "productData",
+            },
+            {
+              model: db.Address,
+              as: "addressData",
+            },
+            {
+              model: db.Allcode,
+              as: "timeTypeData",
+            },
+            {
+              model: db.Allcode,
+              as: "statusData",
+            },
+          ],
+
+          raw: true,
+          nest: true,
+        });
+      }
+
+      resolve(appointments);
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+// Thống kê từ ngày ... đến ngày hiện tại
+let collectFormStatisticByCurrentDate = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let collects = "";
+      if (data.date && data.currentDate && !data.status) {
+        collects = await db.Schedule.findAll({
+          where: {
+            date: {
+              [Op.gte]: data.date,
+              [Op.lte]: data.currentDate,
+              // [Op.between]: [
+              //   { createdAt: data.date },
+              //   { createdAt: data.currentDate },
+              // ],
+            },
+          },
+          include: [
+            {
+              model: db.User,
+              as: "giverData",
+            },
+
+            {
+              model: db.Product,
+              as: "productData",
+            },
+            {
+              model: db.Address,
+              as: "addressData",
+            },
+            {
+              model: db.Allcode,
+              as: "timeTypeData",
+            },
+            {
+              model: db.Allcode,
+              as: "statusData",
+            },
+          ],
+
+          raw: true,
+          nest: true,
+        });
+      } else if (data.date && data.currentDate && data.status) {
+        collects = await db.Schedule.findAll({
+          where: {
+            date: {
+              [Op.gte]: data.date,
+              [Op.lte]: data.currentDate,
+            },
+            statusType: data.status,
+          },
+          include: [
+            {
+              model: db.User,
+              as: "giverData",
+            },
+
+            {
+              model: db.Product,
+              as: "productData",
+            },
+            {
+              model: db.Address,
+              as: "addressData",
+            },
+            {
+              model: db.Allcode,
+              as: "timeTypeData",
+            },
+            {
+              model: db.Allcode,
+              as: "statusData",
+            },
+          ],
+
+          raw: true,
+          nest: true,
+        });
       }
       resolve(collects);
     } catch (e) {
@@ -1049,26 +1790,493 @@ let getAllCollectsByDate = (date) => {
   });
 };
 
+// Thống kê đơn thu gom theo trạng thái tới ngày hiện tại
+let collectFormStatisticByStatusOfCurrentDate = (data) => {
+  console.log("data", data);
+  return new Promise(async (resolve, reject) => {
+    try {
+      let collects = "";
+      let schedules = "";
+      let arr = [];
+      let today = moment(new Date()).format("YYYY-MM-DD");
+      let todayTime = today + " " + "00:00:00";
+      console.log("today", todayTime);
+      if (data.status) {
+        schedules = await db.Schedule.findAll({
+          where: {
+            statusType: data.status,
+          },
+          include: [
+            {
+              model: db.User,
+              as: "giverData",
+            },
+
+            {
+              model: db.Product,
+              as: "productData",
+            },
+            {
+              model: db.Address,
+              as: "addressData",
+            },
+            {
+              model: db.Allcode,
+              as: "timeTypeData",
+            },
+            {
+              model: db.Allcode,
+              as: "statusData",
+            },
+          ],
+          raw: true,
+          nest: true,
+        });
+        // console.log("schedule", schedules);
+
+        if (schedules && !data.dateTimeBegin) {
+          for (let i = 0; i < schedules.length; i++) {
+            collects = await db.Collectionform.findAll({
+              where: {
+                scheduleId: schedules[i].id,
+                statusType: "Yes",
+                receivedDate: {
+                  [Op.gte]: todayTime,
+                  [Op.lte]: new Date(),
+                },
+              },
+              include: [
+                {
+                  model: db.User,
+                  as: "recipientData",
+                },
+                {
+                  model: db.Schedule,
+                  as: "scheduleData",
+                  include: [
+                    {
+                      model: db.User,
+                      as: "giverData",
+                    },
+                    {
+                      model: db.Product,
+                      as: "productData",
+                    },
+                    {
+                      model: db.Allcode,
+                      as: "timeTypeData",
+                    },
+                    {
+                      model: db.Allcode,
+                      as: "statusData",
+                    },
+                  ],
+                },
+              ],
+              raw: true,
+              nest: true,
+            });
+          }
+        } else if (schedules && data.dateTimeBegin) {
+          for (let i = 0; i < schedules.length; i++) {
+            let obj = {};
+            collects = await db.Collectionform.findOne({
+              where: {
+                scheduleId: schedules[i].id,
+                statusType: "Yes",
+                receivedDate: {
+                  [Op.gte]: data.dateTimeBegin,
+                  [Op.lte]: new Date(),
+                },
+              },
+              include: [
+                {
+                  model: db.User,
+                  as: "recipientData",
+                },
+                {
+                  model: db.Schedule,
+                  as: "scheduleData",
+                  include: [
+                    {
+                      model: db.User,
+                      as: "giverData",
+                    },
+                    {
+                      model: db.Product,
+                      as: "productData",
+                    },
+                    {
+                      model: db.Allcode,
+                      as: "timeTypeData",
+                    },
+                    {
+                      model: db.Allcode,
+                      as: "statusData",
+                    },
+                  ],
+                },
+              ],
+              raw: true,
+              nest: true,
+            });
+            arr.push(collects);
+            console.log("arr", arr);
+          }
+        }
+      }
+
+      resolve(arr);
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+let collectFormStatistic = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let collectFormThisMonth = {};
+      var today = new Date();
+      var currentDate =
+        today.getFullYear() +
+        "-" +
+        ("0" + (today.getMonth() + 1)).slice(-2) +
+        "-" +
+        ("0" + today.getDate()).slice(-2);
+
+      let todayLastMonth = new Date(new Date() - 30 * 24 * 60 * 60 * 1000);
+      var dayLastMonth =
+        todayLastMonth.getFullYear() +
+        "-" +
+        ("0" + (todayLastMonth.getMonth() + 1)).slice(-2) +
+        "-" +
+        ("0" + todayLastMonth.getDate()).slice(-2);
+
+      let todayLastMonth2 = new Date(new Date() - 2 * 30 * 24 * 60 * 60 * 1000);
+      var dayLastMonth2 =
+        todayLastMonth2.getFullYear() +
+        "-" +
+        ("0" + (todayLastMonth2.getMonth() + 1)).slice(-2) +
+        "-" +
+        ("0" + todayLastMonth2.getDate()).slice(-2);
+
+      collectFormThisMonth = await db.Schedule.findAll({
+        where: {
+          createdAt: {
+            [Op.lte]: currentDate,
+            [Op.gte]: dayLastMonth,
+          },
+        },
+        include: [
+          {
+            model: db.User,
+            as: "giverData",
+          },
+
+          {
+            model: db.Product,
+            as: "productData",
+          },
+          {
+            model: db.Address,
+            as: "addressData",
+          },
+          {
+            model: db.Allcode,
+            as: "timeTypeData",
+          },
+          {
+            model: db.Allcode,
+            as: "statusData",
+          },
+        ],
+        raw: true,
+        nest: true,
+      });
+      let collectFormLastMonth = {};
+      collectFormLastMonth = await db.Schedule.findAll({
+        where: {
+          createdAt: {
+            [Op.lte]: dayLastMonth,
+            [Op.gte]: dayLastMonth2,
+          },
+        },
+        include: [
+          {
+            model: db.User,
+            as: "giverData",
+          },
+
+          {
+            model: db.Product,
+            as: "productData",
+          },
+          {
+            model: db.Address,
+            as: "addressData",
+          },
+          {
+            model: db.Allcode,
+            as: "timeTypeData",
+          },
+          {
+            model: db.Allcode,
+            as: "statusData",
+          },
+        ],
+        raw: true,
+        nest: true,
+      });
+      let all = await db.Schedule.findAll();
+      const tong = collectFormLastMonth.length + collectFormThisMonth.length;
+      const truoc = collectFormLastMonth.length / tong;
+      const nay = collectFormThisMonth.length / tong;
+      let tang;
+      let phantramTang;
+      if (truoc > nay) {
+        tang = false;
+        let phanTrang = (truoc - nay) * 100;
+        phantramTang = phanTrang.toFixed(0);
+      } else {
+        tang = true;
+        let phanTrang = (nay - truoc) * 100;
+        phantramTang = phanTrang.toFixed(0);
+      }
+      const allCollecsForm = all.length;
+      const collects = {
+        allCollecsForm,
+        phantramTang,
+        tang,
+      };
+      resolve(collects);
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+let getThongketheotuan = (week) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (week == 1) {
+        let arr = [];
+
+        for (let i = 0; i < 7; i++) {
+          let obj = {};
+          obj.value = moment(new Date())
+            .subtract(i, "days")
+            .startOf("day")
+            .format("YYYY/MM/DD");
+          // .valueOf();
+
+          arr.push(obj.value);
+        }
+        let collects = await db.Collectionform.findAll({
+          where: { statusType: "Yes" },
+          include: [
+            {
+              model: db.User,
+              as: "recipientData",
+            },
+            {
+              model: db.Schedule,
+              as: "scheduleData",
+              where: { statusType: "S4" },
+            },
+          ],
+          raw: true,
+          nest: true,
+        });
+        let temp = moment(new Date(collects[0].receivedDate).getTime()).format(
+          "YYYY/MM/DD"
+        );
+        // resolve(collects);
+
+        let arrCount = [];
+        let arr1 = [];
+        let arr2 = [];
+        let arr3 = [];
+        let arr4 = [];
+        let arr5 = [];
+        let arr6 = [];
+        let arr7 = [];
+        for (let y = 0; y < collects.length; y++) {
+          if (
+            moment(new Date(collects[y]?.receivedDate).getTime()).format(
+              "YYYY/MM/DD"
+            ) == arr[0]
+          ) {
+            let obj = {};
+            (obj = collects[y].id), arr1.push(obj);
+          }
+          if (
+            moment(new Date(collects[y]?.receivedDate).getTime()).format(
+              "YYYY/MM/DD"
+            ) == arr[1]
+          ) {
+            let obj = {};
+            (obj = collects[y].id), arr2.push(obj);
+          }
+          if (
+            moment(new Date(collects[y]?.receivedDate).getTime()).format(
+              "YYYY/MM/DD"
+            ) == arr[2]
+          ) {
+            let obj = {};
+            (obj = collects[y].id), arr3.push(obj);
+          }
+          if (
+            moment(new Date(collects[y]?.receivedDate).getTime()).format(
+              "YYYY/MM/DD"
+            ) == arr[3]
+          ) {
+            let obj = {};
+            (obj = collects[y].id), arr4.push(obj);
+          }
+          if (
+            moment(new Date(collects[y]?.receivedDate).getTime()).format(
+              "YYYY/MM/DD"
+            ) == arr[4]
+          ) {
+            let obj = {};
+            (obj = collects[y].id), arr5.push(obj);
+          }
+          if (
+            moment(new Date(collects[y]?.receivedDate).getTime()).format(
+              "YYYY/MM/DD"
+            ) == arr[5]
+          ) {
+            let obj = {};
+            (obj = collects[y].id), arr6.push(obj);
+          }
+          if (
+            moment(new Date(collects[y]?.receivedDate).getTime()).format(
+              "YYYY/MM/DD"
+            ) == arr[6]
+          ) {
+            let obj = {};
+            (obj = collects[y].id), arr7.push(obj);
+          }
+        }
+        resolve({
+          data: [
+            arr1.length,
+            arr2.length,
+            arr3.length,
+            arr4.length,
+            arr5.length,
+            arr6.length,
+            arr7.length,
+          ],
+        });
+      }
+      // else if (week == 2) {
+      //   let arr = [];
+      //   let arr2 = [];
+
+      //   for (let i = 0; i < 7; i++) {
+      //     let obj = {};
+      //     obj.value = moment(new Date())
+      //       .subtract(i + 1, "days")
+      //       .startOf("day")
+      //       .valueOf();
+      //     arr.push(obj.value);
+      //   }
+
+      //   for (let i = 0; i < 7; i++) {
+      //     let obj = {};
+      //     obj.value = moment(new Date())
+      //       .subtract(i + 8, "days")
+      //       .startOf("day")
+      //       .valueOf();
+      //     arr2.push(obj.value);
+      //   }
+
+      //   let arrCount = [];
+      //   for (let i = 0; i < arr.length; i++) {
+      //     let dem = await db.Schedule.count({
+      //       where: { date: arr[i], statusType: "S4" },
+      //     });
+      //     arrCount.push(dem);
+      //   }
+
+      //   let arrCount2 = [];
+      //   for (let i = 0; i < arr2.length; i++) {
+      //     let dem = await db.Schedule.count({
+      //       where: { date: arr[i], statusType: "S4" },
+      //     });
+      //     arrCount2.push(dem);
+      //   }
+
+      //   resolve([arrCount, arrCount2]);
+      // }
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+// let getAllAppointmentsExpire = (collectionForm) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       let arrCollectStatusS3 = "";
+//       let today = new Date();
+//       let currentDate = moment(today);
+//       let arrCollectExpire = [];
+//       if (collectionForm === "ALL") {
+//         arrCollectStatusS3 = await getAppointmentStatusS3(collectionForm);
+//         for (let i = 0; i < arrCollectStatusS3.length; i++) {
+//           currentDate = moment(currentDate);
+//           let date = moment(`${arrCollectStatusS3[i].date}`, "DD/MM/YYYY");
+//           if (currentDate.diff(date, "days") >= 5) {
+//             arrCollectExpire.push(arrCollectStatusS3[i]);
+//           }
+//         }
+//       }
+//       resolve(arrCollectExpire);
+//     } catch (e) {
+//       reject(e);
+//     }
+//   });
+// };
+
 module.exports = {
+  getAllSchedules: getAllSchedules,
   getAllAppointments: getAllAppointments,
-  getAppointmentsNew: getAppointmentsNew,
-  getAppointmentStatusS2: getAppointmentStatusS2,
-  getAppointmentStatusS3: getAppointmentStatusS3,
-  getAppointmentStatusS4: getAppointmentStatusS4,
-  getAppointmentStatusS5: getAppointmentStatusS5,
-  getAppointmentsOfGiver: getAppointmentsOfGiver,
-  getAppointmentsOfGiverStatusS1: getAppointmentsOfGiverStatusS1,
-  getAppointmentsOfGiverStatusS2: getAppointmentsOfGiverStatusS2,
-  getAppointmentsOfGiverStatusS3: getAppointmentsOfGiverStatusS3,
-  getAppointmentsOfGiverStatusS4: getAppointmentsOfGiverStatusS4,
-  getAppointmentsOfGiverStatusS5: getAppointmentsOfGiverStatusS5,
-  getAppointmentsOfRecipient: getAppointmentsOfRecipient,
-  getAppointmentsOfRecipientStatusS2: getAppointmentsOfRecipientStatusS2,
-  getAppointmentsOfRecipientStatusS3: getAppointmentsOfRecipientStatusS3,
-  getAppointmentsOfRecipientStatusS3ByCurrentDate:
-    getAppointmentsOfRecipientStatusS3ByCurrentDate,
-  getAppointmentsOfRecipientStatusS4: getAppointmentsOfRecipientStatusS4,
-  getAppointmentsOfRecipientStatusS5: getAppointmentsOfRecipientStatusS5,
+  getScheduleByStatus: getScheduleByStatus,
+  getScheduleBetweenTwoStatus: getScheduleBetweenTwoStatus,
+  getAllAppointmentsByScheduleByStatusByReceivedDate:
+    getAllAppointmentsByScheduleByStatusByReceivedDate,
+  checkCollect: checkCollect,
+  registerCollectionForm: registerCollectionForm,
+  getScheduleOfGiver: getScheduleOfGiver,
+  getAppointmentsOfRecipientStatus: getAppointmentsOfRecipientStatus,
+  collectFormStatisticByStatusOfCurrentDate:
+    collectFormStatisticByStatusOfCurrentDate,
+  // getAppointmentsNew: getAppointmentsNew,
+  // getAppointmentStatusS2: getAppointmentStatusS2,
+  // getAppointmentStatusS3: getAppointmentStatusS3,
+  // getAppointmentStatusS4: getAppointmentStatusS4,
+  // getAppointmentStatusS5: getAppointmentStatusS5,
+  // getAppointmentsOfGiver: getAppointmentsOfGiver,
+  // getAppointmentsOfGiverStatusS1: getAppointmentsOfGiverStatusS1,
+  // getAppointmentsOfGiverStatusS2: getAppointmentsOfGiverStatusS2,
+  // getAppointmentsOfGiverStatusS3: getAppointmentsOfGiverStatusS3,
+  // getAppointmentsOfGiverStatusS4: getAppointmentsOfGiverStatusS4,
+  // getAppointmentsOfGiverStatusS5: getAppointmentsOfGiverStatusS5,
+  // getAppointmentsOfRecipient: getAppointmentsOfRecipient,
+  // getAppointmentsOfRecipientStatusS2: getAppointmentsOfRecipientStatusS2,
+  // getAppointmentsOfRecipientStatusS3: getAppointmentsOfRecipientStatusS3,
+  // getAppointmentsOfRecipientStatusS3ByCurrentDate:
+  //   getAppointmentsOfRecipientStatusS3ByCurrentDate,
+  // getAppointmentsOfRecipientStatusS4: getAppointmentsOfRecipientStatusS4,
+  // getAppointmentsOfRecipientStatusS5: getAppointmentsOfRecipientStatusS5,
   getAllCollectsByAddress: getAllCollectsByAddress,
-  getAllCollectsByDate: getAllCollectsByDate,
+  // getAllCollectsByDate: getAllCollectsByDate,
+  getAllAppointmentsStatusByCurrentDate: getAllAppointmentsStatusByCurrentDate,
+  collectFormStatisticByCurrentDate: collectFormStatisticByCurrentDate,
+  collectFormStatistic: collectFormStatistic,
+  getThongketheotuan: getThongketheotuan,
+  // getAllAppointmentsExpire: getAllAppointmentsExpire,
 };

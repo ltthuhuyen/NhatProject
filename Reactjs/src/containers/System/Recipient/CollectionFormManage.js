@@ -9,9 +9,15 @@ import * as MdIcons from "react-icons/md";
 import * as HiIcons from "react-icons/hi";
 import * as RiIcons from "react-icons/ri";
 import * as FaIcons from "react-icons/fa";
+import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import * as actions from "../../../store/actions";
+import avata from "../../../assets/images/avata.jpg";
 import "./CollectionFormStatus.scss";
-import { getCollectionFormOfRecipient } from "../../../services/collectionformService";
+import {
+  getAllSchedule,
+  getAllCollectionFormBySchedule,
+} from "../../../services/collectionformService";
 import Footer from "../../Footer/Footer";
 import ScrollUp from "../../../components/ScrollUp";
 class CollectionFormManage extends Component {
@@ -19,6 +25,8 @@ class CollectionFormManage extends Component {
     super(props);
     this.state = {
       arrCollectionForms: [],
+      arrSchedule: [],
+      collect: {},
       statusArr: [],
       status: "",
       statusType: "",
@@ -38,19 +46,75 @@ class CollectionFormManage extends Component {
     );
   };
 
-  componentDidMount() {
-    this.getAllCollectionOfRecipientFormReact();
-    this.props.getStatusStart();
+  async componentDidMount() {
+    await this.getSchedule();
+    await this.getAllCollectionByScheduleOfRecipient();
+    await this.props.getStatusStart();
   }
 
-  getAllCollectionOfRecipientFormReact = async () => {
-    let recipient = this.props.userInfo;
-    let response = await getCollectionFormOfRecipient(recipient.id);
-    console.log("response", response);
+  // getAllCollectionOfRecipientFormReact = async () => {
+  //   let recipient = this.props.userInfo;
+  //   let response = await getAllSchedule(recipient.id);
+  //   console.log("response", response);
+  //   if (response && response.errCode == 0) {
+  //     this.setState({
+  //       arrCollectionFormsOfRecipient: response.appointments,
+  //     });
+  //   }
+  // };
+
+  getSchedule = async () => {
+    let response = await getAllSchedule("ALL");
     if (response && response.errCode == 0) {
       this.setState({
-        arrCollectionFormsOfRecipient: response.appointments,
+        arrSchedule: response.appointments,
       });
+    }
+  };
+
+  getAllCollectionByScheduleOfRecipient = async () => {
+    let { arrSchedule } = this.state;
+    let response = {};
+    let arr = [];
+    let scheduleId;
+    let temp = [];
+    if (arrSchedule) {
+      for (let i = 0; i < arrSchedule.length; i++) {
+        arr.push(arrSchedule[i].id);
+      }
+      if (arr) {
+        for (let i = 0; i < arr.length; i++) {
+          console.log("arrSchedule1", arr);
+          response = await getAllCollectionFormBySchedule({
+            scheduleId: arr[i],
+            recipientId: this.state.recipientId,
+          });
+          if (response) {
+            this.setState(
+              {
+                collect: response.appointments,
+              },
+              () => {
+                console.log("arrCollectStatusS4", this.state.collect);
+              }
+            );
+            if (this.state.collect != null) {
+              temp.push(this.state.collect);
+              console.log("temp", temp);
+            }
+          }
+        }
+      }
+      if (temp) {
+        this.setState(
+          {
+            arrCollect: temp,
+          },
+          () => {
+            console.log("arrCollect", this.state.arrCollect);
+          }
+        );
+      }
     }
   };
 
@@ -71,14 +135,14 @@ class CollectionFormManage extends Component {
   };
 
   render() {
-    let { arrCollectionFormsOfRecipient } = this.state;
+    let { arrCollect } = this.state;
     // let statuses = this.state.statusArr;
     let language = this.props.language;
-    console.log("", this.state.arrCollectionForms);
+
     if (this.props.userInfo) {
       this.state.recipientId = this.props.userInfo.id;
     }
-    console.log("RecipientID", this.props.userInfo.id);
+
     return (
       <>
         <ScrollUp />
@@ -164,13 +228,14 @@ class CollectionFormManage extends Component {
                 </div>
               </NavLink>
             </div>
+            <div className="title">ĐƠN THU GOM</div>
             <div className="row ">
-              {arrCollectionFormsOfRecipient &&
-                arrCollectionFormsOfRecipient.map((item, index) => {
+              {arrCollect &&
+                arrCollect.map((item, index) => {
                   let imageBase64 = "";
-                  if (item.giverData.image.data) {
+                  if (item.scheduleData.giverData.image.data) {
                     imageBase64 = new Buffer(
-                      item.giverData.image.data,
+                      item.scheduleData.giverData.image.data,
                       "base64"
                     ).toString("binary");
                   }
@@ -181,30 +246,29 @@ class CollectionFormManage extends Component {
                         <div className="col-7">
                           <p className="row">
                             <FaIcons.FaUserAlt className="icon mt-1 mr-2" />
-                            {item.giverData.firstName} {item.giverData.lastName}
+                            {item.scheduleData.giverData.firstName}{" "}
+                            {item.scheduleData.giverData.lastName}
                           </p>
                           <p className="row">
                             <HiIcons.HiOutlineMail className="icon mt-1 mr-2" />
-                            {item.giverData.email}
+                            {item.scheduleData.giverData.email}
                           </p>
                           <p className="row">
                             <BsIcons.BsTelephoneInbound className="icon mt-1 mr-2" />
-                            {item.giverData.phone}
+                            {item.scheduleData.giverData.phone}
                           </p>
                         </div>
                       </div>
                       <div className="info-collection">
                         <div className="d-flex">
                           <span className="info mr-1">
-                            <RiIcons.RiProductHuntLine className="icon" /> Sản
-                            phẩm:{" "}
+                            <RiIcons.RiProductHuntLine /> Sản phẩm:{" "}
                           </span>
-                          <p>{item.productData.product_name}</p>
+                          <p>{item.scheduleData.productData.product_name}</p>
                         </div>
                         <div className="d-flex">
                           <span className="info mr-1 mb-1">
-                            <BiIcons.BiUser className="icon" /> Người nhận thu
-                            gom:{" "}
+                            <BiIcons.BiUser /> Người nhận thu gom:{" "}
                           </span>
                           <p>
                             {item.recipientData.firstName}{" "}
@@ -212,15 +276,39 @@ class CollectionFormManage extends Component {
                           </p>
                         </div>
                         <div className="d-flex">
-                          {item.statusTypeData.valueVi === "Chờ xác nhận" ? (
-                            <p className="status-s2">
-                              <RiIcons.RiErrorWarningLine className="icon" />{" "}
-                              {item.statusTypeData.valueVi}
-                            </p>
+                          {item.scheduleData.statusData.valueVi ===
+                            "Chờ xác nhận" ||
+                          item.scheduleData.statusData.valueVi ===
+                            "Chờ thu gom" ? (
+                            <button className="btn status-s2">
+                              <PriorityHighIcon className="icon mr-1" />
+                              {item.scheduleData.statusData.valueVi}
+                            </button>
                           ) : (
-                            <p className="status">
-                              {item.statusTypeData.valueVi}
-                            </p>
+                            <>
+                              {item.scheduleData.statusData.valueVi ===
+                              "Đơn bị hủy" ? (
+                                <button className="btn status-s5">
+                                  <BsIcons.BsX className="icon" />{" "}
+                                  {item.scheduleData.statusData.valueVi}
+                                </button>
+                              ) : (
+                                <>
+                                  {item.scheduleData.statusData.valueVi ===
+                                  "Đã thu gom" ? (
+                                    <button className="btn status-s4">
+                                      <CheckCircleOutlineIcon className="icon mr-1" />
+                                      {item.scheduleData.statusData.valueVi}
+                                    </button>
+                                  ) : (
+                                    <button className="btn status-s1">
+                                      <PriorityHighIcon className="icon mr-1" />
+                                      {item.scheduleData.statusData.valueVi}
+                                    </button>
+                                  )}
+                                </>
+                              )}
+                            </>
                           )}
                           <button
                             className="btn btn-detail "

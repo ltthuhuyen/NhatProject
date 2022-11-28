@@ -19,7 +19,7 @@ let handleCountAppreciate = async (req, res) => {
 };
 
 let handleGetAllAppreciateBySubmission = async (req, res) => {
-  let id = req.body; //all, id
+  let id = req.query.submissionId; //all, id
   if (!id) {
     return res.status(200).json({
       errCode: 0,
@@ -28,6 +28,24 @@ let handleGetAllAppreciateBySubmission = async (req, res) => {
     });
   }
   let appreciates = await appreciateService.getAllAppreciateBySubmission(id);
+  return res.status(200).json({
+    errCode: 0,
+    errMessage: "Ok",
+    appreciates,
+  });
+};
+
+let handleGetAllAppreciateOfReviewerBySubmission = async (req, res) => {
+  let id = req.body; //all, id
+  if (!id) {
+    return res.status(200).json({
+      errCode: 0,
+      errMessage: "Missing required parmeters",
+      appreciates: [],
+    });
+  }
+  let appreciates =
+    await appreciateService.getAllAppreciateOfReviewerBySubmission(id);
   return res.status(200).json({
     errCode: 0,
     errMessage: "Ok",
@@ -56,6 +74,8 @@ let handleDeleteAppreciate = async (req, res) => {
 module.exports = {
   handleCountAppreciate: handleCountAppreciate,
   handleGetAllAppreciateBySubmission: handleGetAllAppreciateBySubmission,
+  handleGetAllAppreciateOfReviewerBySubmission:
+    handleGetAllAppreciateOfReviewerBySubmission,
   handleCreateAppreciate: handleCreateAppreciate,
   handleDeleteAppreciate: handleDeleteAppreciate,
 };

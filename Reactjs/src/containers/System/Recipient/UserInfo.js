@@ -60,7 +60,6 @@ class UserInfo extends Component {
       if (userInfo.image) {
         imageBase64 = new Buffer(userInfo.image, "base64").toString("binary");
       }
-
       //Lấy giá trị hiện tại
       this.setState({
         id: userInfo.id,
@@ -147,6 +146,9 @@ class UserInfo extends Component {
     if (userInfo.id) {
       await editUserInfoService(this.state);
       await getAllUsers(userInfo.id);
+      setTimeout(() => {
+        window.location.reload();
+      }, 0);
     }
   };
 

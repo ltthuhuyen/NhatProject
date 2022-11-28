@@ -20,27 +20,33 @@ class Identification extends Component {
     super(props);
     this.imageRef = React.createRef();
     this.state = {
-      model: null,
+      model: "",
       imageURL: null,
       imgBase64: null,
     };
     this.gotResults = this.gotResults.bind(this);
   }
 
-  componentDidMount() {
-    this.loadModel();
-    this.gotResults();
+  async componentDidMount() {
+    await this.loadModel();
+    await this.gotResults();
   }
 
   loadModel = async () => {
     let classifier;
-    let modelURL = "https://teachablemachine.withgoogle.com/models/tHyfe9Pfn/";
+    let imageModelURL =
+      "https://teachablemachine.withgoogle.com/models/tHyfe9Pfn/";
     // let modelURL = "../../Model/model.json";
-    classifier = await ml5.imageClassifier(modelURL + "model.json");
-    this.setState({
-      model: classifier,
-    });
-    console.log("modelURL", this.state.model);
+    classifier = ml5.imageClassifier(imageModelURL + "model.json");
+    console.log("modelURL", classifier);
+    this.setState(
+      {
+        model: classifier,
+      },
+      () => {
+        console.log("modelURL", this.state.model);
+      }
+    );
   };
 
   // loadModel = async () => {
@@ -66,7 +72,7 @@ class Identification extends Component {
           imageURL: url,
         },
         () => {
-          console.log("imageURL", this.state.imgBase64);
+          console.log("imageURL", this.state.imageURL);
         }
       );
     } else {
@@ -79,10 +85,11 @@ class Identification extends Component {
   identifyImage = (e) => {
     let image;
     let model = this.state.model;
+    console.log("model", model);
     // let img = loadImage(this.state.imageURL);
     // console.log("img", img);
 
-    // let results = model.classify(img, this.gotResults);
+    let results = model.classify(this.imageRef.current);
     // console.log("h", results);
   };
 
@@ -114,18 +121,20 @@ class Identification extends Component {
           <div className="wrapper row">
             <input type="file" onChange={(e) => this.uploadImage(e)}></input>
             <div className="preview-img-container">
-              <input
+              {/* <input
                 id="previewImg"
                 type="file"
                 accept="image/*"
                 hidden
                 onChange={(e) => this.uploadImage(e)}
-              ></input>
+              ></input> */}
               {/* <label className="upload-file" htmlFor="previewImg">
               Tải ảnh <HiIcons.HiOutnlineCamera className="icon" />
             </label> */}
               <div className="preview-image">
-                <img src={this.state.imageURL} />
+                {this.state.imageURL && (
+                  <img src={this.state.imageURL} ref={this.imageRef} />
+                )}
               </div>
             </div>
           </div>

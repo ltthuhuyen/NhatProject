@@ -4,6 +4,7 @@ import { Table } from "reactstrap";
 import * as MdIcons from "react-icons/md";
 import * as AiIcons from "react-icons/ai";
 import * as BsIcons from "react-icons/bs";
+import * as FiIcons from "react-icons/fi";
 import { toast } from "react-toastify";
 import { changeLanguageApp } from "../../store/actions";
 import "./Manage.scss";
@@ -19,6 +20,12 @@ import { FormattedMessage } from "react-intl";
 import ModalProduct from "./ModalProduct";
 import ModalEditProduct from "./ModalEditProduct";
 import NavAdmin from "../../components/NavAdmin";
+import moment from "moment";
+import { dateFormat } from "../../utils";
+import { getCollectionFormStatusByCurrentDate } from "../../services/collectionformService";
+import CustomScrollbars from "../../components/CustomScrollbars";
+import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import CloseIcon from "@mui/icons-material/Close";
 
 class ProductManage extends Component {
   constructor(props) {
@@ -33,13 +40,15 @@ class ProductManage extends Component {
       arrSearchProduct: [],
       currentPage: 1,
       todosPerPage: 10,
+      isShowNotification: false,
     };
     this.handleClick = this.handleClick.bind(this);
   }
 
-  componentDidMount() {
-    this.getAllProductsFromReact();
-    this.getAllCollectionFormReact();
+  async componentDidMount() {
+    await this.getAllProductsFromReact();
+    await this.getAllCollectionFormReact();
+    await this.getAllCollectFormStatusByCurrentDateFromReact();
   }
 
   getAllProductsFromReact = async () => {
@@ -58,6 +67,42 @@ class ProductManage extends Component {
         arrCollectionForms: response.appointments,
       });
     }
+  };
+
+  getAllCollectFormStatusByCurrentDateFromReact = async () => {
+    let today = new Date();
+    let currentDate = moment(today).format("YYYY-MM-DD");
+    var currentTime =
+      today.getHours() +
+      ":" +
+      ("0" + today.getMinutes()).slice(-2) +
+      ":" +
+      ("0" + today.getSeconds()).slice(-2);
+    let currentDateTimeBegin = currentDate + " " + "00:00:00";
+    let currentDateTimeStop = currentDate + " " + currentTime;
+    // console.log("moment", currentDate);
+    // console.log("moment", currentTime);
+    // console.log("currentDateTimeBegin", currentDateTimeBegin);
+    // console.log("currentDateTimeStop", currentDateTimeStop);
+    let response = await getCollectionFormStatusByCurrentDate({
+      currentDateBegin: currentDateTimeBegin,
+      currentDateStop: currentDateTimeStop,
+      status: "S1",
+    });
+
+    if (response) {
+      this.setState({
+        arrCollectsStatusByCurrentDate: response.collects,
+        currentDateTimeBegin: currentDateTimeBegin,
+        currentDateTimeStop: currentDateTimeStop,
+      });
+    }
+  };
+
+  handleNotifications = () => {
+    this.setState({
+      isShowNotification: !this.state.isShowNotification,
+    });
   };
 
   handleOnChangeInput = (e, id) => {
@@ -160,7 +205,8 @@ class ProductManage extends Component {
     this.props.changeLanguageAppRedux(language);
   };
   render() {
-    let arrProducts = this.state.arrProducts;
+    let { arrProducts, arrCollectsStatusByCurrentDate, isShowNotification } =
+      this.state;
     let arrCollectionForms = this.state.arrCollectionForms;
     let { currentPage, todosPerPage } = this.state;
     const indexOfLastTodo = currentPage * todosPerPage;
@@ -194,48 +240,103 @@ class ProductManage extends Component {
               editProduct={this.doEditProduct}
             />
           )}
-          <div className="row header">
-            <div className="d-flex">
-              <div className="img">
-                <img src={imageBase64} className="img-img" />
-              </div>
-              <div className="profile-info">
-                Xin chào{" "}
-                {userInfo && userInfo.firstName + userInfo.lastName
-                  ? userInfo.firstName + " " + userInfo.lastName
-                  : ""}
+          <div className="container-fluid ">
+            <div className=" header_right justify-content-between align-items-center">
+              <div className="d-flex">
+                <div className="d-flex wrapper-welcome">
+                  <div
+                    className="btn btn-logout"
+                    onClick={(e) => this.handleNotifications(e)}
+                  >
+                    <NotificationsNoneIcon />
+                    {isShowNotification ? (
+                      <div className="wrapper-notification shadow rounded">
+                        <div className="title-notification">
+                          Thông báo
+                          <CloseIcon
+                            className="icon-close"
+                            onClick={(e) => this.handleNotifications(e)}
+                          />
+                        </div>
+                        <CustomScrollbars style={{ height: "180px" }}>
+                          {arrCollectsStatusByCurrentDate.length > 0 &&
+                            arrCollectsStatusByCurrentDate.map(
+                              (item, index) => {
+                                return (
+                                  <div
+                                    className="info-notification"
+                                    onClick={(e) =>
+                                      this.handleDetailCollectForm(item)
+                                    }
+                                  >
+                                    {item.giverData.firstName} {""}
+                                    {item.giverData.lastName}{" "}
+                                    <div>
+                                      đặt lịch thu gom{" "}
+                                      {item.productData.product_name} {""}
+                                      tại {item.addressData.address_name} {""}
+                                      {item.addressData.ward_name}
+                                    </div>
+                                  </div>
+                                );
+                              }
+                            )}
+                        </CustomScrollbars>
+                      </div>
+                    ) : (
+                      ""
+                    )}
+                  </div>
+                  <div className="img">
+                    <img src={imageBase64} className="img-img" />
+                  </div>
+                  <div className="profile-info">
+                    {userInfo && userInfo.firstName + userInfo.lastName
+                      ? userInfo.firstName + " " + userInfo.lastName
+                      : ""}
+                  </div>
+                  <div className="btn btn-logout" onClick={processLogout}>
+                    <FiIcons.FiLogOut />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          <div className="row title d-flex">
-            <div className="col-10 title-manage">QUẢN LÝ SẢN PHẨM</div>
-            <div className="serach_field-area d-flex align-items-center">
-              <input
-                type="text"
-                placeholder="Search here..."
-                onChange={(e) => {
-                  this.handleOnChangeInput(e, "search");
-                }}
-              />
+          <div className="wrapper-manage shadow-sm ">
+            <div className="row title d-flex">
+              <div className="col-10 title-manage">QUẢN LÝ SẢN PHẨM</div>
+              <div className="serach_field-area d-flex align-items-center">
+                <input
+                  type="text"
+                  placeholder="Search here..."
+                  onChange={(e) => {
+                    this.handleOnChangeInput(e, "search");
+                  }}
+                />
+                <button
+                  type="search"
+                  className="btn btn-search rounded-pill"
+                  onClick={() => this.handleSearch()}
+                >
+                  <BsIcons.BsSearch /> Tìm
+                </button>
+              </div>
               <button
-                type="search"
-                className="btn btn-search rounded-pill"
-                onClick={() => this.handleSearch()}
+                className="col-1 btn btn-create"
+                onClick={this.handleAddNewProduct}
               >
-                <BsIcons.BsSearch /> Tìm
+                <MdIcons.MdOutlineCreate />{" "}
+                <FormattedMessage id="manage-user.add" />
               </button>
             </div>
-            <button
-              className="col-1 btn btn-create"
-              onClick={this.handleAddNewProduct}
-            >
-              <MdIcons.MdOutlineCreate />{" "}
-              <FormattedMessage id="manage-user.add" />
-            </button>
-          </div>
-          <div className="row content">
-            <div className="table">
-              <Table>
+            <div className="row content">
+              <div className="wrapper-title-sum-statistic d-flex">
+                <span className="wrapper-sum d-flex">
+                  <div className="">Tổng cộng:</div>
+                  <div className="text-sum">{arrProducts.length} sản phẩm</div>
+                </span>
+              </div>
+              <Table className="shadow">
                 <thead className="thead">
                   <tr>
                     <th scope="col">ID</th>
@@ -264,14 +365,14 @@ class ProductManage extends Component {
                       }
                       return (
                         <tr>
-                          <td>{item.id}</td>
-                          <td>{item.product_name}</td>
+                          <td>{item?.id}</td>
+                          <td>{item?.product_name}</td>
                           <td>
                             <div className="img">
                               <img src={imageBase64} className="img-img" />
                             </div>
                           </td>
-                          <td>{item.description}</td>
+                          <td>{item?.description}</td>
                           <td>
                             <button
                               type="button"
@@ -297,20 +398,20 @@ class ProductManage extends Component {
                 </tbody>
               </Table>
             </div>
-          </div>
-          <div className="row btn-pageNumber d-flex">
-            {pageNumbers.map((number) => {
-              return (
-                <button
-                  className="btn btn-prev-next d-flex"
-                  key={number}
-                  id={number}
-                  onClick={this.handleClick}
-                >
-                  {number}
-                </button>
-              );
-            })}
+            <div className="row btn-pageNumber d-flex">
+              {pageNumbers.map((number) => {
+                return (
+                  <button
+                    className="btn btn-prev-next d-flex"
+                    key={number}
+                    id={number}
+                    onClick={this.handleClick}
+                  >
+                    {number}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </>

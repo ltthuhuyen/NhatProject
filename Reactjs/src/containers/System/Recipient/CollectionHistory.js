@@ -11,15 +11,21 @@ import * as RiIcons from "react-icons/ri";
 import * as FaIcons from "react-icons/fa";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import * as actions from "../../../store/actions";
+import avata from "../../../assets/images/avata.jpg";
 import "./CollectionFormStatus.scss";
-import { getCollectionFormOfSuccessedRecipient } from "../../../services/collectionformService";
+import {
+  getAllScheduleStatus,
+  getAllCollectionFormBySchedule,
+} from "../../../services/collectionformService";
 import Footer from "../../Footer/Footer";
 import ScrollUp from "../../../components/ScrollUp";
 class CollectionHistory extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      arrCollectionFormsStatusS3: [],
+      arrScheduleStatusS4: [],
+      collectStatusS4: {},
+      arrCollect: [],
       statusArr: [],
       status: "",
       statusType: "",
@@ -43,20 +49,83 @@ class CollectionHistory extends Component {
     );
   };
 
-  componentDidMount() {
-    this.getCollectionFormOfRecipientStatusS4();
-    this.props.getStatusStart();
+  async componentDidMount() {
+    await this.getScheduleS4();
+    await this.getAllCollectionByScheduleOfRecipient();
+    await this.props.getStatusStart();
   }
 
-  getCollectionFormOfRecipientStatusS4 = async () => {
-    let response = await getCollectionFormOfSuccessedRecipient(
-      this.state.recipientId
-    );
-    console.log("response", response);
+  // getCollectionFormOfRecipientStatusS4 = async () => {
+  //   let response = await getCollectionFormOfSuccessedRecipient({
+  //     recipientId: this.state.recipientId,
+  //     status: "S4",
+  //   });
+  //   console.log("response", response);
+  //   if (response && response.errCode == 0) {
+  //     this.setState({
+  //       arrCollectionFormsStatusS4: response.appointments,
+  //     });
+  //   }
+  // };
+
+  getScheduleS4 = async () => {
+    let response = await getAllScheduleStatus("S4");
     if (response && response.errCode == 0) {
-      this.setState({
-        arrCollectionFormsStatusS4: response.appointments,
-      });
+      this.setState(
+        {
+          arrScheduleStatusS4: response.appointments,
+        },
+        () => {
+          console.log("arrScheduleStatusS4", this.state.arrScheduleStatusS4);
+        }
+      );
+    }
+  };
+
+  getAllCollectionByScheduleOfRecipient = async () => {
+    let { arrScheduleStatusS4 } = this.state;
+    let response;
+    let arr = [];
+    let temp = [];
+    if (arrScheduleStatusS4) {
+      for (let i = 0; i < arrScheduleStatusS4.length; i++) {
+        arr.push(arrScheduleStatusS4[i].id);
+      }
+      if (arr) {
+        for (let i = 0; i < arr.length; i++) {
+          response = await getAllCollectionFormBySchedule({
+            scheduleId: arr[i],
+            recipientId: this.state.recipientId,
+            status: "Yes",
+          });
+          if (response) {
+            this.setState(
+              {
+                collectStatusS4: response.appointments,
+              },
+              () => {
+                console.log("arrCollectStatusS4", this.state.collectStatusS4);
+              }
+            );
+            if (this.state.collectStatusS4 != null) {
+              temp.push(this.state.collectStatusS4);
+              console.log("temp", temp);
+            }
+          }
+          // console.log("temp", response);
+          // temp.push(response.appointments);
+        }
+      }
+      if (temp) {
+        this.setState(
+          {
+            arrCollect: temp,
+          },
+          () => {
+            console.log("arrCollect", this.state.arrCollect);
+          }
+        );
+      }
     }
   };
 
@@ -83,7 +152,7 @@ class CollectionHistory extends Component {
   };
 
   render() {
-    let arrCollectionFormsStatusS4 = this.state.arrCollectionFormsStatusS4;
+    let arrCollect = this.state.arrCollect;
     // let { currentPage, todosPerPage } = this.state;
     // const indexOfLastTodo = currentPage * todosPerPage;
     // const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
@@ -191,12 +260,13 @@ class CollectionHistory extends Component {
             </div>
             <div className="title">LỊCH SỬ THU GOM</div>
             <div className="row ">
-              {arrCollectionFormsStatusS4 &&
-                arrCollectionFormsStatusS4.map((item, index) => {
+              {arrCollect &&
+                arrCollect.length > 0 &&
+                arrCollect.map((item, index) => {
                   let imageBase64 = "";
-                  if (item.giverData.image.data) {
+                  if (item.scheduleData.giverData.image.data) {
                     imageBase64 = new Buffer(
-                      item.giverData.image.data,
+                      item.scheduleData.giverData.image.data,
                       "base64"
                     ).toString("binary");
                   }
@@ -207,15 +277,16 @@ class CollectionHistory extends Component {
                         <div className="col-7">
                           <p className="row">
                             <FaIcons.FaUserAlt className="icon mt-1 mr-2" />
-                            {item.giverData.firstName} {item.giverData.lastName}
+                            {item.scheduleData.giverData.firstName}{" "}
+                            {item.scheduleData.giverData.lastName}
                           </p>
                           <p className="row">
                             <HiIcons.HiOutlineMail className="icon mt-1 mr-2" />
-                            {item.giverData.email}
+                            {item.scheduleData.giverData.email}
                           </p>
                           <p className="row">
                             <BsIcons.BsTelephoneInbound className="icon mt-1 mr-2" />
-                            {item.giverData.phone}
+                            {item.scheduleData.giverData.phone}
                           </p>
                         </div>
                       </div>
@@ -224,7 +295,7 @@ class CollectionHistory extends Component {
                           <span className="info mr-1">
                             <RiIcons.RiProductHuntLine /> Sản phẩm:{" "}
                           </span>
-                          <p>{item.productData.product_name}</p>
+                          <p>{item.scheduleData.productData.product_name}</p>
                         </div>
                         <div className="d-flex">
                           <span className="info mr-1 mb-1">
@@ -236,18 +307,10 @@ class CollectionHistory extends Component {
                           </p>
                         </div>
                         <div className="d-flex">
-                          {item.statusTypeData.valueVi === "Đã thu gom" ? (
-                            <p className="status-s4">
-                              <CheckCircleOutlineIcon className="icon" />{" "}
-                              {item.statusTypeData.valueVi}
-                            </p>
-                          ) : (
-                            <p className="status">
-                              {" "}
-                              {item.statusTypeData.valueVi}
-                            </p>
-                          )}
-
+                          <button className="btn status-s4">
+                            <CheckCircleOutlineIcon className="icon mr-1" />
+                            {item.scheduleData.statusData.valueVi}
+                          </button>
                           <button
                             className="btn btn-detail "
                             onClick={() => this.handleLook(item)}

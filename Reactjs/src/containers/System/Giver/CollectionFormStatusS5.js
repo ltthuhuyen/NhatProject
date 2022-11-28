@@ -11,48 +11,85 @@ import * as RiIcons from "react-icons/ri";
 import * as FaIcons from "react-icons/fa";
 import ClearIcon from "@mui/icons-material/Clear";
 import * as actions from "../../../store/actions";
+import avata from "../../../assets/images/avata.jpg";
 import "./CollectionFormManage.scss";
 import Header from "../../Header/Giver/Header";
 import Banner from "../../Banner/Banner";
 import Footer from "../../Footer/Footer";
 import ScrollUp from "../../../components/ScrollUp";
-import { getCollectionFormOfCancelledGiver } from "../../../services/collectionformService";
+import {
+  getScheduleOfGiver,
+  getAllCollectionFormBySchedule,
+} from "../../../services/collectionformService";
+
 class CollectionFormStatusS5 extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      arrCollectionFormsStatusS5: [],
+      arrScheduleStatusS5: [],
+      arrCollect: [],
       statusArr: [],
       status: "",
       statusType: "",
-      recipientId: "",
+      giverId: "",
     };
   }
 
   handleOnChangeInput = (e, id) => {
     let copyState = { ...this.state };
     copyState[id] = e.target.value;
-    this.setState(
-      {
-        ...copyState,
-      },
-      () => {
-        console.log("check good state", this.state);
-      }
-    );
+    this.setState({
+      ...copyState,
+    });
   };
 
-  componentDidMount() {
-    this.getCollectionFormOfGiverStatusS5();
-    this.props.getStatusStart();
+  async componentDidMount() {
+    await this.getAllScheduleOfGiver();
+    await this.getAllCollectionByScheduleOfGiver();
+    await this.props.getStatusStart();
   }
 
-  getCollectionFormOfGiverStatusS5 = async () => {
-    let response = await getCollectionFormOfCancelledGiver(this.state.giverId);
+  getAllScheduleOfGiver = async () => {
+    let response = await getScheduleOfGiver({
+      giverId: this.state.giverId,
+      status: "S5",
+    });
     if (response && response.errCode == 0) {
       this.setState({
-        arrCollectionFormsStatusS5: response.appointments,
+        arrScheduleStatusS5: response.appointments,
       });
+    }
+  };
+
+  getAllCollectionByScheduleOfGiver = async () => {
+    let { arrScheduleStatusS5 } = this.state;
+    let response;
+    let arr = [];
+    let temp = [];
+    if (arrScheduleStatusS5) {
+      for (let i = 0; i < arrScheduleStatusS5.length; i++) {
+        arr.push(arrScheduleStatusS5[i].id);
+      }
+      if (arr) {
+        for (let i = 0; i < arr.length; i++) {
+          response = await getAllCollectionFormBySchedule({
+            scheduleId: arr[i],
+
+            status: "Yes",
+          });
+          temp.push(response.appointments);
+        }
+      }
+      if (temp) {
+        this.setState(
+          {
+            arrCollect: temp,
+          },
+          () => {
+            console.log("arrCollect", this.state.arrCollect);
+          }
+        );
+      }
     }
   };
 
@@ -73,7 +110,7 @@ class CollectionFormStatusS5 extends Component {
   };
 
   render() {
-    let { arrCollectionFormsStatusS5 } = this.state;
+    let { arrCollect } = this.state;
 
     if (this.props.userInfo) {
       this.state.giverId = this.props.userInfo.id;
@@ -167,15 +204,23 @@ class CollectionFormStatusS5 extends Component {
               </NavLink>
             </div>
             <div className="title">ĐƠN BỊ HỦY</div>
+            <div className="wrapper-title-sum-statistic d-flex">
+              <span className="wrapper-sum d-flex">
+                <div className="">Tổng cộng:</div>
+                <div className="text-sum">{arrCollect.length} đơn</div>
+              </span>
+            </div>
             <div className="row ">
-              {arrCollectionFormsStatusS5 &&
-                arrCollectionFormsStatusS5.map((item, index) => {
+              {arrCollect &&
+                arrCollect.map((item, index) => {
                   let imageBase64 = "";
-                  if (item.giverData.image.data) {
+                  if (item.scheduleData.giverData.image) {
                     imageBase64 = new Buffer(
-                      item.giverData.image.data,
+                      item.scheduleData.giverData.image.data,
                       "base64"
                     ).toString("binary");
+                  } else {
+                    imageBase64 = avata;
                   }
                   return (
                     <div className="col-5 collection-form shadow " key={index}>
@@ -184,15 +229,16 @@ class CollectionFormStatusS5 extends Component {
                         <div className="col-7">
                           <p className="row">
                             <FaIcons.FaUserAlt className="icon " />
-                            {item.giverData.firstName} {item.giverData.lastName}
+                            {item.scheduleData.giverData.firstName}{" "}
+                            {item.scheduleData.giverData.lastName}
                           </p>
                           <p className="row">
                             <HiIcons.HiOutlineMail className="icon " />
-                            {item.giverData.email}
+                            {item.scheduleData.giverData.email}
                           </p>
                           <p className="row">
                             <BsIcons.BsTelephoneInbound className="icon " />
-                            {item.giverData.phone}
+                            {item.scheduleData.giverData.phone}
                           </p>
                         </div>
                       </div>
@@ -202,7 +248,7 @@ class CollectionFormStatusS5 extends Component {
                             <RiIcons.RiProductHuntLine className="icon" /> Sản
                             phẩm:{" "}
                           </span>
-                          <p>{item.productData.product_name}</p>
+                          <p>{item.scheduleData.productData.product_name}</p>
                         </div>
                         <div className="d-flex">
                           <span className="info mr-1 mb-1">
@@ -215,18 +261,10 @@ class CollectionFormStatusS5 extends Component {
                           </p>
                         </div>
                         <div className="d-flex">
-                          {item.statusTypeData.valueVi === "Đơn bị hủy" ? (
-                            <p className="status-s5">
-                              <ClearIcon className="icon" />{" "}
-                              {item.statusTypeData.valueVi}
-                            </p>
-                          ) : (
-                            <p className="status">
-                              {" "}
-                              {item.statusTypeData.valueVi}
-                            </p>
-                          )}
-
+                          <button className="btn status-s5">
+                            <BsIcons.BsX className="icon" />{" "}
+                            {item.scheduleData.statusData.valueVi}
+                          </button>
                           <button
                             className="btn btn-detail "
                             onClick={() => this.handleLook(item)}

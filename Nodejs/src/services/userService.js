@@ -43,11 +43,11 @@ let handleUserLogin = (email, password) => {
             userData.user = user;
           } else {
             userData.errCode = 3;
-            userData.errMessage = "Wrong password";
+            userData.errMessage = "Mật khẩu không đúng";
           }
         } else {
           userData.errCode = 2;
-          userData.errMessage = `User's not found`;
+          userData.errMessage = `Không tìm thấy người dùng này`;
         }
       } else {
         //return error
@@ -349,7 +349,6 @@ let createNewUser = (data) => {
 };
 
 let updateUser = (data) => {
-  console.log(data.id);
   return new Promise(async (resolve, reject) => {
     try {
       if (!data.id) {
@@ -438,8 +437,9 @@ let updateUserInfo = (data) => {
           raw: false,
         });
         if (user) {
+          let hashPasswordFromBcrypt = await hashUserPassword(data.password);
           (user.email = data.email),
-            (user.password = data.password),
+            (user.password = hashPasswordFromBcrypt),
             (user.firstName = data.firstName),
             (user.lastName = data.lastName),
             (user.phone = data.phone),
@@ -509,6 +509,80 @@ let getAllCodeSerVice = (typeInput) => {
   });
 };
 
+let userStatistic = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let userThisMonth = {};
+      var today = new Date();
+      var currentDate =
+        today.getFullYear() +
+        "-" +
+        ("0" + (today.getMonth() + 1)).slice(-2) +
+        "-" +
+        ("0" + today.getDate()).slice(-2);
+      console.log("currentDate", currentDate);
+      let todayLastMonth = new Date(new Date() - 30 * 24 * 60 * 60 * 1000);
+      var dayLastMonth =
+        todayLastMonth.getFullYear() +
+        "-" +
+        ("0" + (todayLastMonth.getMonth() + 1)).slice(-2) +
+        "-" +
+        ("0" + todayLastMonth.getDate()).slice(-2);
+      console.log(dayLastMonth);
+      let todayLastMonth2 = new Date(new Date() - 2 * 30 * 24 * 60 * 60 * 1000);
+      var dayLastMonth2 =
+        todayLastMonth2.getFullYear() +
+        "-" +
+        ("0" + (todayLastMonth2.getMonth() + 1)).slice(-2) +
+        "-" +
+        ("0" + todayLastMonth2.getDate()).slice(-2);
+      console.log("dayLastMonth2", dayLastMonth2);
+      console.log(new Date());
+      userThisMonth = await db.User.findAll({
+        where: {
+          createdAt: {
+            [Op.lte]: currentDate,
+            [Op.gte]: dayLastMonth,
+          },
+        },
+      });
+      let userLastMonth = {};
+      userLastMonth = await db.User.findAll({
+        where: {
+          createdAt: {
+            [Op.lte]: dayLastMonth,
+            [Op.gte]: dayLastMonth2,
+          },
+        },
+      });
+      let all = await db.User.findAll();
+      const tong = userLastMonth.length + userThisMonth.length;
+      const truoc = userLastMonth.length / tong;
+      const nay = userThisMonth.length / tong;
+      let tang;
+      let phantramTang;
+      if (truoc > nay) {
+        tang = false;
+        let phanTrang = (truoc - nay) * 100;
+        phantramTang = phanTrang.toFixed(0);
+      } else {
+        tang = true;
+        let phanTrang = (nay - truoc) * 100;
+        phantramTang = phanTrang.toFixed(0);
+      }
+      const allUsers = all.length;
+      const users = {
+        allUsers,
+        phantramTang,
+        tang,
+      };
+      resolve(users);
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
 module.exports = {
   handleUserLogin: handleUserLogin,
   handleSendEmailForgotPassword: handleSendEmailForgotPassword,
@@ -523,4 +597,5 @@ module.exports = {
   getAllCodeSerVice: getAllCodeSerVice,
   getRoleID: getRoleID,
   countUser: countUser,
+  userStatistic: userStatistic,
 };

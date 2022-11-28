@@ -9,16 +9,23 @@ import * as MdIcons from "react-icons/md";
 import * as HiIcons from "react-icons/hi";
 import * as RiIcons from "react-icons/ri";
 import * as FaIcons from "react-icons/fa";
+import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
 import * as actions from "../../../store/actions";
+import avata from "../../../assets/images/avata.jpg";
 import "./CollectionFormStatus.scss";
-import { getCollectionFormOfWaittingRecipient } from "../../../services/collectionformService";
+import {
+  getAllScheduleStatus,
+  getAllCollectionFormBySchedule,
+} from "../../../services/collectionformService";
 import Footer from "../../Footer/Footer";
 import ScrollUp from "../../../components/ScrollUp";
 class CollectionFormStatusS3 extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      arrCollectionFormsStatusS3: [],
+      arrScheduleStatusS3: [],
+      collectStatusS3: {},
+      arrCollect: [],
       statusArr: [],
       status: "",
       statusType: "",
@@ -40,23 +47,81 @@ class CollectionFormStatusS3 extends Component {
     );
   };
 
-  componentDidMount() {
-    this.getCollectionFormOfRecipientStatusS3();
-    // if(this.props.statusRedux){
-    //     this.state.temp  = this.props.statusRedux
-    // }
-    this.props.getStatusStart();
+  async componentDidMount() {
+    await this.getScheduleS3();
+    await this.getAllCollectionByScheduleOfRecipient();
+    await this.props.getStatusStart();
   }
 
-  getCollectionFormOfRecipientStatusS3 = async () => {
-    let response = await getCollectionFormOfWaittingRecipient(
-      this.state.recipientId
-    );
-    console.log("response", response);
+  // getCollectionFormOfRecipientStatusS3 = async () => {
+  //   let response = await getCollectionFormOfWaittingRecipient({
+  //     recipientId: this.state.recipientId,
+  //     status: "S3",
+  //   });
+  //   console.log("response", response);
+  //   if (response && response.errCode == 0) {
+  //     this.setState({
+  //       arrCollect: response.appointments,
+  //     });
+  //   }
+  // };
+
+  getScheduleS3 = async () => {
+    let response = await getAllScheduleStatus("S3");
     if (response && response.errCode == 0) {
-      this.setState({
-        arrCollectionFormsStatusS3: response.appointments,
-      });
+      this.setState(
+        {
+          arrScheduleStatusS3: response.appointments,
+        },
+        () => {
+          console.log("arrScheduleStatusS3", this.state.arrScheduleStatusS3);
+        }
+      );
+    }
+  };
+
+  getAllCollectionByScheduleOfRecipient = async () => {
+    let { arrScheduleStatusS3 } = this.state;
+    let response;
+    let arr = [];
+    let temp = [];
+    if (arrScheduleStatusS3) {
+      for (let i = 0; i < arrScheduleStatusS3.length; i++) {
+        arr.push(arrScheduleStatusS3[i].id);
+      }
+      if (arr) {
+        for (let i = 0; i < arr.length; i++) {
+          response = await getAllCollectionFormBySchedule({
+            scheduleId: arr[i],
+            recipientId: this.state.recipientId,
+            status: "Yes",
+          });
+          if (response) {
+            this.setState(
+              {
+                collectStatusS3: response.appointments,
+              },
+              () => {
+                console.log("arrCollectStatusS4", this.state.collectStatusS3);
+              }
+            );
+            if (this.state.collectStatusS3 != null) {
+              temp.push(this.state.collectStatusS3);
+              console.log("temp", temp);
+            }
+          }
+        }
+      }
+      if (temp) {
+        this.setState(
+          {
+            arrCollect: temp,
+          },
+          () => {
+            console.log("arrCollect", this.state.arrCollect);
+          }
+        );
+      }
     }
   };
 
@@ -77,7 +142,7 @@ class CollectionFormStatusS3 extends Component {
   };
 
   render() {
-    let arrCollectionFormsStatusS3 = this.state.arrCollectionFormsStatusS3;
+    let arrCollect = this.state.arrCollect;
     let statusArr = this.state.statusArr;
     console.log("statusArr", statusArr);
     // console.log("arrCollectionFormsStatusS2",this.state.arrCollectionFormsStatusS2)
@@ -172,12 +237,12 @@ class CollectionFormStatusS3 extends Component {
             </div>
             <div className="title">CHỜ THU GOM</div>
             <div className="row ">
-              {arrCollectionFormsStatusS3 &&
-                arrCollectionFormsStatusS3.map((item, index) => {
+              {arrCollect &&
+                arrCollect.map((item, index) => {
                   let imageBase64 = "";
-                  if (item.giverData.image.data) {
+                  if (item.scheduleData.giverData.image.data) {
                     imageBase64 = new Buffer(
-                      item.giverData.image.data,
+                      item.scheduleData.giverData.image.data,
                       "base64"
                     ).toString("binary");
                   }
@@ -188,15 +253,16 @@ class CollectionFormStatusS3 extends Component {
                         <div className="col-7">
                           <p className="row">
                             <FaIcons.FaUserAlt className="icon mt-1 mr-2" />
-                            {item.giverData.firstName} {item.giverData.lastName}
+                            {item.scheduleData.giverData.firstName}{" "}
+                            {item.scheduleData.giverData.lastName}
                           </p>
                           <p className="row">
                             <HiIcons.HiOutlineMail className="icon mt-1 mr-2" />
-                            {item.giverData.email}
+                            {item.scheduleData.giverData.email}
                           </p>
                           <p className="row">
                             <BsIcons.BsTelephoneInbound className="icon mt-1 mr-2" />
-                            {item.giverData.phone}
+                            {item.scheduleData.giverData.phone}
                           </p>
                         </div>
                       </div>
@@ -205,7 +271,7 @@ class CollectionFormStatusS3 extends Component {
                           <span className="info mr-1">
                             <RiIcons.RiProductHuntLine /> Sản phẩm:{" "}
                           </span>
-                          <p>{item.productData.product_name}</p>
+                          <p>{item.scheduleData.productData.product_name}</p>
                         </div>
                         <div className="d-flex">
                           <span className="info mr-1 mb-1">
@@ -217,16 +283,10 @@ class CollectionFormStatusS3 extends Component {
                           </p>
                         </div>
                         <div className="d-flex">
-                          {item.statusTypeData.valueVi === "Chờ thu gom" ? (
-                            <p className="status-s2">
-                              <RiIcons.RiErrorWarningLine className="icon" />{" "}
-                              {item.statusTypeData.valueVi}
-                            </p>
-                          ) : (
-                            <p className="status-s3">
-                              {item.statusTypeData.valueVi}
-                            </p>
-                          )}
+                          <button className="btn status-s2">
+                            <PriorityHighIcon className="icon mr-1" />
+                            {item.scheduleData.statusData.valueVi}
+                          </button>
                           <button
                             className="btn btn-detail "
                             onClick={() => this.handleLook(item)}

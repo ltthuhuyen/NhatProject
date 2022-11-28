@@ -21,6 +21,7 @@ export const CRUD_ACTIONS = {
 
 export const dateFormat = {
   SEND_TO_SERVER: "DD/MM/YYYY",
+  FORMAT_DATE: "YYYY-MM-DD",
   FORMATT_DATE_TIME: "DD/MM/YYYY , hh:mm ",
 };
 

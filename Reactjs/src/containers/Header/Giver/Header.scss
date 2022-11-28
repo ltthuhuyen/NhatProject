@@ -4,7 +4,6 @@
 
 .home-header {
     font-weight: 400; 
-    // overflow: hidden;
     position: fixed;
     z-index: 1;
     top: 0; 
@@ -28,7 +27,7 @@
             font-size: 15px;
             font-weight: 500;
             align-items: center;
-            right: 50px;
+            right: 80px;
             top: 10px;
             position: absolute;
             .btn-login-register{
@@ -70,18 +69,26 @@
                                 float: right;
                             }
                         }
-                        .info-notification{
+                         .info-notification {
                             color: rgb(18, 17, 17);
                             font-size: 14px;
                             padding: 20px;
                             border-bottom: 1px solid rgb(225, 225, 225);
-                            &:hover{
-                                color: #077709;
-                                background: #F8F8FF;
-                                opacity: 0.7;
-                            }
-                           
-                        }
+    
+                                 &:hover {
+                                     color: #1530b9 !important;
+                                     background: #F8F8FF;
+                                     opacity: 0.7;
+                                 }
+                                .text-minutes{
+                                    color: rgb(136, 152, 152) !important;
+                                    font-size: 11px;
+                                    right: 3%;
+                                    position: absolute;
+                                }
+            
+    
+                             }
                         
                     }
 
@@ -120,10 +127,9 @@
     }
    
     .content {  
-        // max-width: 100%;
         background-color:#7ed000;
         color: rgb(255, 255, 255);
-        // display: flex;
+        z-index: 8;
         .center-content {
             padding: 25px 40px;
             display: flex;

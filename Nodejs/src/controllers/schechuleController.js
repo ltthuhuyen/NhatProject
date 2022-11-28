@@ -25,8 +25,13 @@ let handleCreateSchedule = async (req, res) => {
 
 let handleUpdateStatusS2 = async (req, res) => {
   let data = req.body;
-
   let message = await scheduleService.updateStatusS2(data);
+  return res.status(200).json(message);
+};
+
+let handleUpdateStatusS3 = async (req, res) => {
+  let data = req.body;
+  let message = await scheduleService.updateStatusS3(data);
   return res.status(200).json(message);
 };
 
@@ -36,9 +41,24 @@ let handleUpdateStatus = async (req, res) => {
   return res.status(200).json(message);
 };
 
+let handleUpdateRegistrationStatus = async (req, res) => {
+  let data = req.body;
+  let message = await scheduleService.updateRegistrationStatus(data);
+  return res.status(200).json(message);
+};
+
+let handleUpdateReceivedDate = async (req, res) => {
+  let data = req.body;
+  let message = await scheduleService.updateReceivedDate(data);
+  return res.status(200).json(message);
+};
+
 module.exports = {
   handleCountCollect: handleCountCollect,
   handleCreateSchedule: handleCreateSchedule,
   handleUpdateStatusS2: handleUpdateStatusS2,
+  handleUpdateStatusS3: handleUpdateStatusS3,
   handleUpdateStatus: handleUpdateStatus,
+  handleUpdateRegistrationStatus: handleUpdateRegistrationStatus,
+  handleUpdateReceivedDate: handleUpdateReceivedDate,
 };

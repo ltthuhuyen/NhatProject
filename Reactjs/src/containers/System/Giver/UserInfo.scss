@@ -35,8 +35,6 @@
                
         }
         .row{
-          //  padding: 3px 0;
-           
             .img{
                 .img-pro {
                     height: 100px;
@@ -55,29 +53,33 @@
                     margin-bottom: 9px;
                 }
             }
-                           .btn-edit {
-                               background-color: white;
-                               color: rgb(245, 221, 7);
-                               border: 1px solid rgb(245, 221, 7);
-                               font-size: 15px;
+            .btn-edit {
+                    border: 1px solid rgb(255, 252, 79);
+                    border-radius: 10px;
+                    background: #fff;
+                    color:rgb(249, 245, 0);
+                    font-size: 20px;
+                    &:hover {
+                        padding: 7px 10px 12px 11px;
+                        color: white;         
+                        clip-path: circle(40%);
+                        background-color:rgb(255, 252, 79);
+                    }
+                }
             
-                               &:hover {
-                                   color: white;
-                                   background-color: rgb(255, 251, 7)
-                               }
-                           }
-            
-                           .btn-delete {
-                               background-color: white;
-                               color: #dc3545;
-                               border: 1px solid #dc3545;
-                               font-size: 18px;
-            
-                               &:hover {
-                                   color: white;
-                                   background-color: #fc394d;
-                               }
-                           }
+                .btn-delete {
+                    border: 1px solid #dc3545;
+                    border-radius: 10px;
+                    background: #fff;
+                    color: #dc3545;
+                    font-size: 20px;
+                    &:hover {
+                        padding: 7px 10px 12px 11px;
+                        color: white;
+                        background-color: #fc394d;
+                        clip-path: circle(40%);
+                    }
+                }
 
         }
     }

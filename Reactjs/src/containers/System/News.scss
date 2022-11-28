@@ -3,21 +3,80 @@
     color: #FFF;
     font-family: monospace;
 }
+.main_content {
+    max-width: 81%;
+    font-size: 15px;
+    border: none;
+    left: 19%;
+    height: 100vh;
+    background: #f6f8fc;
+    position: absolute !important
+}
 .news-container{
+    background: #FFF;
+    top:25%;
+    position: absolute;
+   
+  
     margin: 0 100px 0 200px;
-    max-width: 100%;
-    .title{
-        max-width: auto;
-        font-size: 15px;
-        text-align: center;
-        text-transform: uppercase;
-        font-weight: bold;
-        font-size: 20px;
-        margin-top: 15px;
-        color: #0071ba;
-    }
+    
+    .container-fluid {
+            background: #7ed000;
+    
+            .header_right {
+                // right: 7%;
+                position: absolute;
+    
+                .wrapper-welcome {
+                    .btn-logout {
+                        font-size: 20px;
+                        color: green;
+    
+                        .wrapper-notification {
+                            // overflow: clip;
+                            // width: 130%;
+                            z-index: 1000;
+                            position: absolute;
+                            background: #FFf;
+                            right: 50px;
+                            top: 50px;
+                            border-radius: 10px;
+    
+                            .title-notification {
+                                font-size: 18px;
+                                background: #eaf6c4;
+                                padding: 15px;
+                                font-family: cursive;
+                                border-bottom: 1px solid #e1e1e1;
+    
+                                .icon-close {
+                                    float: right;
+                                }
+                            }
+    
+                            .info-notification {
+                                color: rgb(18, 17, 17);
+                                font-size: 14px;
+                                padding: 20px;
+                                border-bottom: 1px solid rgb(225, 225, 225);
+    
+                                &:hover {
+                                    color: #077709;
+                                    background: #F8F8FF;
+                                    opacity: 0.7;
+                                }
+    
+                            }
+    
+                        }
+                    }
+                }
+            }
+        }
+    
+       
     .row1-news{
-        width: auto;
+        // width: auto;
         margin: 0 0 0 200px;
         margin-top: 20px;
         .img-news{
@@ -38,7 +97,7 @@
         }
     }
     .news-about-editor {
-        max-width: 89%;
+        // max-width: 89%;
         margin: 0 20px 0 215px;
         margin-top: 20px;
     }
@@ -59,7 +118,7 @@
 
     .news-frames{
         margin: 0 200px;
-        margin-top: -150px;
+        // margin-top: -150px;
         // border: 1px solid red;
         height: auto;
         background: white;

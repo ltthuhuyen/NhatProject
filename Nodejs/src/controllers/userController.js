@@ -144,6 +144,15 @@ let getAllCode = async (req, res) => {
   }
 };
 
+let handleUserStatistic = async (req, res) => {
+  let users = await userService.userStatistic();
+  return res.status(200).json({
+    errCode: 0,
+    errMessage: "Ok",
+    users,
+  });
+};
+
 module.exports = {
   handleLogin: handleLogin,
   handleUserSendEmailForgotPassword: handleUserSendEmailForgotPassword,
@@ -157,4 +166,5 @@ module.exports = {
   getAllCode: getAllCode,
   handleGetUsersRole: handleGetUsersRole,
   handleCountUser: handleCountUser,
+  handleUserStatistic: handleUserStatistic,
 };

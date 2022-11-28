@@ -8,6 +8,7 @@ import Footer from "../../Footer/Footer";
 import ScrollUp from "../../../components/ScrollUp";
 import "./CollectionFormManage.scss";
 import { withRouter } from "react-router";
+import avata from "../../../assets/images/avata.jpg";
 import * as AiIcons from "react-icons/ai";
 import * as BiIcons from "react-icons/bi";
 import * as BsIcons from "react-icons/bs";
@@ -15,18 +16,26 @@ import * as MdIcons from "react-icons/md";
 import * as HiIcons from "react-icons/hi";
 import * as RiIcons from "react-icons/ri";
 import * as FaIcons from "react-icons/fa";
-import { getCollectionFormOfUnRegisteredGiver } from "../../../services/collectionformService";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
+import {
+  getScheduleOfGiver,
+  getAllCollectionFormBySchedule,
+} from "../../../services/collectionformService";
+
 class CollectionFormManage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      arrCollectionForms: [],
+      arrScheduleStatusS1: [],
+      arrCollect: [],
       statusArr: [],
       status: "",
       statusType: "",
       giverId: "",
     };
   }
+
   handleOnChangeInput = (e, id) => {
     let copyState = { ...this.state };
     copyState[id] = e.target.value;
@@ -36,30 +45,54 @@ class CollectionFormManage extends Component {
   };
 
   async componentDidMount() {
-    await this.getAllCollectionFormReact();
+    await this.getAllScheduleOfGiver();
+    await this.getAllCollectionByScheduleOfGiver();
     await this.props.getStatusStart();
   }
 
-  getAllCollectionFormReact = async () => {
-    let response = await getCollectionFormOfUnRegisteredGiver(
-      this.state.giverId
-    );
-    console.log("res", response);
+  getAllScheduleOfGiver = async () => {
+    let response = await getScheduleOfGiver({
+      giverId: this.state.giverId,
+      status: "S1",
+    });
     if (response && response.errCode == 0) {
       this.setState(
         {
-          arrCollectionForms: response.appointments,
+          arrScheduleStatusS1: response.appointments,
         },
         () => {
-          console.log("ggg");
+          console.log("arrScheduleStatusS1", this.state.arrScheduleStatusS1);
         }
       );
+    }
+  };
+
+  getAllCollectionByScheduleOfGiver = async () => {
+    let { arrScheduleStatusS1 } = this.state;
+    let response;
+    if (arrScheduleStatusS1) {
+      for (let i = 0; i < arrScheduleStatusS1.length; i++) {
+        response = await getAllCollectionFormBySchedule({
+          scheduleId: arrScheduleStatusS1[i].id,
+        });
+      }
+      if (response) {
+        this.setState(
+          {
+            arrCollect: response.appointments,
+          },
+          () => {
+            console.log("arrCollect", this.state.arrCollect);
+          }
+        );
+      }
     }
   };
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (prevProps.statusRedux !== this.props.statusRedux) {
       let arrStatuses = this.props.statusRedux;
+
       this.setState({
         statusArr: arrStatuses,
         status:
@@ -69,16 +102,18 @@ class CollectionFormManage extends Component {
   }
 
   handleLook = async (schedule) => {
-    this.props.history.push(`/giver/collection-form-detail/${schedule.id}`);
+    this.props.history.push(
+      `/giver/collection-form-detail-status-s2/${schedule.id}`
+    );
   };
 
   render() {
-    let arrCollectionForms = this.state.arrCollectionForms;
-    let language = this.props.language;
+    let { arrScheduleStatusS1 } = this.state;
+
     if (this.props.userInfo) {
       this.state.giverId = this.props.userInfo.id;
     }
-    console.log("collection form", this.state.arrCollectionForms);
+
     return (
       <>
         <ScrollUp />
@@ -166,16 +201,24 @@ class CollectionFormManage extends Component {
                 </div>
               </NavLink>
             </div>
+            <div className="title">ĐƠN THU GOM</div>
+            <div className="wrapper-title-sum-statistic d-flex">
+              <span className="wrapper-sum d-flex">
+                <div className="">Tổng cộng:</div>
+                <div className="text-sum">{arrScheduleStatusS1.length} đơn</div>
+              </span>
+            </div>
             <div className="row ">
-              {arrCollectionForms &&
-                arrCollectionForms.map((item, index) => {
-                  console.log(item);
+              {arrScheduleStatusS1 &&
+                arrScheduleStatusS1.map((item, index) => {
                   let imageBase64 = "";
-                  if (item.giverData.image.data) {
+                  if (item.giverData.image) {
                     imageBase64 = new Buffer(
                       item.giverData.image.data,
                       "base64"
                     ).toString("binary");
+                  } else {
+                    imageBase64 = avata;
                   }
                   return (
                     <div className="col-5 collection-form shadow " key={index}>
@@ -183,15 +226,15 @@ class CollectionFormManage extends Component {
                         <img src={imageBase64} className=" col-5 img-pro" />
                         <div className="col-7">
                           <p className="row">
-                            <FaIcons.FaUserAlt className="icon mt-1 mr-2" />
+                            <FaIcons.FaUserAlt className="icon " />
                             {item.giverData.firstName} {item.giverData.lastName}
                           </p>
                           <p className="row">
-                            <HiIcons.HiOutlineMail className="icon mt-1 mr-2" />
+                            <HiIcons.HiOutlineMail className="icon " />
                             {item.giverData.email}
                           </p>
                           <p className="row">
-                            <BsIcons.BsTelephoneInbound className="icon mt-1 mr-2" />
+                            <BsIcons.BsTelephoneInbound className="icon " />
                             {item.giverData.phone}
                           </p>
                         </div>
@@ -199,29 +242,51 @@ class CollectionFormManage extends Component {
                       <div className="info-collection">
                         <div className="d-flex">
                           <span className="info mr-1">
-                            <RiIcons.RiProductHuntLine /> Sản phẩm:{" "}
+                            <RiIcons.RiProductHuntLine className="icon" /> Sản
+                            phẩm:{" "}
                           </span>
                           <p>{item.productData.product_name}</p>
                         </div>
                         <div className="d-flex">
                           <span className="info mr-1 mb-1">
-                            <BiIcons.BiUser /> Người nhận thu gom:{" "}
+                            <BiIcons.BiUser className="icon" /> Người nhận thu
+                            gom:{" "}
                           </span>
                           <p>
-                            {item.recipientData.firstName}{" "}
-                            {item.recipientData.lastName}
+                            {/* {item.recipientData.firstName}{" "}
+                            {item.recipientData.lastName} */}
                           </p>
                         </div>
                         <div className="d-flex">
-                          {item.statusTypeData.valueVi === "Chờ xác nhận" ? (
-                            <p className="status-s2">
-                              <RiIcons.RiErrorWarningLine className="icon" />{" "}
-                              {item.statusTypeData.valueVi}
-                            </p>
+                          {item.statusData.valueVi === "Chờ xác nhận" ||
+                          item.statusData.valueVi === "Chờ thu gom" ? (
+                            <button className="btn status-s2">
+                              <PriorityHighIcon className="icon mr-1" />
+                              {item.statusData.valueVi}
+                            </button>
                           ) : (
-                            <p className="status-s3">
-                              {item.statusTypeData.valueVi}
-                            </p>
+                            <>
+                              {item.statusData.valueVi === "Đơn bị hủy" ? (
+                                <button className="btn status-s5">
+                                  <BsIcons.BsX className="icon" />{" "}
+                                  {item.statusData.valueVi}
+                                </button>
+                              ) : (
+                                <>
+                                  {item.statusData.valueVi === "Đã thu gom" ? (
+                                    <button className="btn status-s4">
+                                      <CheckCircleOutlineIcon className="icon mr-1" />
+                                      {item.statusData.valueVi}
+                                    </button>
+                                  ) : (
+                                    <button className="btn status-s1">
+                                      <PriorityHighIcon className="icon mr-1" />
+                                      Chưa đăng ký
+                                    </button>
+                                  )}
+                                </>
+                              )}
+                            </>
                           )}
                           <button
                             className="btn btn-detail "
@@ -237,6 +302,7 @@ class CollectionFormManage extends Component {
             </div>
           </div>
         </div>
+
         <Footer />
       </>
     );
@@ -245,11 +311,9 @@ class CollectionFormManage extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    language: state.app.language,
-    userInfo: state.user.userInfo,
     systemMenuPath: state.app.systemMenuPath,
     statusRedux: state.admin.statuses,
-    // roleRedux: state.admin.roles
+    userInfo: state.user.userInfo,
   };
 };
 

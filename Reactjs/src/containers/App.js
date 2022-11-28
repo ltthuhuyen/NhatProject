@@ -23,6 +23,7 @@ import Competition from "./System/Giver/Competition";
 import DetailCompetition from "./System/Giver/DetailCompetition";
 import Submission from "./System/Giver/Submission";
 import Identification from "./System/Giver/Identification";
+import DetailSubmission from "./System/Giver/DetailSubmission";
 
 class App extends Component {
   handlePersistorState = () => {
@@ -51,7 +52,7 @@ class App extends Component {
             {/* {this.props.isLoggedIn && <HomePage />} */}
 
             <span className="content-container">
-              <CustomScrollbars style={{ height: "100vh", width: "100%" }}>
+              <CustomScrollbars style={{ height: "100vh", width: "auto" }}>
                 <Switch>
                   <Route path={path.HOMEPAGE} exact component={HomePage} />
                   <Route
@@ -88,6 +89,10 @@ class App extends Component {
                   <Route
                     path="/submission-by-competition/:id"
                     component={Submission}
+                  />
+                  <Route
+                    path="/submission-detail/:id"
+                    component={DetailSubmission}
                   />
                   <Route path="/identification" component={Identification} />
                 </Switch>

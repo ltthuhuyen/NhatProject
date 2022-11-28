@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, createRef } from "react";
 import { connect } from "react-redux";
 import { Link, NavLink, Redirect, Route, Switch } from "react-router-dom";
 import { withRouter } from "react-router";
@@ -9,9 +9,16 @@ import * as MdIcons from "react-icons/md";
 import * as HiIcons from "react-icons/hi";
 import * as RiIcons from "react-icons/ri";
 import * as FaIcons from "react-icons/fa";
+import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
 import * as actions from "../../../store/actions";
+import avata from "../../../assets/images/avata.jpg";
 import "./CollectionFormStatus.scss";
-import { getCollectionFormOfRegisteredRecipient } from "../../../services/collectionformService";
+import {
+  getAllCollectionForm,
+  getAllScheduleStatus,
+  getAllCollectionFormBySchedule,
+  getCollectionFormOfRecipientByStatus,
+} from "../../../services/collectionformService";
 import Footer from "../../Footer/Footer";
 import ScrollUp from "../../../components/ScrollUp";
 
@@ -19,12 +26,14 @@ class CollectionFormStatusS2 extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      arrScheduleStatusS2: [],
+      arrScheduleOfRecipient: [],
       arrCollectionFormsStatusS2: [],
+      arrCollect: [],
       statusArr: [],
       status: "",
       statusType: "",
       recipientId: "",
-
       temp: "",
     };
   }
@@ -42,27 +51,84 @@ class CollectionFormStatusS2 extends Component {
     );
   };
 
-  componentDidMount() {
-    this.getCollectionFormOfRecipientStatusS2();
-    this.props.getStatusStart();
+  async componentDidMount() {
+    await this.getScheduleS2();
+    await this.getAllCollectionByScheduleOfRecipient();
+    await this.props.getStatusStart();
   }
 
-  getCollectionFormOfRecipientStatusS2 = async () => {
-    let response = await getCollectionFormOfRegisteredRecipient(
-      this.state.recipientId
-    );
-    console.log("response", response);
+  // getAllSchedule = async () => {
+  //   let response = await getAllCollectionForm("ALL");
+  //   console.log(response);
+  //   if (response && response.errCode == 0) {
+  //     this.setState({
+  //       arrSchedule: response.appointments,
+  //     });
+  //   }
+  // };
+  // getCollectionFormOfRecipientStatusS2 = async () => {
+  //   let response = await getCollectionFormOfRecipientByStatus({
+  //     recipientId: this.state.recipientId,
+  //     status: "S2",
+  //   });
+  //   if (response && response.errCode == 0) {
+  //     this.setState({
+  //       arrCollectionFormsStatusS2: response.appointments,
+  //     });
+  //   }
+  // };
+
+  getScheduleS2 = async () => {
+    let response = await getAllScheduleStatus("S2");
     if (response && response.errCode == 0) {
-      this.setState({
-        arrCollectionFormsStatusS2: response.appointments,
-      });
+      this.setState(
+        {
+          arrScheduleStatusS2: response.appointments,
+        },
+        () => {
+          console.log("arrScheduleStatusS2", this.state.arrScheduleStatusS2);
+        }
+      );
+    }
+  };
+
+  getAllCollectionByScheduleOfRecipient = async () => {
+    let { arrScheduleStatusS2 } = this.state;
+    let response;
+    let arr = [];
+    let temp = [];
+    if (arrScheduleStatusS2) {
+      for (let i = 0; i < arrScheduleStatusS2.length; i++) {
+        arr.push(arrScheduleStatusS2[i].id);
+      }
+
+      if (arr) {
+        for (let i = 0; i < arr.length; i++) {
+          console.log("arrSchedule1", arr);
+          response = await getAllCollectionFormBySchedule({
+            scheduleId: arr[i],
+            recipientId: this.state.recipientId,
+          });
+          temp.push(response.appointments);
+        }
+      }
+      if (temp) {
+        this.setState(
+          {
+            arrCollect: temp,
+          },
+          () => {
+            console.log("arrCollect", this.state.arrCollect);
+          }
+        );
+      }
     }
   };
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (prevProps.statusRedux !== this.props.statusRedux) {
       let arrStatuses = this.props.statusRedux;
-      console.log(arrStatuses);
+
       this.setState({
         statusArr: arrStatuses,
         status:
@@ -76,10 +142,10 @@ class CollectionFormStatusS2 extends Component {
   };
 
   render() {
-    let arrCollectionFormsStatusS2 = this.state.arrCollectionFormsStatusS2;
+    let { arrCollect } = this.state;
     let statusArr = this.state.statusArr;
-    console.log("statusArr", statusArr);
-    // console.log("arrCollectionFormsStatusS2",this.state.arrCollectionFormsStatusS2)
+
+    // console.log("arrCollect",this.state.arrCollect)
     if (this.props.userInfo) {
       this.state.recipientId = this.props.userInfo.id;
     }
@@ -169,13 +235,14 @@ class CollectionFormStatusS2 extends Component {
                 </div>
               </NavLink>
             </div>
+            <div className="title">CHỜ XÁC NHẬN</div>
             <div className="row ">
-              {arrCollectionFormsStatusS2 &&
-                arrCollectionFormsStatusS2.map((item, index) => {
+              {arrCollect &&
+                arrCollect.map((item, index) => {
                   let imageBase64 = "";
-                  if (item.giverData.image.data) {
+                  if (item.scheduleData.giverData.image.data) {
                     imageBase64 = new Buffer(
-                      item.giverData.image.data,
+                      item.scheduleData.giverData.image.data,
                       "base64"
                     ).toString("binary");
                   }
@@ -186,30 +253,29 @@ class CollectionFormStatusS2 extends Component {
                         <div className="col-7">
                           <p className="row">
                             <FaIcons.FaUserAlt className="icon mt-1 mr-2" />
-                            {item.giverData.firstName} {item.giverData.lastName}
+                            {item.scheduleData.giverData.firstName}{" "}
+                            {item.scheduleData.giverData.lastName}
                           </p>
                           <p className="row">
                             <HiIcons.HiOutlineMail className="icon mt-1 mr-2" />
-                            {item.giverData.email}
+                            {item.scheduleData.giverData.email}
                           </p>
                           <p className="row">
                             <BsIcons.BsTelephoneInbound className="icon mt-1 mr-2" />
-                            {item.giverData.phone}
+                            {item.scheduleData.giverData.phone}
                           </p>
                         </div>
                       </div>
                       <div className="info-collection">
                         <div className="d-flex">
                           <span className="info mr-1">
-                            <RiIcons.RiProductHuntLine className="icon" /> Sản
-                            phẩm:{" "}
+                            <RiIcons.RiProductHuntLine /> Sản phẩm:{" "}
                           </span>
-                          <p>{item.productData.product_name}</p>
+                          <p>{item.scheduleData.productData.product_name}</p>
                         </div>
                         <div className="d-flex">
                           <span className="info mr-1 mb-1">
-                            <BiIcons.BiUser className="icon" /> Người nhận thu
-                            gom:{" "}
+                            <BiIcons.BiUser /> Người nhận thu gom:{" "}
                           </span>
                           <p>
                             {item.recipientData.firstName}{" "}
@@ -217,16 +283,10 @@ class CollectionFormStatusS2 extends Component {
                           </p>
                         </div>
                         <div className="d-flex">
-                          {item.statusTypeData.valueVi === "Chờ xác nhận" ? (
-                            <p className="status-s2">
-                              <RiIcons.RiErrorWarningLine className="icon" />{" "}
-                              {item.statusTypeData.valueVi}
-                            </p>
-                          ) : (
-                            <p className="status">
-                              {item.statusTypeData.valueVi}
-                            </p>
-                          )}
+                          <button className="btn status-s2">
+                            <PriorityHighIcon className="icon mr-1" />
+                            {item.scheduleData.statusData.valueVi}
+                          </button>
                           <button
                             className="btn btn-detail "
                             onClick={() => this.handleLook(item)}

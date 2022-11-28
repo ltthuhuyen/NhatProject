@@ -82,6 +82,18 @@ let handleCountAllSubmissionsByCompetition = async (req, res) => {
   });
 };
 
+let handleDeleteSubmission = async (req, res) => {
+  let id = req.body.id;
+  if (!id) {
+    return res.status(200).json({
+      errCode: 1,
+      errMessage: "Không tìm thấy bài đăng",
+    });
+  }
+  let message = await submissionService.deleteSumission(id);
+  return res.status(200).json(message);
+};
+
 module.exports = {
   handleCountSubmission: handleCountSubmission,
   handleCreateSubmission: handleCreateSubmission,
@@ -89,4 +101,5 @@ module.exports = {
   handleGetAllSubmissionsByCompetition: handleGetAllSubmissionsByCompetition,
   handleCountAllSubmissionsByCompetition:
     handleCountAllSubmissionsByCompetition,
+  handleDeleteSubmission: handleDeleteSubmission,
 };

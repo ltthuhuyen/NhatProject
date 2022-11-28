@@ -2,7 +2,6 @@ require("dotenv").config();
 const nodemailer = require("nodemailer");
 
 let sendEmail = async (dataSend) => {
-  console.log(dataSend);
   // create reusable transporter object using the default SMTP transport
   let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -18,13 +17,14 @@ let sendEmail = async (dataSend) => {
   let info = await transporter.sendMail({
     from: '"Việt Nam Thu Gom 👻" <vietnamcollects@gmail.com>', // sender address
     to: dataSend.reciverEmail, // list of receivers
-    subject: "Xác Nhận Đặt Lịch Thu Gom", // Subject line
+    subject: "✔️ Xác Nhận Đặt Lịch Thu Gom", // Subject line
     html: `
         <h3>Xin chào ${dataSend.giverName} !</h3>
-        <p>Bạn nhận được email này vì đã đặt lịch thu gom trên Việt Nam Thu Gom</p>
-        <p>Thông tin đơn thu gom gổm: </p>
+        <h3>Bạn nhận được email này vì đã đặt lịch thu gom trên Việt Nam Thu Gom</h3>
+        <h3>Thông tin đơn thu gom gồm: </h3>
         <h4>Sản phẩm thu gom: ${dataSend.productName}</h4>
-        <h4>Ngày thu gom: ${dataSend.dateName} - Thời gian:${dataSend.timeName}</h4>
+        <h4>Thu gom từ ngày: ${dataSend.dateName} - Thời gian:${dataSend.timeName}</h4>
+        <h4>Số lượng: ${dataSend.amountName}</h4>
         <h4>Địa chỉ: ${dataSend.addressName}</h4>
         <p><h3>Xin chân thành cảm ơn 😍 </h3></p>
         `, // html body

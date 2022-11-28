@@ -20,6 +20,13 @@ import * as IoIcons from "react-icons/io";
 import { emitter } from "../../utils/emitter";
 import { ToastContainer, toast } from "react-toastify";
 import NavAdmin from "../../components/NavAdmin";
+import * as FiIcons from "react-icons/fi";
+import CustomScrollbars from "../../components/CustomScrollbars";
+import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import CloseIcon from "@mui/icons-material/Close";
+import moment from "moment";
+import { dateFormat } from "../../utils";
+import { getCollectionFormStatusByCurrentDate } from "../../services/collectionformService";
 
 class SearchUser extends Component {
   constructor(props) {
@@ -32,11 +39,13 @@ class SearchUser extends Component {
       genderData: "",
       search: "",
       arrSearchUser: [],
+      isShowNotification: false,
     };
   }
 
   async componentDidMount() {
     await this.getAllSearchUsersFromReact();
+    await this.getAllCollectFormStatusByCurrentDateFromReact();
   }
 
   handleOnChangeInput = (e, id) => {
@@ -50,6 +59,12 @@ class SearchUser extends Component {
         console.log("check good state", this.state);
       }
     );
+  };
+
+  handleNotifications = () => {
+    this.setState({
+      isShowNotification: !this.state.isShowNotification,
+    });
   };
 
   handleSearch = async () => {
@@ -80,6 +95,36 @@ class SearchUser extends Component {
           }
         );
       }
+    }
+  };
+
+  getAllCollectFormStatusByCurrentDateFromReact = async () => {
+    let today = new Date();
+    let currentDate = moment(today).format("YYYY-MM-DD");
+    var currentTime =
+      today.getHours() +
+      ":" +
+      ("0" + today.getMinutes()).slice(-2) +
+      ":" +
+      ("0" + today.getSeconds()).slice(-2);
+    let currentDateTimeBegin = currentDate + " " + "00:00:00";
+    let currentDateTimeStop = currentDate + " " + currentTime;
+    // console.log("moment", currentDate);
+    // console.log("moment", currentTime);
+    // console.log("currentDateTimeBegin", currentDateTimeBegin);
+    // console.log("currentDateTimeStop", currentDateTimeStop);
+    let response = await getCollectionFormStatusByCurrentDate({
+      currentDateBegin: currentDateTimeBegin,
+      currentDateStop: currentDateTimeStop,
+      status: "S1",
+    });
+
+    if (response) {
+      this.setState({
+        arrCollectsStatusByCurrentDate: response.collects,
+        currentDateTimeBegin: currentDateTimeBegin,
+        currentDateTimeStop: currentDateTimeStop,
+      });
     }
   };
 
@@ -165,8 +210,13 @@ class SearchUser extends Component {
   };
 
   render() {
-    let { arrSearchUser } = this.state;
-    // console.log("arrSearchUserg", arrSearchUser);
+    let {
+      arrSearchUser,
+      isShowNotification,
+      arrCollectsStatusByCurrentDate,
+      currentDateTimeStop,
+    } = this.state;
+    currentDateTimeStop = moment(currentDateTimeStop);
     const { processLogout, userInfo } = this.props;
     let imageBase64 = "";
     if (userInfo.image) {
@@ -190,49 +240,127 @@ class SearchUser extends Component {
               editUser={this.doEditUser}
             />
           )}
-          <div className="row header">
-            <div className="d-flex">
-              <div className="img">
-                <img src={imageBase64} className="img-img" />
-              </div>
-              <div className="profile-info">
-                Xin chào{" "}
-                {userInfo && userInfo.firstName + userInfo.lastName
-                  ? userInfo.firstName + " " + userInfo.lastName
-                  : ""}
+          <div className="container-fluid  ">
+            <div className=" header_right justify-content-between align-items-center">
+              <div className="d-flex">
+                <div className="d-flex wrapper-welcome">
+                  <div
+                    className="btn btn-logout"
+                    onClick={(e) => this.handleNotifications(e)}
+                  >
+                    <NotificationsNoneIcon />
+                    {isShowNotification ? (
+                      <div className="wrapper-notification shadow rounded">
+                        <div className="title-notification">
+                          Thông báo
+                          <CloseIcon
+                            className="icon-close"
+                            onClick={(e) => this.handleNotifications(e)}
+                          />
+                        </div>
+                        <CustomScrollbars style={{ height: "180px" }}>
+                          {arrCollectsStatusByCurrentDate.length > 0 &&
+                            arrCollectsStatusByCurrentDate.map(
+                              (item, index) => {
+                                let t = moment(item.createdAt);
+                                console.log("t", t);
+                                let tt = moment(`${t}`);
+                                console.log("tt", tt);
+                                return (
+                                  <>
+                                    <div
+                                      className="info-notification"
+                                      onClick={(e) =>
+                                        this.handleDetailCollectForm(item)
+                                      }
+                                    >
+                                      {item.giverData.firstName} {""}
+                                      {item.giverData.lastName}{" "}
+                                      <div>
+                                        đặt lịch thu gom{" "}
+                                        {item.productData.product_name} {""}
+                                        tại {item.addressData.address_name} {""}
+                                        {item.addressData.ward_name}
+                                        {/* {currentDateTimeStop} */}
+                                        {/* {item.createdAt} */}
+                                      </div>
+                                      <div className="text-minutes">
+                                        {currentDateTimeStop.diff(
+                                          tt,
+                                          "minutes"
+                                        ) > 60 ? (
+                                          <>
+                                            {Math.floor(
+                                              currentDateTimeStop.diff(
+                                                tt,
+                                                "minutes"
+                                              ) / 60
+                                            )}{" "}
+                                            giờ trước
+                                          </>
+                                        ) : (
+                                          <>
+                                            {currentDateTimeStop.diff(tt)} phút
+                                            trước
+                                          </>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </>
+                                );
+                              }
+                            )}
+                        </CustomScrollbars>
+                      </div>
+                    ) : (
+                      ""
+                    )}
+                  </div>
+                  <div className="img">
+                    <img src={imageBase64} className="img-img" />
+                  </div>
+                  <div className="profile-info">
+                    {userInfo && userInfo.firstName + userInfo.lastName
+                      ? userInfo.firstName + " " + userInfo.lastName
+                      : ""}
+                  </div>
+                  <div className="btn btn-logout" onClick={processLogout}>
+                    <FiIcons.FiLogOut />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          <div className="row title d-flex">
-            <div className="col-6 title-manage">TÌM KIẾM NGƯỜI DÙNG</div>
-            <div className="serach_field-area d-flex align-items-center">
-              <input
-                type="text"
-                placeholder="Search here..."
-                onChange={(e) => {
-                  this.handleOnChangeInput(e, "search");
-                }}
-              />
+          <div className="wrapper-manage shadow-sm ">
+            <div className="row title d-flex">
+              <div className="col-6 title-manage">TÌM KIẾM NGƯỜI DÙNG</div>
+              <div className="serach_field-area d-flex align-items-center">
+                <input
+                  type="text"
+                  placeholder="Search here..."
+                  onChange={(e) => {
+                    this.handleOnChangeInput(e, "search");
+                  }}
+                />
+                <button
+                  type="search"
+                  className="btn btn-search rounded-pill"
+                  onClick={() => this.handleSearch()}
+                >
+                  <BsIcons.BsSearch /> Tìm
+                </button>
+              </div>
               <button
-                type="search"
-                className="btn btn-search rounded-pill"
-                onClick={() => this.handleSearch()}
+                className="col-1 btn btn-create "
+                onClick={this.handleAddNewUser}
               >
-                <BsIcons.BsSearch /> Tìm
+                <MdIcons.MdOutlineCreate />{" "}
+                <FormattedMessage id="manage-user.add" />
               </button>
             </div>
-            <button
-              className="col-1 btn btn-create "
-              onClick={this.handleAddNewUser}
-            >
-              <MdIcons.MdOutlineCreate />{" "}
-              <FormattedMessage id="manage-user.add" />
-            </button>
-          </div>
 
-          <div className="row content">
-            <div className="table">
-              <Table>
+            <div className="row content">
+              <Table className="shadow">
                 <thead className="thead">
                   <tr>
                     <th scope="col">ID</th>
@@ -292,20 +420,6 @@ class SearchUser extends Component {
                               onClick={() => this.handleDetailUser(item)}
                             >
                               <IoIcons.IoIosMore />
-                            </button>
-                            <button
-                              type="button"
-                              className="btn btn-edit mx-2 "
-                              onClick={() => this.handleEditUser(item)}
-                            >
-                              <AiIcons.AiOutlineEdit />
-                            </button>
-                            <button
-                              type="button"
-                              className="btn btn-delete  "
-                              onClick={() => this.handleDeleteUser(item)}
-                            >
-                              <AiIcons.AiOutlineDelete />
                             </button>
                           </td>
                         </tr>

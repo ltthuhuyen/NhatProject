@@ -91,7 +91,37 @@ let createNewAppreciate = (data) => {
   });
 };
 
-let getAllAppreciateBySubmission = (data) => {
+let getAllAppreciateBySubmission = (submissionId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let appreciates = "";
+      if (submissionId) {
+        appreciates = await db.Appreciate.findAll({
+          where: {
+            submissionId: submissionId,
+          },
+          include: [
+            {
+              model: db.Submission,
+              as: "submissionData",
+            },
+            {
+              model: db.User,
+              as: "reviewerData",
+            },
+          ],
+          raw: true,
+          nest: true,
+        });
+      }
+      resolve(appreciates);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+let getAllAppreciateOfReviewerBySubmission = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
       let appreciates = "";
@@ -148,6 +178,8 @@ let deleteAppreciate = (id) => {
 module.exports = {
   countAppreciateBySubmission: countAppreciateBySubmission,
   getAllAppreciateBySubmission: getAllAppreciateBySubmission,
+  getAllAppreciateOfReviewerBySubmission:
+    getAllAppreciateOfReviewerBySubmission,
   createNewAppreciate: createNewAppreciate,
   deleteAppreciate: deleteAppreciate,
 };

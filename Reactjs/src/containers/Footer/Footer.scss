@@ -1,40 +1,46 @@
 .bg-footer {
     max-width: 100%;
-   .title-footer{
-    background:  #eaf6c4;
-    color:  #0c9344;
-    padding: 90px;
-    font-size: 50px;
-    font-weight: bold;
-    font-family: 'comic sans ms', sans-serif;
-    text-align: center;
-   }
-    .row{
+
+    .title-footer {
+        background: #eaf6c4;
+        color: #0c9344;
+        padding: 90px;
+        font-size: 50px;
+        font-weight: bold;
+        font-family: 'comic sans ms', sans-serif;
+        text-align: center;
+    }
+
+    .row {
         max-width: 100%;
-        background:#fff;
+        background: #fff;
         padding: 40px 130px;
-        .title{
+
+        .title {
             font-family: monospace;
-         }
-         
-        
-        .content{
+        }
+
+
+        .content {
             color: rgb(0, 21, 255);
-            .icon{
-                 font-size: 18px;
-                 color: rgb(63, 62, 62);
-                 margin: 0px 0px 6px 0px;
+
+            .icon {
+                font-size: 18px;
+                color: rgb(63, 62, 62);
+                margin: 0px 0px 6px 0px;
             }
-            .link{
+
+            .link {
                 color: rgb(0, 21, 255);
                 text-decoration: none;
             }
-         }
+        }
 
-     }
-     .icon-contact{
-         padding: 0px 10px;
-     }
-       
-    
+    }
+
+    .icon-contact {
+        padding: 0px 10px;
+    }
+
+
 }

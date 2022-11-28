@@ -5,7 +5,8 @@ import { allNews } from "../../../services/newsService";
 import { dateFormat } from "../../../utils";
 import moment from "moment";
 import * as BsIcons from "react-icons/bs";
-import Header from "../../Header/Giver/Header";
+import HeaderR2 from "../../Header/Giver/Header";
+import HeaderR3 from "../../Header/Recipient/Header";
 import Banner from "../../Banner/Banner";
 import Footer from "../../Footer/Footer";
 import ScrollUp from "../../../components/ScrollUp";
@@ -45,11 +46,13 @@ class News extends Component {
 
   render() {
     let arrNews = this.state.arrNews;
-
+    let userInfo = this.props.userInfo;
+    console.log("userInfo", userInfo);
     return (
       <>
         <ScrollUp />
-        <Header />
+        {!userInfo || userInfo.roleId === "R2" ? <HeaderR2 /> : <HeaderR3 />}
+
         <Banner />
         <div className="news">
           <div className="title-news">TIN TỨC</div>
@@ -96,6 +99,7 @@ class News extends Component {
 const mapStateToProps = (state) => {
   return {
     // news: state.news.News,
+    userInfo: state.user.userInfo,
   };
 };
 

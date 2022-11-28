@@ -40,24 +40,16 @@ class Header extends Component {
 
   getAllCollectionFormOfWaittingRecipientByCurrentDate = async () => {
     let userInfo = this.props.userInfo;
-    console.log(this.state.currentDate);
+
     let response = await getCollectionFormOfWaittingRecipientByCurrentDate({
       recipientId: userInfo.id,
       currentDate: this.state.currentDate,
     });
-    console.log(response);
+
     if (response && response.errCode == 0) {
-      this.setState(
-        {
-          arrCollectionFormOfRecipientStatusS3: response.appointments,
-        },
-        () => {
-          console.log(
-            "this.state.addressUser",
-            this.state.arrCollectionFormOfRecipientStatusS3
-          );
-        }
-      );
+      this.setState({
+        arrCollectionFormOfRecipientStatusS3: response.appointments,
+      });
     }
   };
 
@@ -74,6 +66,10 @@ class Header extends Component {
     );
   };
 
+  handleDetailUser = (userInfo) => {
+    this.props.history.push("/recipient/user-info");
+  };
+
   handleNotifications = () => {
     this.setState({
       isShowNotification: !this.state.isShowNotification,
@@ -81,12 +77,12 @@ class Header extends Component {
   };
 
   handleDetailCollectForm = (collectForm) => {
-    // window.location.reload();
-    // e.preventDefault();
-
     this.props.history.push(
       `/recipient/collection-form-detail/${collectForm.id}`
     );
+    setTimeout(() => {
+      window.location.reload();
+    }, 0);
   };
 
   render() {
@@ -96,8 +92,9 @@ class Header extends Component {
       curentDate,
       arrCollectionFormOfRecipientStatusS3,
     } = this.state;
+
     let imageBase64 = "";
-    if (userInfo.image) {
+    if (userInfo) {
       imageBase64 = new Buffer(userInfo.image, "base64").toString("binary");
     }
     return (
@@ -158,8 +155,11 @@ class Header extends Component {
                                       {item.productData.product_name} {""}
                                       <div>
                                         tại {item.giverData.firstName} {""}
-                                        {item.giverData.lastName}{" "}
+                                        {item.giverData.lastName}
+                                        {" - "}
+                                        {item.addressData.address_name} {""}
                                         {item.addressData.ward_name} {""}
+                                        {item.addressData.district_name}
                                       </div>
                                     </div>
                                   );
@@ -236,6 +236,20 @@ class Header extends Component {
                   }}
                 >
                   TIN TỨC
+                </NavLink>
+              </div>
+              <div className="child-content">
+                <NavLink
+                  to="/competition"
+                  className="link-homepage"
+                  activeStyle={{
+                    background: "white",
+                    color: "#019117",
+                    padding: "10px",
+                    borderRadius: "13px",
+                  }}
+                >
+                  CUỘC THI
                 </NavLink>
               </div>
               <div className="child-content">

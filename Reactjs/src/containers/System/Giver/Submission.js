@@ -2,12 +2,16 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router";
 import { dateFormat } from "../../../utils";
+import { toast } from "react-toastify";
 import moment from "moment";
 import * as BiIcons from "react-icons/bi";
 import * as BsIcons from "react-icons/bs";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import DeleteIcon from "@mui/icons-material/Delete";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import Header from "../../Header/Giver/Header";
+import HeaderR2 from "../../Header/Giver/Header";
+import HeaderR3 from "../../Header/Recipient/Header";
 import Banner from "../../Banner/Banner";
 import Footer from "../../Footer/Footer";
 import ScrollUp from "../../../components/ScrollUp";
@@ -16,10 +20,12 @@ import { allCompetitions } from "../../../services/competitionService";
 import {
   allSubmissionsByCompetition,
   countSubmissionsByCompetition,
+  deleteSubmission,
 } from "../../../services/submissionService";
 import {
   countAppreciateBySubmission,
   allApprecicateBySubmission,
+  allApprecicateOfReviewerBySubmission,
   createAppreciate,
   deleteAppreciate,
 } from "../../../services/appreciateService";
@@ -38,6 +44,7 @@ class Submission extends Component {
       currentDate: "",
       isShow: true,
       isClickHeart: "",
+      arrAppreciate: [],
       appreciateOfReviewer: [],
     };
   }
@@ -48,6 +55,7 @@ class Submission extends Component {
     await this.getAllSubmissionsByCompetitiveFromReact();
     await this.countAllAppreciateBySubmissionFromReact();
     await this.getAllAppreciateBySubmissionFromReact();
+    await this.getAllAppreciateOfReviewerBySubmissionFromReact();
   }
 
   getCompetitionsFromReact = async () => {
@@ -65,20 +73,6 @@ class Submission extends Component {
       }
     }
   };
-
-  //   getAllSubmissionsFromReact = async () => {
-  //     let response = await allSubmissions("ALL");
-  //     if (response && response.errCode == 0) {
-  //       this.setState(
-  //         {
-  //           arrSubmissions: response.submissions,
-  //         },
-  //         () => {
-  //           console.log("competition", this.state.arrSubmissions);
-  //         }
-  //       );
-  //     }
-  //   };
 
   getAllSubmissionsByCompetitiveFromReact = async () => {
     if (
@@ -113,11 +107,27 @@ class Submission extends Component {
   };
 
   handleCreateSubmission = (competition) => {
-    this.props.history.push(`/giver/create-submission/${competition.id}`);
+    let userInfo = this.props.userInfo;
+    if (userInfo && userInfo.roleId === "R2") {
+      this.props.history.push(`/giver/create-submission/${competition.id}`);
+    } else if (userInfo && userInfo.roleId === "R3") {
+      this.props.history.push(`/recipient/create-submission/${competition.id}`);
+    }
   };
 
   handleDetailCompetition = (competition) => {
     this.props.history.push(`/competition-detail/${competition.id}`);
+  };
+
+  handleSeeDetailSubmission = (submission) => {
+    let userInfo = this.props.userInfo;
+    if (!userInfo) {
+      this.props.history.push(`/submission-detail/${submission.id}`);
+    } else if (userInfo && userInfo.roleId === "R2") {
+      this.props.history.push(`/giver/submission-detail/${submission.id}`);
+    } else if (userInfo && userInfo.roleId === "R3") {
+      this.props.history.push(`/recipient/submission-detail/${submission.id}`);
+    }
   };
 
   handleIsShow() {
@@ -143,105 +153,90 @@ class Submission extends Component {
 
   getAllAppreciateBySubmissionFromReact = async () => {
     let allSubmissionsByCompetition = this.state.arrSubmissionsByCompetition;
-    let reviewerId = this.props.userInfo.id;
     for (let i = 0; i < allSubmissionsByCompetition.length; i++) {
-      let res = await allApprecicateBySubmission({
-        submissionId: allSubmissionsByCompetition[i].id,
-        reviewerId: reviewerId,
-      });
+      let res = await allApprecicateBySubmission(
+        allSubmissionsByCompetition[i].id
+      );
+
       if (res && res.errCode === 0) {
         this.setState({
-          appreciateOfReviewer: res.appreciates,
+          arrAppreciate: res.appreciates,
         });
       }
     }
   };
 
-  // handleHeart = async (submission) => {
-  //   console.log("submission", submission);
-  //   let submissionId = submission.id;
-  //   let reviewerId = this.props.userInfo.id;
-  //   this.setState(
-  //     {
-  //       isClickHeart: true,
-  //     },
-  //     () => {
-  //       console.log("isClickHeart", this.state.isClickHeart);
-  //     }
-  //   );
-  //   if (this.state.isClickHeart === true) {
-  //     let res = await createAppreciate({
-  //       submissionId: submissionId,
-  //       reviewerId: reviewerId,
-  //     });
-  //     this.getAllAppreciateBySubmissionFromReact();
-  //   } else {
-  //     let appreciateOfReviewer = this.state.appreciateOfReviewer;
-  //     for (let i = 0; i < appreciateOfReviewer.length; i++) {
-  //       let appreciateId = appreciateOfReviewer[i].id;
-  //       let res = await deleteAppreciate(appreciateId);
-  //       console.log("xóa ", appreciateId);
-  //       this.getAllAppreciateBySubmissionFromReact();
-  //     }
-  //   }
-  // };
-
-  //  {appreciateOfReviewer &&
-  //                           appreciateOfReviewer
-  //                             .map(
-  //                               (appreciateOfReviewer) =>
-  //                                 appreciateOfReviewer.reviewerId
-  //                             )
-  //                             .includes(userInfo.id)}
-  //                         ? (
-  //                         {appreciateOfReviewer &&
-  //                           appreciateOfReviewer.map(
-  //                             (appreciateOfReviewer, index) => {
-  //                               return (
-  //                                 <FavoriteBorderIcon
-  //                                   className="icon text-black ml-1"
-  //                                   onClick={(e) =>
-  //                                     this.handleHeart(appreciateOfReviewer)
-  //                                   }
-  //                                 />
-  //                               );
-  //                             }
-  //                           )}
-  //                         ) : ( "" )
+  getAllAppreciateOfReviewerBySubmissionFromReact = async () => {
+    let allSubmissionsByCompetition = this.state.arrSubmissionsByCompetition;
+    let userInfo = this.props.userInfo;
+    if (userInfo) {
+      let reviewerId = this.props.userInfo.id;
+      for (let i = 0; i < allSubmissionsByCompetition.length; i++) {
+        let res = await allApprecicateOfReviewerBySubmission({
+          submissionId: allSubmissionsByCompetition[i].id,
+          reviewerId: reviewerId,
+        });
+        if (res && res.errCode === 0) {
+          this.setState({
+            appreciateOfReviewer: res.appreciates,
+          });
+        }
+      }
+    }
+  };
 
   handleHeart = async (submission) => {
     let submissionId = submission.id;
     let appreciateOfReviewer = this.state.appreciateOfReviewer;
-    if (appreciateOfReviewer.length > 0) {
+    if (appreciateOfReviewer && appreciateOfReviewer.length > 0) {
       let appreciate = appreciateOfReviewer.filter(
         (item) => item.submissionId == submissionId
       );
       for (let i = 0; i < appreciate.length; i++) {
         this.setState({
-          isClickHeart: false,
           appreciateId: appreciate[i].id,
         });
         let res = await deleteAppreciate(this.state.appreciateId);
-        this.getAllAppreciateBySubmissionFromReact();
-        this.props.history.push(
-          `/submission-by-competition/${submission.competitionId}`
-        );
+        if (res && res.errCode === 0) {
+          await this.countAllAppreciateBySubmissionFromReact();
+          await this.getAllAppreciateOfReviewerBySubmissionFromReact();
+          let userInfo = this.props.userInfo;
+          if (userInfo && userInfo.roleId === "R2") {
+            this.props.history.push(
+              `/giver/submission-by-competition/${submission.competitionId}`
+            );
+          } else if (userInfo && userInfo.roleId === "R3") {
+            this.props.history.push(
+              `/recipient/submission-by-competition/${submission.competitionId}`
+            );
+          }
+        }
       }
     } else {
       let submissionId = submission.id;
       let reviewerId = this.props.userInfo.id;
-      this.setState({
-        isClickHeart: true,
-      });
+      // this.setState({
+      //   isClickHeart: true,
+      // });
 
       let res = await createAppreciate({
         submissionId: submissionId,
         reviewerId: reviewerId,
       });
-      this.getAllAppreciateBySubmissionFromReact();
-      this.props.history.push(
-        `/submission-by-competition/${submission.competitionId}`
-      );
+      if (res && res.errCode === 0) {
+        await this.countAllAppreciateBySubmissionFromReact();
+        await this.getAllAppreciateOfReviewerBySubmissionFromReact();
+        let userInfo = this.props.userInfo;
+        if (userInfo && userInfo.roleId === "R2") {
+          this.props.history.push(
+            `/giver/submission-by-competition/${submission.competitionId}`
+          );
+        } else if (userInfo && userInfo.roleId === "R3") {
+          this.props.history.push(
+            `/recipient/submission-by-competition/${submission.competitionId}`
+          );
+        }
+      }
     }
   };
 
@@ -250,6 +245,19 @@ class Submission extends Component {
     let res = await deleteAppreciate(appreciateId);
     console.log("xóa ", appreciateId);
     this.getAllAppreciateBySubmissionFromReact();
+  };
+
+  handleDeleteSubmission = async (appreciate) => {
+    let userInfo = this.props.userInfo;
+    if (appreciate.participantId === userInfo.id) {
+      let res = await deleteSubmission(appreciate.id);
+      if (res && res.errCode === 0) {
+        this.getAllSubmissionsByCompetitiveFromReact();
+        toast.success("Xóa bài đăng thành công!");
+      } else {
+        toast.error("Xóa bài đăng không thành công");
+      }
+    }
   };
 
   render() {
@@ -262,8 +270,10 @@ class Submission extends Component {
       participantData,
       countSubmission,
       countAppreciate,
+      arrAppreciate,
       appreciateOfReviewer,
     } = this.state;
+    console.log("countAppreciate", arrAppreciate);
 
     let imageBase64 = "";
     if (arrCompetitions?.avatar) {
@@ -274,7 +284,7 @@ class Submission extends Component {
     return (
       <>
         <ScrollUp />
-        <Header />
+        {!userInfo || userInfo.roleId === "R2" ? <HeaderR2 /> : <HeaderR3 />}
         <Banner />
         <div className="submission">
           <div className="title-submission">CUỘC THI</div>
@@ -377,7 +387,12 @@ class Submission extends Component {
                             </div>
                           </div>
 
-                          <div className="info-submission d-flex">
+                          <div
+                            className="info-submission d-flex"
+                            onClick={(e) =>
+                              this.handleSeeDetailSubmission(item)
+                            }
+                          >
                             <div className="col-4 img ">
                               <img src={imageBase64} className="img-pro" />
                             </div>
@@ -395,31 +410,90 @@ class Submission extends Component {
                             </div>
                           </div>
 
-                          <div className="d-flex">
-                            {countAppreciate &&
-                              countAppreciate.map((countAppreciate, index) => {
-                                return (
-                                  <div className="text-red bg-black">
-                                    {countAppreciate.count}
-                                  </div>
-                                );
-                              })}
-                            {appreciateOfReviewer.map(
-                              (appreciateOfReviewer) =>
-                                appreciateOfReviewer.reviewerId
-                            ) ? (
-                              <FavoriteBorderIcon
-                                className="icon text-black ml-1"
-                                onClick={(e) => this.handleHeart(item)}
-                                activeStyle={{
-                                  color: "red",
-                                }}
-                              />
+                          <div className="d-flex wrapper-icon">
+                            {countAppreciate && countAppreciate.length > 0 ? (
+                              <>
+                                {countAppreciate.length > 0 &&
+                                  countAppreciate.map(
+                                    (countAppreciate, index) => {
+                                      return (
+                                        <button className="btn text-count-heart">
+                                          {countAppreciate?.count} lượt thích
+                                        </button>
+                                      );
+                                    }
+                                  )}
+                              </>
                             ) : (
-                              <FavoriteBorderIcon
-                                className="icon text-black ml-1"
-                                onClick={(e) => this.handleHeart(item)}
-                              />
+                              <>
+                                {" "}
+                                <button className="btn text-count-heart">
+                                  0 lượt thích
+                                </button>
+                              </>
+                            )}
+
+                            {userInfo ? (
+                              <>
+                                {" "}
+                                {appreciateOfReviewer.map(
+                                  (appreciateOfReviewer) =>
+                                    appreciateOfReviewer.reviewerId
+                                ) ? (
+                                  <button className="btn btn-heart">
+                                    <FavoriteBorderIcon
+                                      className=""
+                                      onClick={(e) => this.handleHeart(item)}
+                                      activeStyle={{
+                                        color: "red",
+                                        background: "red",
+                                      }}
+                                    />
+                                  </button>
+                                ) : (
+                                  <button className="btn btn-heart">
+                                    <FavoriteBorderIcon
+                                      className=""
+                                      onClick={(e) => this.handleHeart(item)}
+                                    />
+                                  </button>
+                                )}
+                                {item.participantId === userInfo.id ? (
+                                  <>
+                                    {" "}
+                                    <button
+                                      className="btn btn-delete"
+                                      onClick={(e) =>
+                                        this.handleDeleteSubmission(item)
+                                      }
+                                    >
+                                      <DeleteIcon />
+                                    </button>
+                                  </>
+                                ) : (
+                                  <></>
+                                )}
+                              </>
+                            ) : (
+                              <>
+                                {" "}
+                                {arrAppreciate.map(
+                                  (arrAppreciate) => arrAppreciate.reviewerId
+                                ) ? (
+                                  <button className="btn btn-heart" disabled>
+                                    <FavoriteBorderIcon
+                                      className=""
+                                      activeStyle={{
+                                        color: "red",
+                                      }}
+                                    />
+                                  </button>
+                                ) : (
+                                  <button className="btn btn-heart" disabled>
+                                    <FavoriteBorderIcon className="" />
+                                  </button>
+                                )}
+                              </>
                             )}
                           </div>
                         </div>

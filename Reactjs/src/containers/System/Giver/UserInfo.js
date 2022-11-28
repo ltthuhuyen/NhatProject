@@ -47,12 +47,14 @@ class UserInfo extends Component {
       ward_name: "",
       isOpenModalChangePassword: false,
       userEmail: "",
+      user: "",
     };
   }
 
   async componentDidMount() {
     await this.props.getGenderStart();
     await this.props.getRoleStart();
+    await this.getUserInfoFromReact();
     let userInfo = this.props.userInfo;
     if (userInfo) {
       let imageBase64 = "";
@@ -91,6 +93,17 @@ class UserInfo extends Component {
       });
     }
   }
+
+  getUserInfoFromReact = async () => {
+    let userInfo = this.props.userInfo;
+    let response = await getAllUsers(userInfo.id);
+    console.log(response);
+    if (response && response.errCode == 0) {
+      this.setState({
+        user: response.users,
+      });
+    }
+  };
 
   handleChangePassword = (email) => {
     this.setState({
@@ -145,7 +158,7 @@ class UserInfo extends Component {
     }
     if (userInfo.id) {
       await editUserInfoService(this.state);
-      await getAllUsers(userInfo.id);
+      await this.getUserInfoFromReact();
     }
   };
 

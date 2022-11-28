@@ -25,7 +25,11 @@ import NewsManage from "../containers/System/NewsManage";
 import CompetitionManage from "../containers/System/CompetitionManage";
 import CreateCompetition from "../containers/System/CreateCompetition";
 import EditCompetition from "../containers/System/EditCompetition";
-
+import SearchCompetition from "../containers/System/SearchCompetition";
+import SearchNews from "../containers/System/SearchNews";
+import SubmissionByCompetitionManage from "../containers/System/SubmissionByCompetitionManage";
+import DetailSubmission from "../containers/System/DetailSubmission";
+// import Dashboard from "../components/Dashboard";
 class System extends Component {
   render() {
     const { isLoggedIn } = this.props;
@@ -33,7 +37,7 @@ class System extends Component {
       <div className="system-container">
         <div className="system-list">
           <Switch>
-            <Route path="/system/home" component={HomePage} />
+            <Route path="/system/home" component={Dashboard} />
             <Route path="/system/user-info" component={UserInfo} />
             <Route
               path="/system/change-password"
@@ -86,6 +90,11 @@ class System extends Component {
               path="/system/collection-form-status-s5-manage"
               component={CollectionFormStatusS5Manage}
             />
+            <Route path="/system/search-news/:search" component={SearchNews} />
+            <Route
+              path="/system/search-competition/:search"
+              component={SearchCompetition}
+            />
             <Route
               path="/system/competition-manage"
               component={CompetitionManage}
@@ -98,9 +107,16 @@ class System extends Component {
               path="/system/edit-competition/:id"
               component={EditCompetition}
             />
+            <Route
+              path="/system/submission-by-competition-manage/:id"
+              component={SubmissionByCompetitionManage}
+            />
+            <Route
+              path="/system/detail-submission-by-competition-manage/:id"
+              component={DetailSubmission}
+            />
 
             {/* <Route path="/system/user-info" component={UserInfo} />        */}
-
             {/* <Route component={() => { return (<Redirect to={systemMenuPath} />) }} /> */}
           </Switch>
         </div>

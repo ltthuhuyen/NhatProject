@@ -17,10 +17,16 @@ import { IconContext } from "react-icons";
 import { Table } from "reactstrap";
 import { emitter } from "../../utils/emitter";
 import { toast } from "react-toastify";
-import * as AiIcons from "react-icons/ai";
+import * as FiIcons from "react-icons/fi";
 import * as BsIcons from "react-icons/bs";
 import * as MdIcons from "react-icons/md";
 import NavAdmin from "../../components/NavAdmin";
+import moment from "moment";
+import { dateFormat } from "../../utils";
+import { getCollectionFormStatusByCurrentDate } from "../../services/collectionformService";
+import CustomScrollbars from "../../components/CustomScrollbars";
+import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import CloseIcon from "@mui/icons-material/Close";
 
 class UserManage extends Component {
   constructor(props) {
@@ -35,12 +41,14 @@ class UserManage extends Component {
       arrSearchUser: [],
       currentPage: 1,
       todosPerPage: 10,
+      isShowNotification: false,
     };
     this.handleClick = this.handleClick.bind(this);
   }
 
   async componentDidMount() {
     await this.getUserRoleID();
+    await this.getAllCollectFormStatusByCurrentDateFromReact();
   }
 
   handleOnChangeInput = (e, id) => {
@@ -63,6 +71,42 @@ class UserManage extends Component {
         arrRoleID: response.users,
       });
     }
+  };
+
+  getAllCollectFormStatusByCurrentDateFromReact = async () => {
+    let today = new Date();
+    let currentDate = moment(today).format("YYYY-MM-DD");
+    var currentTime =
+      today.getHours() +
+      ":" +
+      ("0" + today.getMinutes()).slice(-2) +
+      ":" +
+      ("0" + today.getSeconds()).slice(-2);
+    let currentDateTimeBegin = currentDate + " " + "00:00:00";
+    let currentDateTimeStop = currentDate + " " + currentTime;
+    // console.log("moment", currentDate);
+    // console.log("moment", currentTime);
+    // console.log("currentDateTimeBegin", currentDateTimeBegin);
+    // console.log("currentDateTimeStop", currentDateTimeStop);
+    let response = await getCollectionFormStatusByCurrentDate({
+      currentDateBegin: currentDateTimeBegin,
+      currentDateStop: currentDateTimeStop,
+      status: "S1",
+    });
+
+    if (response) {
+      this.setState({
+        arrCollectsStatusByCurrentDate: response.collects,
+        currentDateTimeBegin: currentDateTimeBegin,
+        currentDateTimeStop: currentDateTimeStop,
+      });
+    }
+  };
+
+  handleNotifications = () => {
+    this.setState({
+      isShowNotification: !this.state.isShowNotification,
+    });
   };
 
   handleAddNewUser = () => {
@@ -164,7 +208,13 @@ class UserManage extends Component {
     }
   };
   render() {
-    let arrRoleID = this.state.arrRoleID;
+    let {
+      arrRoleID,
+      arrCollectsStatusByCurrentDate,
+      isShowNotification,
+      currentDateTimeStop,
+    } = this.state;
+    currentDateTimeStop = moment(currentDateTimeStop);
     const { processLogout, userInfo } = this.props;
     let { currentPage, todosPerPage } = this.state;
     const indexOfLastTodo = currentPage * todosPerPage;
@@ -195,49 +245,127 @@ class UserManage extends Component {
               editUser={this.doEditUser}
             />
           )}
-          <div className="row header">
-            <div className="d-flex">
-              <div className="img">
-                <img src={imageBase64} className="img-img" />
-              </div>
-              <div className="profile-info">
-                Xin chào{" "}
-                {userInfo && userInfo.firstName + userInfo.lastName
-                  ? userInfo.firstName + " " + userInfo.lastName
-                  : ""}
+          <div className="container-fluid ">
+            <div className=" header_right justify-content-between align-items-center">
+              <div className="d-flex">
+                <div className="d-flex wrapper-welcome">
+                  <div
+                    className="btn btn-logout"
+                    onClick={(e) => this.handleNotifications(e)}
+                  >
+                    <NotificationsNoneIcon />
+                    {isShowNotification ? (
+                      <div className="wrapper-notification shadow rounded">
+                        <div className="title-notification">
+                          Thông báo
+                          <CloseIcon
+                            className="icon-close"
+                            onClick={(e) => this.handleNotifications(e)}
+                          />
+                        </div>
+                        <CustomScrollbars style={{ height: "180px" }}>
+                          {arrCollectsStatusByCurrentDate.length > 0 &&
+                            arrCollectsStatusByCurrentDate.map(
+                              (item, index) => {
+                                let t = moment(item.createdAt);
+                                console.log("t", t);
+                                let tt = moment(`${t}`);
+                                console.log("tt", tt);
+                                return (
+                                  <>
+                                    <div
+                                      className="info-notification"
+                                      onClick={(e) =>
+                                        this.handleDetailCollectForm(item)
+                                      }
+                                    >
+                                      {item.giverData.firstName} {""}
+                                      {item.giverData.lastName}{" "}
+                                      <div>
+                                        đặt lịch thu gom{" "}
+                                        {item.productData.product_name} {""}
+                                        tại {item.addressData.address_name} {""}
+                                        {item.addressData.ward_name}
+                                        {/* {currentDateTimeStop} */}
+                                        {/* {item.createdAt} */}
+                                      </div>
+                                      <div className="text-minutes">
+                                        {currentDateTimeStop.diff(
+                                          tt,
+                                          "minutes"
+                                        ) > 60 ? (
+                                          <>
+                                            {Math.floor(
+                                              currentDateTimeStop.diff(
+                                                tt,
+                                                "minutes"
+                                              ) / 60
+                                            )}{" "}
+                                            giờ trước
+                                          </>
+                                        ) : (
+                                          <>
+                                            {currentDateTimeStop.diff(tt)} phút
+                                            trước
+                                          </>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </>
+                                );
+                              }
+                            )}
+                        </CustomScrollbars>
+                      </div>
+                    ) : (
+                      ""
+                    )}
+                  </div>
+                  <div className="img">
+                    <img src={imageBase64} className="img-img" />
+                  </div>
+                  <div className="profile-info">
+                    {userInfo && userInfo.firstName + userInfo.lastName
+                      ? userInfo.firstName + " " + userInfo.lastName
+                      : ""}
+                  </div>
+                  <div className="btn btn-logout" onClick={processLogout}>
+                    <FiIcons.FiLogOut />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-
-          <div className="row title d-flex">
-            <div className="col-10 title-manage">
-              QUẢN LÝ NGƯỜI NHẬN THU GOM
-            </div>
-            <div className="serach_field-area d-flex align-items-center">
-              <input
-                type="text"
-                placeholder="Search here..."
-                onChange={(e) => {
-                  this.handleOnChangeInput(e, "search");
-                }}
-              />
+          <div className="wrapper-manage shadow-sm ">
+            <div className="row title d-flex">
+              <div className="col-10 title-manage">
+                QUẢN LÝ NGƯỜI NHẬN THU GOM
+              </div>
+              <div className="serach_field-area d-flex align-items-center">
+                <input
+                  type="text"
+                  placeholder="Search here..."
+                  onChange={(e) => {
+                    this.handleOnChangeInput(e, "search");
+                  }}
+                />
+                <button
+                  type="search"
+                  className="btn btn-search rounded-pill"
+                  onClick={() => this.handleSearch()}
+                >
+                  <BsIcons.BsSearch /> Tìm
+                </button>
+              </div>
               <button
-                type="search"
-                className="btn btn-search rounded-pill"
-                onClick={() => this.handleSearch()}
+                className="col-1 btn btn-create "
+                onClick={this.handleAddNewUser}
               >
-                <BsIcons.BsSearch /> Tìm
+                <MdIcons.MdOutlineCreate />{" "}
+                <FormattedMessage id="manage-user.add" />
               </button>
             </div>
-            <button
-              className="col-1 btn btn-create "
-              onClick={this.handleAddNewUser}
-            >
-              <MdIcons.MdOutlineCreate />{" "}
-              <FormattedMessage id="manage-user.add" />
-            </button>
-          </div>
-          {/* <div className="title text-center">
+            {/* <div className="title text-center">
                     QUẢN LÝ NGƯỜI NHẬN
                 </div>
                 <button 
@@ -250,9 +378,15 @@ class UserManage extends Component {
                         </div>
 
                 </button> */}
-          <div className="row content">
-            <div className="table">
-              <Table>
+            <div className="row content">
+              <div className="wrapper-title-sum-statistic d-flex">
+                <span className="wrapper-sum d-flex">
+                  <div className="">Tổng cộng:</div>
+                  <div className="text-sum">{arrRoleID.length} người dùng</div>
+                </span>
+              </div>
+
+              <Table className="shadow">
                 <tr className="thead">
                   <th scope="col">ID</th>
                   <th scope="col">Quyền</th>
@@ -263,59 +397,106 @@ class UserManage extends Component {
                   <th scope="col">Hành động</th>
                 </tr>
                 <tbody className="tbody">
-                  {arrRoleID &&
-                    arrRoleID.map((item, index) => {
-                      let imageBase64 = "";
-                      if (item.image) {
-                        imageBase64 = new Buffer(item.image, "base64").toString(
-                          "binary"
-                        );
-                      }
-                      return (
-                        <tr>
-                          <td>{item.id}</td>
-                          <td>{item.roleIdData.valueVi}</td>
-                          <td>{item.email}</td>
-                          <td>
-                            <div className="img">
-                              <img src={imageBase64} className="img-img" />
-                            </div>
-                          </td>
-                          <td>
-                            {item.firstName} {item.lastName}
-                          </td>
-                          <td>{item.genderData.valueVi}</td>
-                          <td>
-                            <button
-                              type="button"
-                              className="btn btn-detail  "
-                              onClick={() => this.handleDetailUser(item)}
-                            >
-                              <BsIcons.BsThreeDots />
-                            </button>
-                            {/* <button type="button" className="btn btn-edit mx-3" onClick={() => this.handleEditUser(item)}><AiIcons.AiOutlineEdit /></button>
+                  {currentTodos && currentTodos.length > 0 ? (
+                    <>
+                      {" "}
+                      {currentTodos &&
+                        currentTodos.map((item, index) => {
+                          let imageBase64 = "";
+                          if (item.image) {
+                            imageBase64 = new Buffer(
+                              item.image,
+                              "base64"
+                            ).toString("binary");
+                          }
+                          return (
+                            <tr>
+                              <td>{item.id}</td>
+                              <td>{item.roleIdData.valueVi}</td>
+                              <td>{item.email}</td>
+                              <td>
+                                <div className="img">
+                                  <img src={imageBase64} className="img-img" />
+                                </div>
+                              </td>
+                              <td>
+                                {item.firstName} {item.lastName}
+                              </td>
+                              <td>{item.genderData.valueVi}</td>
+                              <td>
+                                <button
+                                  type="button"
+                                  className="btn btn-detail  "
+                                  onClick={() => this.handleDetailUser(item)}
+                                >
+                                  <BsIcons.BsThreeDots />
+                                </button>
+                                {/* <button type="button" className="btn btn-edit mx-3" onClick={() => this.handleEditUser(item)}><AiIcons.AiOutlineEdit /></button>
                                                 <button type="button" className="btn btn-delete" onClick={() => this.handleDeleteUser(item)}><AiIcons.AiOutlineDelete /></button> */}
-                          </td>
-                        </tr>
-                      );
-                    })}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                    </>
+                  ) : (
+                    <>
+                      {" "}
+                      {arrRoleID &&
+                        arrRoleID.map((item, index) => {
+                          let imageBase64 = "";
+                          if (item.image) {
+                            imageBase64 = new Buffer(
+                              item.image,
+                              "base64"
+                            ).toString("binary");
+                          }
+                          return (
+                            <tr>
+                              <td>{item.id}</td>
+                              <td>{item.roleIdData.valueVi}</td>
+                              <td>{item.email}</td>
+                              <td>
+                                <div className="img">
+                                  <img src={imageBase64} className="img-img" />
+                                </div>
+                              </td>
+                              <td>
+                                {item.firstName} {item.lastName}
+                              </td>
+                              <td>{item.genderData.valueVi}</td>
+                              <td>
+                                <button
+                                  type="button"
+                                  className="btn btn-detail  "
+                                  onClick={() => this.handleDetailUser(item)}
+                                >
+                                  <BsIcons.BsThreeDots />
+                                </button>
+                                {/* <button type="button" className="btn btn-edit mx-3" onClick={() => this.handleEditUser(item)}><AiIcons.AiOutlineEdit /></button>
+                                                <button type="button" className="btn btn-delete" onClick={() => this.handleDeleteUser(item)}><AiIcons.AiOutlineDelete /></button> */}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                    </>
+                  )}
                 </tbody>
               </Table>
             </div>
-          </div>
-          <div className="row btn-pageNumber d-flex">
-            {pageNumbers.map((number) => {
-              return (
-                <button
-                  className="btn btn-prev-next d-flex"
-                  key={number}
-                  id={number}
-                  onClick={this.handleClick}
-                >
-                  {number}
-                </button>
-              );
-            })}
+            <div className="row btn-pageNumber d-flex">
+              {pageNumbers.map((number) => {
+                return (
+                  <button
+                    className="btn btn-prev-next d-flex"
+                    key={number}
+                    id={number}
+                    onClick={this.handleClick}
+                  >
+                    {number}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </>

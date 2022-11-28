@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
         as: "genderData",
       });
       User.hasMany(models.Schedule, { foreignKey: "giverId", as: "giverData" });
-      User.hasMany(models.Schedule, {
+      User.hasMany(models.Collectionform, {
         foreignKey: "recipientId",
         as: "recipientData",
       });

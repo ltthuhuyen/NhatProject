@@ -12,12 +12,14 @@ import * as HiIcons from "react-icons/hi";
 import * as RiIcons from "react-icons/ri";
 import * as FiIcons from "react-icons/fi";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import DirectionsIcon from "@mui/icons-material/Directions";
 import "./SearchCollectionForm.scss";
 import { withRouter } from "react-router";
 import {
   getAllCities,
   getAllDistricts,
   getAllWards,
+  getAllAddressOfUser,
 } from "../../../services/addressService";
 import { searchCollectByAddressService } from "../../../services/searchService";
 import { saveUpdateStaticS2 } from "../../../services/appointmentService";
@@ -26,6 +28,7 @@ import { Diversity1 } from "@mui/icons-material";
 class SearchCollectionForm extends Component {
   constructor(props) {
     super(props);
+    var today = new Date();
     this.state = {
       arrCollectionForms: [],
       arrCollectionFormsByAddress: [],
@@ -37,6 +40,7 @@ class SearchCollectionForm extends Component {
       currentPage: 1,
       todosPerPage: 10,
       isShowAlert: false,
+      addressUser: [],
     };
     this.handleClick = this.handleClick.bind(this);
   }
@@ -49,10 +53,11 @@ class SearchCollectionForm extends Component {
     });
   };
 
-  componentDidMount() {
-    this.getAllCitiesFromReact();
-    this.getAllDistrictsFromReact();
-    this.getAllWardFromReact();
+  async componentDidMount() {
+    await this.getAllCitiesFromReact();
+    await this.getAllDistrictsFromReact();
+    await this.getAllWardFromReact();
+    await this.getAllCollectsNearAddress();
   }
 
   getAllCitiesFromReact = async () => {
@@ -79,6 +84,47 @@ class SearchCollectionForm extends Component {
       this.setState({
         arrWards: response,
       });
+    }
+  };
+
+  //Đơn thu gom gần địa chỉ của bạn
+  getAllCollectsNearAddress = async () => {
+    let userId = this.props.userInfo.id;
+    console.log("userId", userId);
+    let response = await getAllAddressOfUser(userId);
+    if (response) {
+      this.setState(
+        {
+          addressUser: response.addresses,
+        },
+        () => {
+          console.log("arrAddresses", this.state.addressUser);
+        }
+      );
+    }
+    let { addressUser } = this.state;
+    for (let i = 0; i < addressUser.length; i++) {
+      let today = new Date();
+      if (addressUser[i].city_name && addressUser[i].district_name) {
+        let response = await searchCollectByAddressService({
+          city_name: addressUser[i].city_name,
+          district_name: addressUser[i].district_name,
+          date: moment(today).format(dateFormat.SEND_TO_SERVER),
+        });
+        if (response) {
+          this.setState(
+            {
+              arrCollectionFormsByAddress: response,
+            },
+            () => {
+              console.log(
+                "arrCollectionFormsByAddress",
+                this.state.arrCollectionFormsByAddress
+              );
+            }
+          );
+        }
+      }
     }
   };
 
@@ -139,9 +185,17 @@ class SearchCollectionForm extends Component {
         date: this.state.currentDate,
       });
       if (response) {
-        this.setState({
-          arrCollectionFormsByAddress: response,
-        });
+        this.setState(
+          {
+            arrCollectionFormsByAddress: response,
+          },
+          () => {
+            console.log(
+              "arrCollectionFormsByAddress",
+              this.state.arrCollectionFormsByAddress
+            );
+          }
+        );
       }
     }
   };
@@ -185,7 +239,7 @@ class SearchCollectionForm extends Component {
           <div className="title-search-collection-form">TÌM ĐƠN THU GOM</div>
           <div className="line"></div>
           <div className="search-content shadow">
-            <div className="row d-flex">
+            <div className="wrapper-search d-flex">
               <div className="col-3">
                 {/* <label className='label'>Thành phố</label> */}
                 <select
@@ -275,9 +329,19 @@ class SearchCollectionForm extends Component {
               </div>
             </div>
             <div className=" ">
+              <div className="wrapper-title d-flex">
+                <div className="title">
+                  ĐƠN THU GOM GẦN BẠN , ĐẾN THU GOM NGAY !!!
+                </div>
+                <span className="wrapper-sum d-flex">
+                  <div className="">Tổng cộng:</div>
+                  <div className="text-sum">
+                    {arrCollectionFormsByAddress.length} đơn
+                  </div>
+                </span>
+              </div>
               {arrCollectionFormsByAddress &&
                 arrCollectionFormsByAddress.map((item, index) => {
-                  console.log("item", item);
                   let imageBase64 = "";
                   if (item.giverData.image) {
                     imageBase64 = new Buffer(
@@ -286,68 +350,92 @@ class SearchCollectionForm extends Component {
                     ).toString("binary");
                   }
                   return arrCollectionFormsByAddress > "0" ? (
-                    <div className="row shadow" aria-hidden="true">
-                      <div className="col-3">
-                        <img src={imageBase64} className="img-pro" />
-                      </div>
-                      <div className="col-9 mt-3">
-                        <p className="info-giver">
-                          {item.giverData.firstName} {item.giverData.lastName} -{" "}
-                          <HiIcons.HiOutlineMail /> Email:{" "}
-                          {item.giverData.email}
-                        </p>
-                        <div className="d-flex">
-                          <span className="info-collection mr-1">
-                            <RiIcons.RiProductHuntLine className=" icon" /> Sản
-                            phẩm thu gom:{" "}
-                          </span>
-                          <p>{item.productData.product_name}</p>
+                    <>
+                      <div className="row shadow" aria-hidden="true">
+                        <div className="col-4 mt-2">
+                          <div>
+                            <iframe
+                              width="280"
+                              height="230"
+                              frameborder="0"
+                              scrolling="no"
+                              marginheight="0"
+                              marginwidth="0"
+                              id="gmap_canvas"
+                              src={`https://maps.google.com/maps?width=706&height=320&hl=en&q=${item.addressData.address_name}''${item.addressData.address_name}&t=&z=16&ie=UTF8&iwloc=B&output=embed`}
+                            ></iframe>
+                            {/* <a href="https://maps-generator.com/">Maps Generator</a> */}
+                          </div>
                         </div>
-                        <div className="d-flex">
-                          <span className="info-collection mr-1">
-                            <BsIcons.BsTelephoneInbound className="icon" /> Điện
-                            thoại:{" "}
-                          </span>
-                          <p> {item.giverData.phone}</p>
-                        </div>
-                        <div className="d-flex">
-                          <span className="info-collection mr-1">
-                            <FiIcons.FiMapPin className="icon" /> Địa chỉ thu
-                            gom:{" "}
-                          </span>
-                          <p>
-                            {item.addressData.address_name} -{" "}
-                            {item.addressData.ward_name} -{" "}
-                            {item.addressData.district_name} -{" "}
-                            {item.addressData.city_name}
+                        <div className="col-8 pl-1 mt-4">
+                          <p className="info-giver">
+                            {item.giverData.firstName} {item.giverData.lastName}{" "}
+                            - <HiIcons.HiOutlineMail /> Email:{" "}
+                            {item.giverData.email}
                           </p>
+                          <div className="d-flex">
+                            <span className="info-collection mr-1">
+                              <RiIcons.RiProductHuntLine className=" icon" />{" "}
+                              Sản phẩm thu gom:{" "}
+                            </span>
+                            <p>{item.productData.product_name}</p>
+                          </div>
+                          <div className="d-flex">
+                            <span className="info-collection mr-1">
+                              <BsIcons.BsTelephoneInbound className="icon" />{" "}
+                              Điện thoại:{" "}
+                            </span>
+                            <p> {item.giverData.phone}</p>
+                          </div>
+                          <div className="d-flex">
+                            <span className="info-collection mr-1">
+                              <FiIcons.FiMapPin className="icon" /> Thu gom:{" "}
+                            </span>
+                            <p>
+                              {item.addressData.address_name} -{" "}
+                              {item.addressData.ward_name} -{" "}
+                              {item.addressData.district_name} -{" "}
+                              {item.addressData.city_name}
+                            </p>
+                            {/* <div>
+                              <DirectionsIcon /> Chỉ đường
+                            </div> */}
+                            {/* <button
+                              className="btn btn-map "
+                              onClick={() => this.handleMap()}
+                            >
+                              <DirectionsIcon className="icon" />
+                              Chỉ đường
+                            </button> */}
+                          </div>
+                          <div className="d-flex">
+                            <span className="info-collection mr-1">
+                              <BsIcons.BsCalendarDate className="icon mr-1" />
+                              Ngày:{" "}
+                            </span>
+                            <p>{item.date}</p>
+                            <span className="info-collection ml-1 mr-1">
+                              {" "}
+                              - Thời gian:{" "}
+                            </span>
+                            <p>{item.timeTypeData.valueVi}</p>
+                          </div>
                         </div>
-                        <div className="d-flex">
-                          <span className="info-collection mr-1">
-                            <BsIcons.BsCalendarDate className="icon" /> Ngày:{" "}
-                          </span>
-                          <p>{item.date}</p>
-                          <span className="info-collection ml-1 mr-1">
-                            {" "}
-                            - Thời gian:{" "}
-                          </span>
-                          <p>{item.timeTypeData.valueVi}</p>
-                        </div>
+                        {item.statusType === "S1" ? (
+                          <button
+                            className="btn-register-receive"
+                            onClick={() => this.handleUpdate(item)}
+                          >
+                            <IoIcons.IoMdArrowRoundForward /> Đăng ký
+                          </button>
+                        ) : (
+                          <div disabled className="registed">
+                            <CheckCircleOutlineIcon className="icon" />
+                            Đã đăng ký
+                          </div>
+                        )}
                       </div>
-                      {item.statusType === "S1" ? (
-                        <button
-                          className="btn-register-receive"
-                          onClick={() => this.handleUpdate(item)}
-                        >
-                          <IoIcons.IoMdArrowRoundForward /> Đăng ký
-                        </button>
-                      ) : (
-                        <div disabled className="registed">
-                          <CheckCircleOutlineIcon className="icon" />
-                          Đã đăng ký
-                        </div>
-                      )}
-                    </div>
+                    </>
                   ) : (
                     <div className="wrapper-alert shadow ">
                       <div className="row text-blue">

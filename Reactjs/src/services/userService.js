@@ -66,6 +66,10 @@ const getUserRoleIDService = (role) => {
   return axios.get(`/api/get-user-role?role=${role}`);
 };
 
+const userStatistic = () => {
+  return axios.post("/api/user-statistic");
+};
+
 export {
   handleLoginApi,
   handleSendEmailForgotPassword,
@@ -79,4 +83,5 @@ export {
   deleteUserSerVice,
   getAllCodeService,
   getUserRoleIDService,
+  userStatistic,
 };

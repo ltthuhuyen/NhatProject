@@ -1,14 +1,16 @@
-.collection-form{
+.collection-form {
     // margin: 190px 170px 0 170px;
     margin: 20px 200px 130px 200px;
-    .title-collection-form{
+
+    .title-collection-form {
         text-align: center;
         font-family: monospace;
         font-weight: 500;
         color: #333333;
         font-size: 45px;
     }
-    .line{
+
+    .line {
         margin-left: 530px;
         margin-bottom: 50px;
         text-align: center;
@@ -19,173 +21,278 @@
 
     }
 }
-.container-collection-form-status{
-    padding: 80px 70px;
+
+.container-collection-form-status {
+    padding: 80px 70px !important;
     align-items: center;
-    .wrapper-link{
+    font-size: 13.5px;
+    .wrapper-link {
         // padding-bottom: 5px;
         border-bottom: 1px solid #F8F8FF;
+        font-size: 15px;
         a {
             margin-left: 50px;
             text-decoration: none;
             color: #646363;
-          
+
 
             .icon {
                 font-size: 19px;
                 margin-right: 10px;
 
             }
-         }
+        }
     }
-   
-    .div-content{
+
+    .div-content {
         margin-left: 90px;
-        .icon{
+
+        .icon {
             font-size: 19px;
             margin-right: 10px;
             color: rgb(9, 116, 32);
         }
-        a{
+
+        a {
             text-decoration: none;
             color: black;
         }
     }
+
     .title {
-        max-width: 40%;
-        margin-left: 32%;
-        margin-top: 5%;
-        font-size: 25px;
-        font-family: Courier New;
-        padding: 10px 0px;
-        text-align: center;
-        color: rgb(249, 253, 251);
-        border-radius: 60px;
-        background-color: #7ed000;
+        // max-width: 40%;
+        // margin-left: 32%;
+        // font-size: 25px;
+        // font-family: Courier New;
+        // padding: 10px 0px;
+        // text-align: center;
+        // color: rgb(249, 253, 251);
+        // border-radius: 60px;
+        // background-color: #7ed000;
     }
-    .row{
-        .collection-form{
-            border-radius: 15px;
-            border: 2px solid  rgb(246, 248, 247) ;
-            // background:#dcfcb3;
-            background: #FFF;
-        //   color: rgb(0, 21, 255);
-            // background: rgb(248, 243, 243);
-            // background-color: #e9fff4;
-            margin: 50px 40px;
-            padding: 40px 30px;
-            &:hover{
-                transform: scale(1.05);
-                background-color:  #fbf5f7;
+
+    .wrapper-title-sum-statistic {
+        .wrapper-sum {
+            font-size: 14px;
+            right: 18%;
+            margin-top: 15px;
+            position: absolute;
+            color: #8CC63E;
+
+            .text-sum {
+                margin-left: 4px;
+                color: black;
             }
+        }
+
+    }
+
+    .row {
+        padding: 5px ;
+
+        .collection-form {
+            border-radius: 15px;
+            border: 2px solid #f6f8f7;
+            background: #FFF;
+            margin: 50px 42px;
+            padding: 30px 25px;
+
+            .title-collect {
+                color: #0015ff;
+                text-align: center;
+
+                font-size: 17px;
+            }
+
+            &:hover {
+            
+                background-color: #fbf5f7;
+            }
+
             .img-pro {
                 clip-path: circle(55px);
                 height: 120px;
                 width: 100%;
                 overflow: hidden;
             }
-            .img-pro img{
-                height: 100px; 
-            
+
+            .img-pro img {
+                height: 100px;
+
             }
-            .info-giver-recipient{
-                font-size: 15px;
-                .icon{
-                    margin: 3px 6px 0px 0px ;
-                    color:#8CC63E;
+
+            .info-giver-recipient {
+                font-size: 13.5px;
+                padding-bottom: 8px;
+
+                .icon- {
+                    color: #8CC63E;
+                    font-size: 12px;
                 }
-            }
-            .info-collection{
-                .icon{
-                    margin-bottom: 6px;
-                    color:#4c9a17;
+
+                .status-recived {
+                    padding: 4px;
+                    font-size: 12px;
+                    color: #fff;
+                    background: #7ed000;
+
+                    .icon {
+                        color: #FFF;
+                        font-size: 13px;
+                    }
                 }
-                .status-s2{
-                    font-family: Courier New;
-                    font-size: 13px;
-                    color: black;
-                    width: auto;
-                    background: yellow;
-                    padding: 0px 3px;
-                    .icon{
+
+                .update-status {
+                    right: 2%;
+                    top: 85%;
+                    position: absolute;
+
+                    .btn-update-status {
                         font-size: 12px;
+                        border-radius: 13px;
+                        background-color: #e2f9f9;
+                        color: #017110;
+
+                        .confirmed {
+                            margin-left: 700px;
+                            color: #8CC63E;
+                        }
+                    }
+
+                }
+            }
+
+            .info-collection {
+                .icon {
+                    margin-bottom: 6px;
+                    font-size: 17px;
+                    color: #8CC63E;
+                }
+
+                .status-s1 {
+                    font-size: 11px;
+                    padding: 4px;
+                    color: #fff;
+                    width: 110px;
+                    background: rgb(162, 162, 162);
+
+                    .icon {
                         margin-bottom: 3px;
+                        font-size: 12px;
+                        color: #fff;
+                        background: rgb(162, 162, 162);
+                    }
+                }
+
+                .status-s2 {
+                    align-items: center;
+                    font-size: 11px;
+                    padding: 4px;
+                    color: black;
+                    width: 110px;
+                    background: yellow;
+
+                    .icon {
+                        margin-bottom: 3px;
+                        font-size: 12px;
                         color: black;
                         background: yellow;
                     }
                 }
-                .status-s4{
-                    font-family: Courier New;
-                    font-size: 13px;
-                    // font-weight: 700;
-                    color: #fff;
-                    background: #7ed000;
-                    padding: 0px 3px;
-                    .icon{
-                        font-size: 13px;
-                        margin-top:5px;
-                        color: #fff;
-                        background: #7ed000 ;
+
+                .status-s3 {
+                    align-items: center;
+                    font-size: 11px;
+                    padding: 4px;
+                    color: black;
+                    width: 110px;
+                    background: yellow;
+
+                    .icon {
+                        margin-bottom: 3px;
+                        font-size: 12px;
+                        color: black;
+                        background: yellow;
                     }
                 }
-                .status-s5{
-                    font-family: Courier New;
-                    font-size: 13px;
+
+                .status-s4 {
+                    font-size: 11px;
+                    padding: 4px;
+                    color: #fff;
+                    background: #7ed000;
+                    width: 110px;
+
+                    .icon {
+                        margin: 0 4px 3px 0;
+                        font-size: 12px;
+                        color: #fff;
+                        background: #7ed000;
+                    }
+                }
+
+                .status-s5 {
+                    font-size: 11px;
+                    padding: 4px;
                     // font-weight: 700;
                     color: #fff;
                     background: #ff3939;
                     // background: #FFF;
                     // color: #ff3939;
-                    padding: 0px 3px;
-                    .icon{
-                        margin-top:5px;
+                    width: 110px;
+
+                    .icon {
+                        margin: 0 4px 3px 0;
                         font-size: 12px;
                         // color: #fff;
                         background: #ff3939;
                         color: #FFF;
-                        
+
                     }
                 }
+
                 .btn-detail {
                     width: auto;
-                    margin-left: 45%;
-                    padding: 0px 10px;
+                    right: 5%;
+                    position: absolute;
+                    padding: 7px 10px;
                     border-radius: 10px;
                     background: #8CC63E;
                     color: #FFF;
-                    &:hover{
+
+                    &:hover {
                         background: #FFF;
                         color: rgb(1, 113, 16);
                         transform: scale(1.1);
                         border: 1px solid rgb(1, 113, 16);
                     }
                 }
-                .update-status{
-                    margin-left: 700px;
-                    .btn-update-status{
+
+                .update-status {
+                    margin-left: 480px;
+
+                    .btn-update-status {
                         margin-left: 15px;
                         border-radius: 13px;
                         background-color: rgb(226, 249, 249);
                         color: rgb(1, 113, 16);
-                     
-                    //        &:hover{
-                    //         background-color: #ffffff;
-                    //         // transform: scale(1.1);
-                    //         border: 1px solid rgb(1, 113, 16);
-                    // }
-                    .confirmed {
-                        margin-left: 700px;
-                        color: #8CC63E;
+
+                        //        &:hover{
+                        //         background-color: #ffffff;
+                        //         // transform: scale(1.1);
+                        //         border: 1px solid rgb(1, 113, 16);
+                        // }
+                        .confirmed {
+                            margin-left: 700px;
+                            color: #8CC63E;
+                        }
                     }
+
                 }
-               
             }
+
         }
-           
-        }
-        
+
     }
-   
+
 }
-
-

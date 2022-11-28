@@ -11,18 +11,23 @@ import * as RiIcons from "react-icons/ri";
 import * as FaIcons from "react-icons/fa";
 import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
 import * as actions from "../../../store/actions";
+import avata from "../../../assets/images/avata.jpg";
 import "./CollectionFormManage.scss";
 import Header from "../../Header/Giver/Header";
 import Banner from "../../Banner/Banner";
 import Footer from "../../Footer/Footer";
 import ScrollUp from "../../../components/ScrollUp";
-import { getCollectionFormOfRegisteredGiver } from "../../../services/collectionformService";
+import {
+  getScheduleOfGiver,
+  getAllCollectionFormBySchedule,
+} from "../../../services/collectionformService";
 
 class CollectionFormStatusS2 extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      arrCollectionFormsStatusS3: [],
+      arrScheduleStatusS2: [],
+      arrCollect: [],
       statusArr: [],
       status: "",
       statusType: "",
@@ -33,27 +38,53 @@ class CollectionFormStatusS2 extends Component {
   handleOnChangeInput = (e, id) => {
     let copyState = { ...this.state };
     copyState[id] = e.target.value;
-    this.setState(
-      {
-        ...copyState,
-      },
-      () => {
-        console.log("check good state", this.state);
-      }
-    );
+    this.setState({
+      ...copyState,
+    });
   };
 
-  componentDidMount() {
-    this.getCollectionFormOfGiverStatusS2();
-    this.props.getStatusStart();
+  async componentDidMount() {
+    await this.getAllScheduleOfGiver();
+    await this.getAllCollectionByScheduleOfGiver();
+    await this.props.getStatusStart();
   }
 
-  getCollectionFormOfGiverStatusS2 = async () => {
-    let response = await getCollectionFormOfRegisteredGiver(this.state.giverId);
+  getAllScheduleOfGiver = async () => {
+    let response = await getScheduleOfGiver({
+      giverId: this.state.giverId,
+      status: "S2",
+    });
     if (response && response.errCode == 0) {
-      this.setState({
-        arrCollectionFormsStatusS2: response.appointments,
-      });
+      this.setState(
+        {
+          arrScheduleStatusS2: response.appointments,
+        },
+        () => {
+          console.log("arrScheduleStatusS2", this.state.arrScheduleStatusS2);
+        }
+      );
+    }
+  };
+
+  getAllCollectionByScheduleOfGiver = async () => {
+    let { arrScheduleStatusS2 } = this.state;
+    let response;
+    if (arrScheduleStatusS2) {
+      for (let i = 0; i < arrScheduleStatusS2.length; i++) {
+        response = await getAllCollectionFormBySchedule({
+          scheduleId: arrScheduleStatusS2[i].id,
+        });
+      }
+      if (response) {
+        this.setState(
+          {
+            arrCollect: response.appointments,
+          },
+          () => {
+            console.log("arrCollect", this.state.arrCollect);
+          }
+        );
+      }
     }
   };
 
@@ -70,13 +101,14 @@ class CollectionFormStatusS2 extends Component {
   }
 
   handleLook = async (schedule) => {
+    console.log("res", schedule);
     this.props.history.push(
       `/giver/collection-form-detail-status-s2/${schedule.id}`
     );
   };
 
   render() {
-    let { arrCollectionFormsStatusS2 } = this.state;
+    let { arrScheduleStatusS2 } = this.state;
 
     if (this.props.userInfo) {
       this.state.giverId = this.props.userInfo.id;
@@ -170,15 +202,23 @@ class CollectionFormStatusS2 extends Component {
               </NavLink>
             </div>
             <div className="title">CHỜ XÁC NHẬN</div>
+            <div className="wrapper-title-sum-statistic d-flex">
+              <span className="wrapper-sum d-flex">
+                <div className="">Tổng cộng:</div>
+                <div className="text-sum">{arrScheduleStatusS2.length} đơn</div>
+              </span>
+            </div>
             <div className="row ">
-              {arrCollectionFormsStatusS2 &&
-                arrCollectionFormsStatusS2.map((item, index) => {
+              {arrScheduleStatusS2 &&
+                arrScheduleStatusS2.map((item, index) => {
                   let imageBase64 = "";
-                  if (item.giverData.image.data) {
+                  if (item.giverData.image) {
                     imageBase64 = new Buffer(
                       item.giverData.image.data,
                       "base64"
                     ).toString("binary");
+                  } else {
+                    imageBase64 = avata;
                   }
                   return (
                     <div className="col-5 collection-form shadow " key={index}>
@@ -212,23 +252,16 @@ class CollectionFormStatusS2 extends Component {
                             <BiIcons.BiUser className="icon" /> Người nhận thu
                             gom:{" "}
                           </span>
-                          <p>
-                            {item.giverData.firstName} {item.giverData.lastName}
-                          </p>
+                          {/* <p>
+                            {item.recipientData.firstName}{" "}
+                            {item.recipientData.lastName}
+                          </p> */}
                         </div>
                         <div className="d-flex">
-                          {item.statusTypeData.valueVi === "Chờ xác nhận" ? (
-                            <p className="status-s2">
-                              <PriorityHighIcon className="icon" />{" "}
-                              {item.statusTypeData.valueVi}
-                            </p>
-                          ) : (
-                            <p className="status">
-                              {" "}
-                              {item.statusTypeData.valueVi}
-                            </p>
-                          )}
-
+                          <button className="btn status-s2">
+                            <PriorityHighIcon className="icon mr-1" />
+                            {item.statusData.valueVi}
+                          </button>
                           <button
                             className="btn btn-detail "
                             onClick={() => this.handleLook(item)}

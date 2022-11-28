@@ -7,9 +7,16 @@ import { withRouter } from "react-router";
 import { Table } from "reactstrap";
 import { saveUpdateStatic } from "../../services/appointmentService";
 import * as BsIcons from "react-icons/bs";
+import * as FiIcons from "react-icons/fi";
 import "./Manage.scss";
 import { getAllCollectionForm } from "../../services/collectionformService";
 import NavAdmin from "../../components/NavAdmin";
+import moment from "moment";
+import { dateFormat } from "../../utils";
+import { getCollectionFormStatusByCurrentDate } from "../../services/collectionformService";
+import CustomScrollbars from "../../components/CustomScrollbars";
+import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import CloseIcon from "@mui/icons-material/Close";
 
 class DetailCollectionForm extends Component {
   constructor(props) {
@@ -26,24 +33,20 @@ class DetailCollectionForm extends Component {
       timeTypeData: {},
       date: "",
       phone: "",
+      isShowNotification: false,
     };
   }
-  handleOnChangeInput = (e, id) => {
-    let copyState = { ...this.state };
-    copyState[id] = e.target.value;
-    this.setState(
-      {
-        ...copyState,
-      },
-      () => {
-        console.log("check good state", this.state);
-      }
-    );
+
+  handleNotifications = () => {
+    this.setState({
+      isShowNotification: !this.state.isShowNotification,
+    });
   };
 
-  componentDidMount() {
-    this.getAllCollectionFormReact();
-    this.props.getStatusStart();
+  async componentDidMount() {
+    await this.getAllCollectionFormReact();
+    await this.props.getStatusStart();
+    await this.getAllCollectFormStatusByCurrentDateFromReact();
   }
 
   getAllCollectionFormReact = async () => {
@@ -56,19 +59,39 @@ class DetailCollectionForm extends Component {
       let response = await getAllCollectionForm(scheduleId);
       console.log("response", response);
       if (response && response.errCode === 0) {
-        this.setState({
-          arrCollectionForms: response.appointments,
-          giverData: response.appointments.giverData,
-          addressData: response.appointments.addressData,
-          recipientData: response.appointments.recipientData,
-          productData: response.appointments.productData,
-          statusTypeData: response.appointments.statusTypeData,
-          timeTypeData: response.appointments.timeTypeData,
-          phone: response.appointments.phone,
-          date: response.appointments.date,
-          status: response.appointments.statusTypeData.keyMap,
-        });
+        this.setState(
+          {
+            arrCollectionForms: response.appointments,
+            giverData: response.appointments.scheduleData?.giverData,
+            addressData: response.appointments.scheduleData.addressData,
+            recipientData: response.appointments.scheduleData.recipientData,
+            productData: response.appointments.scheduleData.productData,
+            statusData: response.appointments.scheduleData.statusData,
+            timeTypeData: response.appointments.scheduleData.timeTypeData,
+            phone: response.appointments.scheduleData.phone,
+            date: response.appointments.scheduleData.date,
+            status: response.appointments.statusTypeData.keyMap,
+          },
+          () => {
+            console.log("giverData", this.state.giverData);
+          }
+        );
       }
+    }
+  };
+
+  getAllCollectFormStatusByCurrentDateFromReact = async () => {
+    let today = new Date();
+
+    let response = await getCollectionFormStatusByCurrentDate({
+      date: moment(today).format(dateFormat.FORMAT_DATE),
+      status: "S1",
+    });
+
+    if (response) {
+      this.setState({
+        arrCollectsStatusByCurrentDate: response.collects,
+      });
     }
   };
 
@@ -82,6 +105,19 @@ class DetailCollectionForm extends Component {
       });
     }
   }
+
+  handleOnChangeInput = (e, id) => {
+    let copyState = { ...this.state };
+    copyState[id] = e.target.value;
+    this.setState(
+      {
+        ...copyState,
+      },
+      () => {
+        console.log("check good state", this.state);
+      }
+    );
+  };
 
   handleUpdate = async (id, status) => {
     let response = await saveUpdateStatic({
@@ -99,6 +135,8 @@ class DetailCollectionForm extends Component {
       timeTypeData,
       date,
       status,
+      arrCollectsStatusByCurrentDate,
+      isShowNotification,
     } = this.state;
     let statuses = this.state.statusArr;
     const { processLogout, userInfo } = this.props;
@@ -111,16 +149,65 @@ class DetailCollectionForm extends Component {
       <>
         <NavAdmin />
         <div className="main_content">
-          <div className="row header">
-            <div className="d-flex">
-              <div className="img">
-                <img src={imageBase64} className="img-img" />
-              </div>
-              <div className="profile-info">
-                Xin chào{" "}
-                {userInfo && userInfo.firstName + userInfo.lastName
-                  ? userInfo.firstName + " " + userInfo.lastName
-                  : ""}
+          <div className="container-fluid  ">
+            <div className=" header_right justify-content-between align-items-center">
+              <div className="d-flex">
+                <div className="d-flex wrapper-welcome">
+                  <div
+                    className="btn btn-logout"
+                    onClick={(e) => this.handleNotifications(e)}
+                  >
+                    <NotificationsNoneIcon />
+                    {isShowNotification ? (
+                      <div className="wrapper-notification shadow rounded">
+                        <div className="title-notification">
+                          Thông báo
+                          <CloseIcon
+                            className="icon-close"
+                            onClick={(e) => this.handleNotifications(e)}
+                          />
+                        </div>
+                        <CustomScrollbars style={{ height: "180px" }}>
+                          {arrCollectsStatusByCurrentDate.length > 0 &&
+                            arrCollectsStatusByCurrentDate.map(
+                              (item, index) => {
+                                return (
+                                  <div
+                                    className="info-notification"
+                                    onClick={(e) =>
+                                      this.handleDetailCollectForm(item)
+                                    }
+                                  >
+                                    {item.giverData.firstName} {""}
+                                    {item.giverData.lastName}{" "}
+                                    <div>
+                                      đặt lịch thu gom{" "}
+                                      {item.productData.product_name} {""}
+                                      tại {item.addressData.address_name} {""}
+                                      {item.addressData.ward_name}
+                                    </div>
+                                  </div>
+                                );
+                              }
+                            )}
+                        </CustomScrollbars>
+                      </div>
+                    ) : (
+                      ""
+                    )}
+                  </div>
+                  <div className="img">
+                    <img src={imageBase64} className="img-img" />
+                  </div>
+                  <div className="profile-info">
+                    {userInfo && userInfo.firstName + userInfo.lastName
+                      ? userInfo.firstName + " " + userInfo.lastName
+                      : ""}
+                  </div>
+                  <div className="btn btn-logout" onClick={processLogout}>
+                    <FiIcons.FiLogOut />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -144,67 +231,65 @@ class DetailCollectionForm extends Component {
             </div>
           </div>
           <div className="row content">
-            <div className="table">
-              <Table>
-                <thead className="thead">
-                  <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col" colspan="2">
-                      Thông tin người nhận thu gom
-                    </th>
-                    <th scope="col">Ngày thu gom</th>
-                    <th scope="col">Thời gian</th>
-                    <th scope="col">Địa chỉ thu gom</th>
-                    <th scope="col">Trạng thái</th>
-                    <th scope="col">Hành động</th>
-                  </tr>
-                </thead>
-                <tbody className="tbody">
-                  <tr>
-                    <td>{arrCollectionForms.id}</td>
-                    <td>{recipientData.email}</td>
-                    <td>{recipientData.phone}</td>
-                    <td>{date}</td>
-                    <td>{timeTypeData.valueVi}</td>
-                    <td>
-                      {addressData?.address_name} - {addressData?.ward_name} -
-                      {addressData?.district_name} - {addressData?.city_name}
-                    </td>
-                    <td>
-                      <select
-                        id="status"
-                        class="form-control"
-                        onChange={(e) => {
-                          this.handleOnChangeInput(e, "status");
-                        }}
-                        value={status}
-                      >
-                        {statuses &&
-                          statuses.length > 0 &&
-                          statuses.map((item, index) => {
-                            return (
-                              <option key={index} value={item.keyMap}>
-                                {item.valueVi}
-                              </option>
-                            );
-                          })}
-                      </select>
-                    </td>
-                    <td>
-                      {" "}
-                      <button
-                        className="btn btn-update"
-                        onClick={() =>
-                          this.handleUpdate(this.props.match.params.id, status)
-                        }
-                      >
-                        <FormattedMessage id="common.update" />
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </Table>
-            </div>
+            <Table>
+              <thead className="thead">
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col" colspan="2">
+                    Thông tin người nhận thu gom
+                  </th>
+                  <th scope="col">Thu gom từ ngày</th>
+                  <th scope="col">Thời gian</th>
+                  <th scope="col">Địa chỉ thu gom</th>
+                  <th scope="col">Trạng thái</th>
+                  <th scope="col">Hành động</th>
+                </tr>
+              </thead>
+              <tbody className="tbody">
+                <tr>
+                  <td>{arrCollectionForms.id}</td>
+                  <td>{recipientData.email}</td>
+                  <td>{recipientData.phone}</td>
+                  <td>{date}</td>
+                  <td>{timeTypeData.valueVi}</td>
+                  <td>
+                    {addressData?.address_name} - {addressData?.ward_name} -
+                    {addressData?.district_name} - {addressData?.city_name}
+                  </td>
+                  <td>
+                    <select
+                      id="status"
+                      class="form-control"
+                      onChange={(e) => {
+                        this.handleOnChangeInput(e, "status");
+                      }}
+                      value={status}
+                    >
+                      {statuses &&
+                        statuses.length > 0 &&
+                        statuses.map((item, index) => {
+                          return (
+                            <option key={index} value={item.keyMap}>
+                              {item.valueVi}
+                            </option>
+                          );
+                        })}
+                    </select>
+                  </td>
+                  <td>
+                    {" "}
+                    <button
+                      className="btn btn-update"
+                      onClick={() =>
+                        this.handleUpdate(this.props.match.params.id, status)
+                      }
+                    >
+                      <FormattedMessage id="common.update" />
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </Table>
           </div>
         </div>
       </>

@@ -1,0 +1,100 @@
+  <div className=" ">
+              ĐƠN THU GOM XUNG QUANH BẠN
+              {arrCollectionFormsByAddress &&
+                arrCollectionFormsByAddress.map((item, index) => {
+                  let imageBase64 = "";
+                  if (item.giverData.image) {
+                    imageBase64 = new Buffer(
+                      item.giverData.image,
+                      "base64"
+                    ).toString("binary");
+                  }
+                  return arrCollectionFormsByAddress > "0" ? (
+                    <>
+                      <div className="col-3 ">
+                        <div>
+                          <iframe
+                            width="520"
+                            height="260"
+                            frameborder="0"
+                            scrolling="no"
+                            marginheight="0"
+                            marginwidth="0"
+                            id="gmap_canvas"
+                            src={`https://maps.google.com/maps?width=706&height=320&hl=en&q=${item.addressData.address_name}''${item.addressData.address_name}&t=&z=16&ie=UTF8&iwloc=B&output=embed`}
+                          ></iframe>
+                          {/* <a href="https://maps-generator.com/">Maps Generator</a> */}
+                        </div>
+                      </div>
+                      <div className="row shadow" aria-hidden="true">
+                        <div className="col-3">
+                          <img src={imageBase64} className="img-pro" />
+                        </div>
+                        <div className="col-9 mt-3">
+                          <p className="info-giver">
+                            {item.giverData.firstName} {item.giverData.lastName}{" "}
+                            - <HiIcons.HiOutlineMail /> Email:{" "}
+                            {item.giverData.email}
+                          </p>
+                          <div className="d-flex">
+                            <span className="info-collection mr-1">
+                              <RiIcons.RiProductHuntLine className=" icon" />{" "}
+                              Sản phẩm thu gom:{" "}
+                            </span>
+                            <p>{item.productData.product_name}</p>
+                          </div>
+                          <div className="d-flex">
+                            <span className="info-collection mr-1">
+                              <BsIcons.BsTelephoneInbound className="icon" />{" "}
+                              Điện thoại:{" "}
+                            </span>
+                            <p> {item.giverData.phone}</p>
+                          </div>
+                          <div className="d-flex">
+                            <span className="info-collection mr-1">
+                              <FiIcons.FiMapPin className="icon" /> Địa chỉ thu
+                              gom:{" "}
+                            </span>
+                            <p>
+                              {item.addressData.address_name} -{" "}
+                              {item.addressData.ward_name} -{" "}
+                              {item.addressData.district_name} -{" "}
+                              {item.addressData.city_name}
+                            </p>
+                          </div>
+                          <div className="d-flex">
+                            <span className="info-collection mr-1">
+                              <BsIcons.BsCalendarDate className="icon" /> Ngày:{" "}
+                            </span>
+                            <p>{item.date}</p>
+                            <span className="info-collection ml-1 mr-1">
+                              {" "}
+                              - Thời gian:{" "}
+                            </span>
+                            <p>{item.timeTypeData.valueVi}</p>
+                          </div>
+                        </div>
+                        {item.statusType === "S1" ? (
+                          <button
+                            className="btn-register-receive"
+                            onClick={() => this.handleUpdate(item)}
+                          >
+                            <IoIcons.IoMdArrowRoundForward /> Đăng ký
+                          </button>
+                        ) : (
+                          <div disabled className="registed">
+                            <CheckCircleOutlineIcon className="icon" />
+                            Đã đăng ký
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="wrapper-alert shadow ">
+                      <div className="row text-blue">
+                        Hiện tại, địa điểm này chưa có đơn thu gom
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>

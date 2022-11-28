@@ -32,6 +32,15 @@ const saveUpdateStaticS2 = (inputData) => {
 const saveUpdateStatic = (inputData) => {
   return axios.put("/api/update-status", inputData);
 };
+
+const saveUpdateRegistrationStatus = (inputData) => {
+  return axios.put("/api/update-registration-status", inputData);
+};
+
+const saveUpdateRecivedDate = (inputData) => {
+  return axios.put("/api/update-receivedDate", inputData);
+};
+
 export {
   createNewTemp,
   getAllTemps,
@@ -40,4 +49,6 @@ export {
   saveBulkScheduleAppoinment,
   saveUpdateStaticS2,
   saveUpdateStatic,
+  saveUpdateRegistrationStatus,
+  saveUpdateRecivedDate,
 };

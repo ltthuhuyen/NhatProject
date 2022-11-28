@@ -683,13 +683,8 @@
                     color: #7ed000;
                 }
                 .btn-isShow{
-                    margin-left: 3px;
                     font-size: 12px;
                     margin-top: -7px;
-                    // padding: 10px;
-                    border-radius: 13px;
-                    border: 1px solid #8CC63E;
-                    // background: #8CC63E;
                     color:#8CC63E;
                     .icon-see{
                         margin-right: 3px;
@@ -721,31 +716,38 @@
                     border: 1px solid #8CC63E;
                     border-radius: 15px;
                     margin: 20px;
-                    padding: 30px;
+                    padding: 10px;
             
                     .info-participant {
                         display: flex;
             
                         .img .img-pro {
                             clip-path: circle(50%);
-                            border: 1px solid black;
-                            width: 60px;
-                            height: 60px;
+                        
+                            width: 50px;
+                            height: 50px;
                         }
             
                         .name {
                             color: rgb(97, 94, 94);
+                            // font-weight: 600;
+                            font-family: 'comic sans ms', sans-serif;
                             padding: 15px 10px;
                             font-size: 14px;
                         }
                     }
             
                     .info-submission {
-                        margin: 15px;
-                        padding: 20px;
-                        border: 1px solid rgb(97, 94, 94);
-                        border-radius: 15px;
-            
+                        // margin: 15px;
+                        // padding: 20px;
+                        // border: 1px solid rgb(97, 94, 94);
+                        // border-radius: 15px;
+                        margin: 10px 0 7px 0;
+                        border-top: 1px solid #8CC63E;
+                        padding: 20px ; 
+                        /* border: 1px solid #8CC63E; */
+                         border-bottom: 1px solid #8CC63E;
+                        
                         .link {
                             text-decoration: none;
             
@@ -776,11 +778,43 @@
             
                             .count-submission {
                                 font-weight: 600;
-                                font-size: 11px;
+                                font-size: 12px;
+
                                 color: rgb(97, 94, 94);
             
                             }
             
+                        }
+                    }
+
+                    .wrapper-icon{
+                        display: flex;
+                        .text-count-heart{
+                            color: #dc3545;
+                            margin-left: 30px;
+                            font-family: 'comic sans ms', sans-serif;
+                            font-size: 13px;
+                            align-items: space-between;
+                            padding: 0;
+                        }
+                        .btn-heart{
+                            padding: 0;
+                        }
+                        .btn-delete{
+                            padding: 2px 3px 3px;
+                            right: 70px;
+                            position: absolute;
+                            background-color: white;
+                                // color: #dc3545;
+                                border-radius: calc(50%);
+                                
+                            
+                                &:hover {
+                                    color: white;
+                                    background-color: #fc394d;
+                                    border-radius: calc(50%);
+                                }
+                            
                         }
                     }
             
@@ -811,5 +845,49 @@
 
     &:hover{
         scale: (1.03);
+    }
+}
+
+.submission-detail {
+    margin: 220px;
+    justify-content: center;
+
+    .title-submission-detail {
+        text-align: center;
+        font-family: monospace;
+        font-weight: 500;
+        color: #333333;
+        font-size: 50px;
+
+    }
+
+    .line {
+        margin-left: 520px;
+        margin-bottom: 50px;
+        text-align: center;
+        border-style: solid;
+        border-color: #222222;
+        height: 3px;
+        width: 80px;
+
+    }
+    .wrapper-info-submission{
+        right: 230px;
+        position: absolute;
+       
+        .info-submisser{
+            font-style: italic;
+            font-size: 15px;
+
+            .title-text{
+                color: #a9a9a9;
+
+                margin-right: 3px;
+            }
+            .info-text{
+                color: #000;
+              
+            }
+        }
     }
 }

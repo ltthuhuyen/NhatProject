@@ -12,6 +12,7 @@ import "./Header.scss";
 import ModalEditUser from "../../System/ModalEditUser";
 import { editUserService } from "../../../services/userService";
 import { toast } from "react-toastify";
+import avata from "../../../assets/images/avata.jpg";
 
 class Header extends Component {
   changeLanguage = (language) => {
@@ -106,10 +107,12 @@ class Header extends Component {
     let { isShowNotification } = this.state;
     let language = this.props.language;
     let imageBase64 = "";
-    // console.log("userInfo", userInfo.image);
-    // if (userInfo.image) {
-    //   imageBase64 = new Buffer(userInfo.image, "base64").toString("binary");
-    // }
+
+    if (userInfo && userInfo.image) {
+      imageBase64 = new Buffer(userInfo.image, "base64").toString("binary");
+    } else {
+      imageBase64 = avata;
+    }
     return (
       <div>
         <div className="home-header">

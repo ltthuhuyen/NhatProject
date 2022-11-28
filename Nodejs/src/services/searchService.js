@@ -21,9 +21,44 @@ let searchProduct = (search) => {
   });
 };
 
+let searchNews = (search) => {
+  console.log("search", search);
+  return new Promise(async (resolve, reject) => {
+    try {
+      let data = await db.News.findAll({
+        where: {
+          title: {
+            [Op.like]: `%${search}%`,
+          },
+        },
+      });
+      resolve(data);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+let searchCompetitive = (search) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let data = await db.Competition.findAll({
+        where: {
+          title: {
+            [Op.like]: `%${search}%`,
+          },
+        },
+      });
+      resolve(data);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 // Tìm kiếm đơn thu gom theo địa chỉ
 let searchCollectionByAddress = (search) => {
-  console.log(search);
+  console.log("search", search);
   return new Promise(async (resolve, reject) => {
     try {
       if (
@@ -151,6 +186,8 @@ let searchCollectionByDate = (search) => {
 };
 module.exports = {
   searchProduct: searchProduct,
+  searchNews: searchNews,
+  searchCompetitive: searchCompetitive,
   searchCollectionByAddress: searchCollectionByAddress,
   searchCollectionByDate: searchCollectionByDate,
 };

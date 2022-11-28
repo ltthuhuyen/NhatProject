@@ -5,7 +5,8 @@ import { allNews } from "../../../services/newsService";
 import { dateFormat } from "../../../utils";
 import moment from "moment";
 import "./News.scss";
-import Header from "../../Header/Giver/Header";
+import HeaderR2 from "../../Header/Giver/Header";
+import HeaderR3 from "../../Header/Recipient/Header";
 import Footer from "../../Footer/Footer";
 import ScrollUp from "../../../components/ScrollUp";
 
@@ -39,10 +40,11 @@ class DetailNews extends Component {
 
   render() {
     let newsDetail = this.state.newsDetail;
+    let userInfo = this.props.userInfo;
     return (
       <>
         <ScrollUp />
-        <Header />
+        {!userInfo || userInfo.roleId === "R2" ? <HeaderR2 /> : <HeaderR3 />}
         <div className="news-detail">
           <div className="title-news-detail">{newsDetail.title}</div>
           <div className="line"></div>
@@ -71,6 +73,7 @@ class DetailNews extends Component {
 const mapStateToProps = (state) => {
   return {
     // news: state.news.News,
+    userInfo: state.user.userInfo,
   };
 };
 

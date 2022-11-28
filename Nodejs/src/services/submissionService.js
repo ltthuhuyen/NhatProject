@@ -121,6 +121,24 @@ let getAllSubmissions = (submissionId) => {
           raw: true,
           nest: true,
         });
+      } else {
+        submissions = await db.Submission.findOne({
+          where: {
+            ID: submissionId,
+          },
+          include: [
+            {
+              model: db.Competition,
+              as: "competitionData",
+            },
+            {
+              model: db.User,
+              as: "participantData",
+            },
+          ],
+          raw: true,
+          nest: true,
+        });
       }
       resolve(submissions);
     } catch (error) {
@@ -198,6 +216,64 @@ let countSubmissionByCompetition = (competitionId) => {
   });
 };
 
+let deleteSumission = (id) => {
+  return new Promise(async (resolve, reject) => {
+    let foundSubmission = await db.Submission.findOne({
+      where: { ID: id },
+    });
+    let appreciate = await db.Appreciate.findAll({
+      where: {
+        submissionId: id,
+      },
+    });
+    if (!foundSubmission) {
+      resolve({
+        errCode: 1,
+        errMessage: `Không tìm thấy bài thi`,
+      });
+    } else {
+      await db.Submission.destroy({
+        where: { ID: id },
+      });
+      await db.Appreciate.destroy({
+        where: { submissionId: id },
+      });
+      resolve({
+        errCode: 0,
+        message: "Xóa thành công",
+      });
+    }
+  });
+};
+
+let deleteUser = (userId) => {
+  return new Promise(async (resolve, reject) => {
+    let foundUser = await db.User.findOne({
+      where: { id: userId },
+    });
+    let foundAddress = await db.Address.findAll({
+      where: { userId: userId },
+    });
+    if (!foundUser) {
+      resolve({
+        errCode: 1,
+        errMessage: "Không Tìm thấy người dùng",
+      });
+    } else {
+      let user = await db.User.destroy({
+        where: { id: userId },
+      });
+      let address = await db.Address.destroy({
+        where: { userId: userId },
+      });
+      resolve({
+        errCode: 0,
+        errMessage: "Xóa người dùng thành công",
+      });
+    }
+  });
+};
+
 module.exports = {
   check_Competition_Participant: check_Competition_Participant,
   countSubmission: countSubmission,
@@ -205,4 +281,5 @@ module.exports = {
   getAllSubmissions: getAllSubmissions,
   getAllSubmissionsByCompetition: getAllSubmissionsByCompetition,
   countSubmissionByCompetition: countSubmissionByCompetition,
+  deleteSumission: deleteSumission,
 };

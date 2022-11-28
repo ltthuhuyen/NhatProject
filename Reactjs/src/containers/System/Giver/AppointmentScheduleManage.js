@@ -36,6 +36,7 @@ class AppointmentScheduleManage extends Component {
       rangeTime: [],
       arrTemps: [],
       statusType: "",
+      amount: "",
       date: "",
       timeType: "",
     };
@@ -129,9 +130,15 @@ class AppointmentScheduleManage extends Component {
     }
   };
 
+  handleCheckAmount = (e) => {
+    this.setState({
+      amount: e.target.value,
+    });
+  };
+
   handleConfirm = async () => {
-    let { addressId, currentDate, timeType } = this.state;
-    if (!addressId || !currentDate || !timeType) {
+    let { addressId, currentDate, timeType, amount } = this.state;
+    if (!addressId || !currentDate || !timeType || !amount) {
       toast.error("Vui lòng chọn đủ thông tin!");
       return;
     }
@@ -142,6 +149,7 @@ class AppointmentScheduleManage extends Component {
         item.date = currentDate;
         item.timeType = timeType;
         item.statusType = "S1";
+        item.amount = amount;
         //recipientId = "";
         return item;
       });
@@ -164,7 +172,7 @@ class AppointmentScheduleManage extends Component {
         alert(response.errMessange);
       } else {
         toast.success("Thêm địa chỉ thành công!");
-        await getAllAddressOfUser(this.state.giverId);
+        await this.getAllAddressOfUserFromReact();
         this.setState({
           isOpenModalAddress: false,
         });
@@ -176,7 +184,7 @@ class AppointmentScheduleManage extends Component {
 
   render() {
     let { addressUser, rangeTime } = this.state;
-    console.log("rangeTime", rangeTime);
+
     if (this.props.userInfo) {
       this.state.giverId = this.props.userInfo.id;
     }
@@ -228,9 +236,7 @@ class AppointmentScheduleManage extends Component {
           <div className="row ">
             <div className="col-3 form-group"></div>
             <div className="col-6 form-group">
-              <label>
-                <FormattedMessage id="manage-schedule.appointment-date" />
-              </label>
+              <label>Thu gom từ ngày</label>
               <DatePicker
                 onChange={this.handleOnChangeDataPicker}
                 className="form-control date"
@@ -264,6 +270,38 @@ class AppointmentScheduleManage extends Component {
                 })}
             </div>
             <div className="col-3 form-group"></div>
+          </div>
+          <div className="row">
+            <div className="col-3 form-group"></div>
+            <div className="col-6 form-group">
+              <label>Số lượng</label>
+              <div className="d-flex">
+                <input
+                  type="radio"
+                  clasName="mx-2"
+                  value="Ít (0.5kg - 3kg)"
+                  checked={this.state.amount === "Ít (0.5kg - 3kg)"}
+                  onChange={(e) => this.handleCheckAmount(e, "amount")}
+                />
+                <label className="mt-2 mx-2"> Ít (0.5kg - 3kg)</label>
+                <input
+                  type="radio"
+                  clasName="mx-2"
+                  value="Vừa (3kg - 5kg)"
+                  checked={this.state.amount === "Vừa (3kg - 5kg)"}
+                  onChange={(e) => this.handleCheckAmount(e, "amount")}
+                />
+                <label className="mt-2 mx-2">Vừa (3kg - 5kg)</label>
+                <input
+                  type="radio"
+                  clasName="mx-2"
+                  value="Lớn (5kg trở lên)"
+                  checked={this.state.amount === "Lớn (5kg trở lên)"}
+                  onChange={(e) => this.handleCheckAmount(e, "amount")}
+                />
+                <label className="mt-2 mx-2">Lớn (5kg trở lên)</label>
+              </div>
+            </div>
           </div>
           <div className="row">
             <div className="col-6 form-group"></div>

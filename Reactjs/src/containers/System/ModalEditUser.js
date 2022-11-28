@@ -5,6 +5,7 @@ import _ from "lodash";
 import { FormattedMessage } from "react-intl";
 import { CRUD_ACTIONS, LANGUAGES, CommonUtils } from "../../utils";
 import * as actions from "../../store/actions";
+import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import "./Create.scss";
 import {
   getAllCities,
@@ -56,24 +57,31 @@ class ModalEditUser extends Component {
     // }
     if (user && !_.isEmpty(user)) {
       //Lấy giá trị hiện tại
-      this.setState({
-        id: user.id,
-        email: user.userData.email,
-        password: "HARDCODES",
-        firstName: user.userData.firstName,
-        lastName: user.userData.lastName,
-        phone: user.userData.phone,
-        gender: user.userData.gender,
-        roleId: user.userData.roleId,
-        image: imageBase64,
-        // previewImgURL: imageBase64,
-        city_name: user.city_name,
-        district_name: user.district_name,
-        ward_name: user.ward_name,
-        address_name: user.address_name,
+      this.setState(
+        {
+          id: user.id,
+          email: user.userData.email,
+          password: "HARDCODES",
+          firstName: user.userData.firstName,
+          lastName: user.userData.lastName,
+          phone: user.userData.phone,
+          gender: user.userData.gender,
+          roleId: user.userData.roleId,
+          image: imageBase64,
+          previewImgURL: new Buffer(user.userData.image, "base64").toString(
+            "binary"
+          ),
+          city_name: user.city_name,
+          district_name: user.district_name,
+          ward_name: user.ward_name,
+          address_name: user.address_name,
 
-        action: CRUD_ACTIONS.EDIT,
-      });
+          action: CRUD_ACTIONS.EDIT,
+        },
+        () => {
+          console.log("image", this.state.image);
+        }
+      );
     }
   }
 
@@ -212,7 +220,9 @@ class ModalEditUser extends Component {
       district_name,
       ward_name,
       address_name,
+      previewImgURL,
     } = this.state;
+
     return (
       <Modal
         isOpen={this.props.isOpen}
@@ -229,7 +239,7 @@ class ModalEditUser extends Component {
           }}
         >
           {" "}
-          <FormattedMessage id="manage-user.edit" />{" "}
+          SỬA THÔNG TIN NGƯỜI DÙNG{" "}
         </ModalHeader>
         <ModalBody>
           <div className="form-create-edit">
@@ -375,11 +385,11 @@ class ModalEditUser extends Component {
                   />
                   <label className="upload-file" htmlFor="previewImg">
                     <FormattedMessage id="common.upload-image" />{" "}
-                    <i className="fas fa-upload"></i>
+                    <CameraAltIcon className="icon" />
                   </label>
                   <div
                     className="preview-image"
-                    style={{ backgroundImage: `url(${this.state.image})` }}
+                    style={{ backgroundImage: `url(${previewImgURL})` }}
                     onClick={() => this.openPreviewImage()}
                   ></div>
                 </div>

@@ -21,7 +21,8 @@ import {
   editAddressInfoService,
   deleteAddressSerVice,
 } from "../../../services/addressService";
-import { add } from "lodash";
+import { getAllCollectionForm } from "../../../services/collectionformService";
+
 class AddressInfo extends Component {
   constructor(props) {
     super(props);
@@ -34,11 +35,13 @@ class AddressInfo extends Component {
       district_name: "",
       city_name: "",
       arrAddresses: [],
+      arrCollectionForms: [],
       isOpenModalChangePassword: false,
     };
   }
 
   async componentDidMount() {
+    await this.getAllCollectionFormReact();
     await this.getAllAddressOfUserFromReact();
     await this.getAllCitiesFromReact();
     await this.getAllDistrictsFromReact();
@@ -126,6 +129,15 @@ class AddressInfo extends Component {
     });
   };
 
+  getAllCollectionFormReact = async () => {
+    let response = await getAllCollectionForm("ALL");
+    if (response && response.errCode == 0) {
+      this.setState({
+        arrCollectionForms: response.appointments,
+      });
+    }
+  };
+
   getAllAddressOfUserFromReact = async () => {
     let userInfo = this.props.userInfo;
     let response = await getAllAddressOfUser(userInfo.id);
@@ -137,7 +149,6 @@ class AddressInfo extends Component {
   };
 
   handleEditAddress = (address) => {
-    console.log("address", address);
     this.setState({
       isShow: !this.state.isShow,
     });
@@ -174,7 +185,8 @@ class AddressInfo extends Component {
   };
 
   render() {
-    let { arrAddresses, arrCities, districts, wards } = this.state;
+    let { arrCollectionForms, arrAddresses, arrCities, districts, wards } =
+      this.state;
     let userInfo = this.props.userInfo;
     return (
       <>
@@ -261,6 +273,12 @@ class AddressInfo extends Component {
                                 type="button"
                                 className="btn btn-delete  "
                                 onClick={() => this.handleDeleteAddress(item)}
+                                disabled={arrCollectionForms
+                                  .map(
+                                    (arrCollectionForms) =>
+                                      arrCollectionForms.recipientId
+                                  )
+                                  .includes(item.userId)}
                               >
                                 <AiIcons.AiOutlineDelete />
                               </button>
@@ -347,7 +365,7 @@ class AddressInfo extends Component {
                       type="text"
                       class="form-control"
                       onChange={(e) => {
-                        this.handleOnChangeInput(e, "address");
+                        this.handleOnChangeInput(e, "address_name");
                       }}
                       value={this.state.address_name}
                     />

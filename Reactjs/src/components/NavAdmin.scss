@@ -9,6 +9,7 @@
 }
 .sidebar{
     height: 100vh;
+    border-right: 1px solid #f6fcfa;
     left: 0;
     top: 0;
     z-index: 99;
@@ -16,10 +17,10 @@
     position: fixed;
     width: 300px;
     z-index: 999;
-    overflow: hidden;
-    overflow-y: auto;
+    // overflow: hidden;
+        // overflow-y: auto;
     transition: .5s;
-    background: #fff;
+    background: #FFF;
     ul{
         list-style: none !important;
        .icon{
@@ -136,8 +137,8 @@
     
 }
 .header_right  {
-  margin-top: 8px;
-  padding-left: 500px;
+ 
+//   margin-left: 1200px;
     .header_notification_warp> a{
         color: black;
         .link-notification{
@@ -147,12 +148,13 @@
        
     }
     img.img-img {
-            clip-path: circle(20px);
-            border: 1px solid #7ed200;
-            width: 50px;
-            height: 50px;
-        }
+        clip-path: circle(20px);
+        border: 1px solid #7ed200;
+        width: 50px;
+        height: 50px;
+    }
     .profile-info{
+        font-family: 'comic sans ms', sans-serif;
         margin-top: 12px;
     }
 }

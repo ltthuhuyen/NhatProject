@@ -4,8 +4,17 @@ const countAppreciateBySubmission = (submissionId) => {
   return axios.get(`/api/count-appreciates?id=${submissionId}`);
 };
 
-const allApprecicateBySubmission = (data) => {
-  return axios.post("/api/get-all-appreciates-by-submissions", data);
+const allApprecicateBySubmission = (submissionId) => {
+  return axios.get(
+    `/api/get-all-appreciates-by-submissions?submissionId=${submissionId}`
+  );
+};
+
+const allApprecicateOfReviewerBySubmission = (data) => {
+  return axios.post(
+    "/api/get-all-appreciates-of-reviewer-by-submissions",
+    data
+  );
 };
 
 const createAppreciate = (data) => {
@@ -21,6 +30,7 @@ const deleteAppreciate = (id) => {
 export {
   countAppreciateBySubmission,
   allApprecicateBySubmission,
+  allApprecicateOfReviewerBySubmission,
   createAppreciate,
   deleteAppreciate,
 };

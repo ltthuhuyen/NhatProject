@@ -12,50 +12,72 @@ import CollectionFormStatusS5 from "../containers/System/Recipient/CollectionFor
 import DetailCollectionForm from "../containers/System/Recipient/DetailCollectionForm";
 import CollectionHistory from "../containers/System/Recipient/CollectionHistory";
 import CollectionFormManage from "../containers/System/Recipient/CollectionFormManage";
+import Submission from "../containers/System/Giver/Submission";
+import CreateSubmission from "../containers/System/Giver/CreateSubmission";
+import DetailSubmission from "../containers/System/Giver/DetailSubmission";
+import Map from "../../src/containers/Map/Map";
 
 class Recipient extends Component {
   render() {
     const { isLoggedIn } = this.props;
+    let userInfo = this.props.userInfo;
     return (
       <>
         {isLoggedIn && <Header />}
-        <div className="giver-container">
-          <div className="giver-list">
-            <Switch>
-              <Route path="/recipient/home" component={HomePage} />
-              <Route path="/recipient/user-info" component={UserInfo} />
-              <Route
-                path="/recipient/change-password"
-                component={ModalChangePassword}
-              />
-              <Route path="/recipient/address-info" component={AddressInfo} />
-              <Route
-                path="/recipient/collection-form"
-                component={CollectionFormManage}
-              />
-              <Route
-                path="/recipient/collection-form-status-s2"
-                component={CollectionFormStatusS2}
-              />
-              <Route
-                path="/recipient/collection-form-status-s3"
-                component={CollectionFormStatusS3}
-              />
-              <Route
-                path="/recipient/collection-form-status-s5"
-                component={CollectionFormStatusS5}
-              />
-              <Route
-                path="/recipient/collection-form-detail/:id"
-                component={DetailCollectionForm}
-              />
-              <Route
-                path="/recipient/collection-history"
-                component={CollectionHistory}
-              />
-            </Switch>
+        {userInfo && userInfo.roleId === "R3" ? (
+          <div className="giver-container">
+            <div className="giver-list">
+              <Switch>
+                <Route path="/recipient/home" component={HomePage} />
+                <Route path="/recipient/user-info" component={UserInfo} />
+                <Route
+                  path="/recipient/change-password"
+                  component={ModalChangePassword}
+                />
+                <Route path="/recipient/address-info" component={AddressInfo} />
+                <Route
+                  path="/recipient/collection-form"
+                  component={CollectionFormManage}
+                />
+                <Route
+                  path="/recipient/collection-form-status-s2"
+                  component={CollectionFormStatusS2}
+                />
+                <Route
+                  path="/recipient/collection-form-status-s3"
+                  component={CollectionFormStatusS3}
+                />
+                <Route
+                  path="/recipient/collection-form-status-s5"
+                  component={CollectionFormStatusS5}
+                />
+                <Route
+                  path="/recipient/collection-form-detail/:id"
+                  component={DetailCollectionForm}
+                />
+                <Route
+                  path="/recipient/collection-history"
+                  component={CollectionHistory}
+                />
+                <Route
+                  path="/recipient/create-submission/:id"
+                  component={CreateSubmission}
+                />
+                <Route
+                  path="/recipient/submission-by-competition/:id"
+                  component={Submission}
+                />
+                <Route
+                  path="/recipient/submission-detail/:id"
+                  component={DetailSubmission}
+                />
+                <Route path="/recipient/gg-map" component={Map} />
+              </Switch>
+            </div>
           </div>
-        </div>
+        ) : (
+          ""
+        )}
       </>
     );
   }
@@ -64,6 +86,7 @@ class Recipient extends Component {
 const mapStateToProps = (state) => {
   return {
     isLoggedIn: state.user.isLoggedIn,
+    userInfo: state.user.userInfo,
   };
 };
 
