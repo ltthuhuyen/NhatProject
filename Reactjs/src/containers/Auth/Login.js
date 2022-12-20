@@ -8,6 +8,7 @@ import * as HiIcons from "react-icons/hi";
 import * as RiIcons from "react-icons/ri";
 import * as BsIcons from "react-icons/bs";
 import "./Login.scss";
+import { toast } from "react-toastify";
 import { FormatteMessage } from "react-intl";
 import { handleLoginApi } from "../../services/userService";
 import { userLoginSuccess } from "../../store/actions";
@@ -26,7 +27,8 @@ class Login extends Component {
     };
   }
 
-  handleForgot = () => {
+  handleForgot = (e) => {
+    e.preventDefault();
     this.setState({
       isOpenModalForgot: true,
     });
@@ -66,8 +68,8 @@ class Login extends Component {
         });
       }
       if (data && data.errCode === 0) {
+        toast.success("Đăng nhập thành công");
         this.props.userLoginSuccess(data.user);
-        console.log("login succeeds");
       }
     } catch (error) {
       if (error.response) {
@@ -77,8 +79,6 @@ class Login extends Component {
           });
         }
       }
-      // console.log(e)
-      console.log("hoidanit", error.response);
     }
   };
 
@@ -160,7 +160,9 @@ class Login extends Component {
                     <div
                       to="/forgot-password"
                       className="link-forgot-password"
-                      onClick={this.handleForgot}
+                      onClick={(e) => {
+                        this.handleForgot(e);
+                      }}
                     >
                       Quên mật khẩu ?
                     </div>

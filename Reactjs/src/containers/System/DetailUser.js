@@ -61,9 +61,7 @@ class DetailUser extends Component {
     await this.getAllCollectFormStatusByCurrentDateFromReact();
   }
 
-  async componentDidUpdate(prevProps, prevState, snapshot) {
-    console.log("update");
-  }
+  async componentDidUpdate(prevProps, prevState, snapshot) {}
   getAllUsersFromReact = async () => {
     if (
       this.props.match &&
@@ -320,8 +318,11 @@ class DetailUser extends Component {
                                           </>
                                         ) : (
                                           <>
-                                            {currentDateTimeStop.diff(tt)} phút
-                                            trước
+                                            {currentDateTimeStop.diff(
+                                              tt,
+                                              "minutes"
+                                            )}{" "}
+                                            phút trước
                                           </>
                                         )}
                                       </div>
@@ -412,7 +413,6 @@ class DetailUser extends Component {
                   <div className="lable ml-0">Địa chỉ</div>
                   {arrAddresses &&
                     arrAddresses.map((item, index) => {
-                      console.log("item", item);
                       return (
                         <p className="d-flex">
                           <div className="col-10 mt-2">
@@ -431,9 +431,9 @@ class DetailUser extends Component {
                             arrCollectionForms
                               .map(
                                 (arrCollectionForms) =>
-                                  arrCollectionForms.giverId
+                                  arrCollectionForms.scheduleData.addressId
                               )
-                              .includes(item.userId) ? (
+                              .includes(item.id) ? (
                               <>
                                 {" "}
                                 <button

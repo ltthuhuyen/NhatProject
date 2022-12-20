@@ -13,16 +13,21 @@ import * as FaIcons from "react-icons/fa";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import "./CollectionFormManage.scss";
+// import "./CollectionFormManage.scss";
+import "./DetailCollectionFormManage.scss";
 import avata from "../../../assets/images/avata.jpg";
 import Header from "../../Header/Giver/Header";
 import Banner from "../../Banner/Banner";
 import Footer from "../../Footer/Footer";
 import ScrollUp from "../../../components/ScrollUp";
 import moment from "moment";
-import { getAllCollectionForm } from "../../../services/collectionformService";
+import { toast } from "react-toastify";
+import {
+  getAllSchedule,
+  getAllCollectionFormBySchedule,
+} from "../../../services/collectionformService";
 import { getAllAddressOfUser } from "../../../services/addressService";
-import { saveUpdateStatic } from "../../../services/appointmentService";
+import { saveUpdateRegistrationStatus } from "../../../services/appointmentService";
 class DetailCollectionForm extends Component {
   constructor(props) {
     super(props);
@@ -41,6 +46,7 @@ class DetailCollectionForm extends Component {
       phone: "",
       recipientId: "",
       img: "",
+      schedule: {},
     };
   }
 
@@ -69,33 +75,39 @@ class DetailCollectionForm extends Component {
       this.props.match.params &&
       this.props.match.params.id
     ) {
-      let collectId = this.props.match.params.id;
-      console.log("collectId", collectId);
-      let response = await getAllCollectionForm(collectId);
-      console.log("response", response);
+      let scheduleId = this.props.match.params.id;
 
-      if (response && response.errCode === 0) {
-        this.setState(
-          {
-            arrCollectionForms: response?.appointments,
-            giverData: response?.appointments?.scheduleData?.giverData,
-            recipientData: response?.appointments?.recipientData,
-            productData: response?.appointments?.scheduleData?.productData,
-            addressData: response?.appointments?.scheduleData?.addressData,
-            statusData: response?.appointments?.scheduleData?.statusData,
-            timeTypeData: response?.appointments?.scheduleData?.timeTypeData,
-            phone: response?.appointments?.scheduleData?.phone,
-            date: response?.appointments?.scheduleData?.date,
-            // status: response?.appointments?.statusTypeData.keyMap,
-            amount: response?.appointments?.scheduleData?.amount,
-            receivedDate: response?.appointments?.receivedDate,
-            avataGiver: response?.appointments?.scheduleData?.giverData?.image,
-            avataRecipient: response?.appointments?.recipientData?.image,
-          },
-          () => {
-            console.log("vvv", this.state.addressData);
+      let response = await getAllSchedule(scheduleId);
+      console.log("response", response);
+      if (response && response.appointments) {
+        this.setState({
+          schedule: response.appointments,
+        });
+      }
+
+      if (this.state.schedule) {
+        let responseCollect = await getAllCollectionFormBySchedule({
+          scheduleId: this.state.schedule.id,
+        });
+        if (responseCollect) {
+          this.setState(
+            {
+              arrCollect: responseCollect.appointments,
+            },
+            () => {
+              console.log("arrCollect", this.state.arrCollect);
+            }
+          );
+          let response = await getAllAddressOfUser(
+            this.state.detail?.recipientData?.id
+          );
+
+          if (response && response.errCode === 0) {
+            this.setState({
+              addressRecipient: response.addresses,
+            });
           }
-        );
+        }
       }
     }
   };
@@ -120,18 +132,20 @@ class DetailCollectionForm extends Component {
     }
   }
 
-  // handleUpdate = async (id, status, recipientId) => {
-  //   let response = await saveUpdateStatic({
-  //     id: id,
-  //     status: this.state.status,
-  //     recipientId: this.props.userInfo.id,
-  //   });
-  //   // this.props.history.push(`/recipient/collection-form/`);
-  //   this.props.history.push(`/giver/collection-form-detail-status-s2/${id}`);
-  // };
+  handleUpdate = async (collect) => {
+    let response = await saveUpdateRegistrationStatus({
+      id: collect.id,
+    });
+    if (response && response.errCode === 0) {
+      await getAllSchedule(this.props.match.params.id);
+      await this.getAllCollectionFormReact();
+      toast.success("Xác nhận thành công!");
+    }
+  };
   render() {
     let {
-      arrCollectionForms,
+      schedule,
+      arrCollect,
       giverData,
       recipientData,
       productData,
@@ -149,7 +163,6 @@ class DetailCollectionForm extends Component {
     if (this.props.userInfo) {
       this.state.recipientId = this.props.userInfo.id;
     }
-    console.log("arrCollectionForms", arrCollectionForms);
 
     let imageBase64Giver = "";
     if (avataGiver) {
@@ -170,7 +183,7 @@ class DetailCollectionForm extends Component {
         <ScrollUp />
         <Header />
         <Banner />
-        <div className="collection-form">
+        <div className="collection-form-detail">
           <div className="title-collection-form">ĐƠN THU GOM</div>
           <div className="line"></div>
           <div className="container-collection-form-status shadow-lg">
@@ -246,155 +259,189 @@ class DetailCollectionForm extends Component {
                 <div className="icon">
                   <BsIcons.BsClipboardCheck />
                 </div>
-                <span className="mt-1 title-history">Xem lịch sử thu gom</span>
+                <span className="mt-1 title-history">Đã thu gom</span>
                 <div className="icon mr-0">
                   <MdIcons.MdOutlineNavigateNext />
                 </div>
               </NavLink>
             </div>
             <div className="title">CHI TIẾT ĐƠN THU GOM</div>
-            <div className="row  ">
-              <div className="collection-form shadow">
-                <div className="d-flex ">
-                  <div className="col-6">
-                    <div className="row info-giver-recipient">
-                      <img src={imageBase64Giver} className="col-5 img-pro" />
-                      <div className="col-7">
-                        <p className="row">
-                          <FaIcons.FaUserAlt className="icon " />
-                          Người cho: {giverData?.firstName}{" "}
-                          {giverData?.lastName}
-                        </p>
-                        <p className="row">
-                          <HiIcons.HiOutlineMail className="icon" />
-                          {giverData?.email}{" "}
-                        </p>
-                        <p className="row">
-                          <BsIcons.BsTelephoneInbound className="icon " />
-                          {giverData?.phone}{" "}
-                        </p>
-                      </div>
-                      <p>
-                        <FiIcons.FiMapPin className="icon mb-2" />
-                        {addressData?.address_name} - {addressData?.ward_name} -{" "}
-                        {addressData?.district_name} - {addressData?.city_name}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="col-6">
-                    {addressRecipient &&
-                      addressRecipient.length > 0 &&
-                      addressRecipient.map((item, index) => {
-                        return recipientData ? (
-                          <div className="row info-giver-recipient">
-                            <img
-                              src={imageBase64Recipient}
-                              className=" col-5 img-pro"
-                            />
-                            <div className="col-7">
-                              <p className="row">
-                                <FaIcons.FaUserAlt className="icon " />
-                                Người nhận: {recipientData.firstName}{" "}
-                                {recipientData.lastName}
-                              </p>
-                              <p className="row">
-                                <HiIcons.HiOutlineMail className="icon" />
-                                {recipientData.email}{" "}
-                              </p>
-                              <p className="row">
-                                <BsIcons.BsTelephoneInbound className="icon " />
-                                {recipientData.phone}{" "}
-                              </p>
-                            </div>
-                            <p>
-                              {" "}
-                              <FiIcons.FiMapPin className="icon mb-2" />
-                              {item?.address_name} - {item?.ward_name} -{" "}
-                              {item?.district_name} - {item?.city_name}
+            <div className="row d-flex">
+              {schedule.statusType == "S1" ||
+              schedule.statusType == "S3" ||
+              schedule.statusType == "S4" ||
+              schedule.statusType == "S5" ? (
+                <>
+                  <div className="collection-form shadow">
+                    <div className="d-flex ">
+                      <div className="col-6">
+                        <div className="row info-giver-recipient">
+                          <div className="col-5 img-pro"></div>
+                          <div className="col-7">
+                            <p className="row">
+                              <FaIcons.FaUserAlt className="icon " />
+                              Người cho: {schedule.giverData?.firstName}{" "}
+                              {schedule.giverData?.lastName}
+                            </p>
+                            <p className="row">
+                              <HiIcons.HiOutlineMail className="icon" />
+                              {schedule.giverData?.email}{" "}
+                            </p>
+                            <p className="row">
+                              <BsIcons.BsTelephoneInbound className="icon " />
+                              {schedule.giverData?.phone}{" "}
                             </p>
                           </div>
-                        ) : (
-                          ""
-                        );
-                      })}
-                  </div>
-                </div>
-                <hr></hr>
-                <div className="info-collection">
-                  <div className="d-flex">
-                    <span className="info mr-1">
-                      <RiIcons.RiProductHuntLine /> Sản phẩm:{" "}
-                    </span>
-                    <p>{productData?.product_name} </p>
-                    <span className="info ml-2 mr-1"> - Mô tả: </span>
-                    <p>{productData?.description}</p>
-                  </div>
-                  <div className="d-flex">
-                    <span className="info mr-1">
-                      <ShoppingCartIcon className="icon sm" /> Số lượng:
-                    </span>
-                    <p>{amount}</p>
-                  </div>
-                  <div className="d-flex">
-                    <span className="info mr-1">
-                      <FiIcons.FiMapPin className="icon " /> Địa chỉ thu gom:{" "}
-                    </span>
-                    <p>
-                      {addressData?.address_name} - {addressData?.ward_name} -{" "}
-                      {addressData?.district_name} - {addressData?.city_name}
-                    </p>
-                  </div>
-                  <div className="d-flex">
-                    <span className="info mr-1">
-                      <BsIcons.BsCalendarDate className="icon" /> Thu gom từ
-                      ngày:{" "}
-                    </span>
-                    <p>{date}</p>
-                    <span className="info ml-2 mr-1"> - Thời gian: </span>
-                    <p>{timeTypeData?.valueVi}</p>
-                  </div>
-                  <div className="d-flex">
-                    {statusData?.valueVi === "Chờ xác nhận" ||
-                    statusData?.valueVi === "Chờ thu gom" ? (
-                      <button className="btn status-s3">
-                        <PriorityHighIcon className="icon mr-1" />
-                        {statusData?.valueVi}
-                      </button>
-                    ) : (
-                      <>
-                        {statusData?.valueVi === "Đơn bị hủy" ? (
-                          <button className="btn status-s5">
-                            <BsIcons.BsX className="icon" />{" "}
-                            {statusData?.valueVi}
+                          <p>
+                            <FiIcons.FiMapPin className="icon mb-2" />
+                            {schedule.addressData?.address_name} -{" "}
+                            {schedule.addressData?.ward_name} -{" "}
+                            {schedule.addressData?.district_name} -{" "}
+                            {schedule.addressData?.city_name}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="col-6">
+                        {arrCollect &&
+                          arrCollect.length > 0 &&
+                          arrCollect.map((arrCollect, index) => {
+                            if (
+                              arrCollect.scheduleId == schedule.id &&
+                              arrCollect.statusType == "Yes"
+                            ) {
+                              return recipientData ? (
+                                <div className="row info-giver-recipient">
+                                  <img
+                                    src={imageBase64Recipient}
+                                    className=" col-5 img-pro"
+                                  />
+                                  <div className="col-7">
+                                    <p className="row">
+                                      <FaIcons.FaUserAlt className="icon " />
+                                      Người nhận:{" "}
+                                      {arrCollect.recipientData.firstName}{" "}
+                                      {arrCollect.recipientData.lastName}
+                                    </p>
+                                    <p className="row">
+                                      <HiIcons.HiOutlineMail className="icon" />
+                                      {arrCollect.recipientData.email}{" "}
+                                    </p>
+                                    <p className="row">
+                                      <BsIcons.BsTelephoneInbound className="icon " />
+                                      {arrCollect.recipientData.phone}{" "}
+                                    </p>
+                                  </div>
+                                  <p>
+                                    {" "}
+                                    <FiIcons.FiMapPin className="icon mb-2" />
+                                    {
+                                      arrCollect.recipientData.userData
+                                        ?.address_name
+                                    }
+                                    -{" "}
+                                    {
+                                      arrCollect.recipientData.userData
+                                        ?.ward_name
+                                    }
+                                    -{" "}
+                                    {
+                                      arrCollect.recipientData.userData
+                                        ?.district_name
+                                    }
+                                    -{" "}
+                                    {
+                                      arrCollect.recipientData.userData
+                                        ?.city_name
+                                    }
+                                  </p>
+                                </div>
+                              ) : (
+                                ""
+                              );
+                            }
+                          })}
+                      </div>
+                    </div>
+                    <hr></hr>
+                    <div className="info-collection">
+                      <div className="d-flex">
+                        <span className="info mr-1">
+                          <RiIcons.RiProductHuntLine /> Sản phẩm:{" "}
+                        </span>
+                        <p>{schedule.productData?.product_name} </p>
+                        <span className="info ml-2 mr-1"> - Mô tả: </span>
+                        <p>{schedule.productData?.description}</p>
+                      </div>
+                      <div className="d-flex">
+                        <span className="info mr-1">
+                          <ShoppingCartIcon className="icon sm" /> Số lượng:
+                        </span>
+                        <p>{schedule.amount}</p>
+                      </div>
+                      <div className="d-flex">
+                        <span className="info mr-1">
+                          <FiIcons.FiMapPin className="icon " /> Địa chỉ thu
+                          gom:{" "}
+                        </span>
+                        <p>
+                          {schedule.addressData?.address_name} -{" "}
+                          {schedule.addressData?.ward_name} -{" "}
+                          {schedule.addressData?.district_name} -{" "}
+                          {schedule.addressData?.city_name}
+                        </p>
+                      </div>
+                      <div className="d-flex">
+                        <span className="info mr-1">
+                          <BsIcons.BsCalendarDate className="icon" /> Thu gom từ
+                          ngày:{" "}
+                        </span>
+                        <p>{schedule.date}</p>
+                        <span className="info ml-2 mr-1"> - Thời gian: </span>
+                        <p>{schedule.timeTypeData?.valueVi}</p>
+                      </div>
+                      <div className="d-flex">
+                        {schedule.statusData?.valueVi === "Chờ xác nhận" ||
+                        schedule.statusData?.valueVi === "Chờ thu gom" ? (
+                          <button className="btn status-s3">
+                            <PriorityHighIcon className="icon mr-1" />
+                            {schedule.statusData?.valueVi}
                           </button>
                         ) : (
                           <>
-                            {statusData?.valueVi === "Đã thu gom" ? (
-                              <>
-                                <button className="btn status-s4">
-                                  <CheckCircleOutlineIcon className="icon mr-1" />
-                                  {statusData?.valueVi}
-                                </button>
-                                <span className="info mr-1">Lúc: </span>
-                                <p>
-                                  {moment(receivedDate).format(
-                                    "DD/MM/YYYY - hh:mm:ss"
-                                  )}
-                                </p>
-                              </>
-                            ) : (
-                              <button className="btn status-s1">
-                                <PriorityHighIcon className="icon mr-1" />
-                                {statusData?.valueVi}
+                            {schedule.statusData?.valueVi === "Đơn bị hủy" ? (
+                              <button className="btn status-s5">
+                                <BsIcons.BsX className="icon" />{" "}
+                                {schedule.statusData?.valueVi}
                               </button>
+                            ) : (
+                              <>
+                                {schedule.statusData?.valueVi ===
+                                "Đã thu gom" ? (
+                                  <>
+                                    <button className="btn status-s4">
+                                      <CheckCircleOutlineIcon className="icon mr-1" />
+                                      {schedule.statusData?.valueVi}
+                                    </button>
+                                    <span className="info-receivedDate">
+                                      {" "}
+                                      {moment(receivedDate).format(
+                                        "DD/MM/YYYY - hh:mm:ss"
+                                      )}
+                                    </span>
+                                  </>
+                                ) : (
+                                  <button className="btn status-s1">
+                                    <PriorityHighIcon className="icon mr-1" />
+                                    {schedule.statusData?.valueVi}
+                                  </button>
+                                )}
+                              </>
                             )}
                           </>
                         )}
-                      </>
-                    )}
 
-                    {/* <div className="d-flex update-status">
+                        {/* <div className="d-flex update-status">
                       {statusData?.valueVi === "Chờ thu gom" ? (
                         <>
                           <select
@@ -421,9 +468,283 @@ class DetailCollectionForm extends Component {
                         ""
                       )}
                     </div> */}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </>
+              ) : (
+                <>
+                  <div className="collection-form-detail shadow col-6">
+                    <div className="title-collect">ĐƠN THU GOM</div>
+                    <hr></hr>
+                    <div className="d-flex ">
+                      <div className="col-12">
+                        <div className="row info-giver-recipient-detail">
+                          <div className="col-5 img-pro"></div>
+                          <div className="col-7">
+                            <p className="row">
+                              <FaIcons.FaUserAlt className="icon " />
+                              Người cho: {schedule?.giverData?.firstName}{" "}
+                              {schedule?.giverData?.lastName}
+                            </p>
+                            <p className="row">
+                              <HiIcons.HiOutlineMail className="icon" />
+                              {schedule?.giverData?.email}{" "}
+                            </p>
+                            <p className="row">
+                              <BsIcons.BsTelephoneInbound className="icon " />
+                              {schedule?.giverData?.phone}{" "}
+                            </p>
+                          </div>
+                          <p>
+                            <FiIcons.FiMapPin className="icon mb-2" />
+                            {schedule?.addressData?.address_name} -{" "}
+                            {schedule?.addressData?.ward_name} -{" "}
+                            {schedule?.addressData?.district_name} -{" "}
+                            {schedule?.addressData?.city_name}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <hr></hr>
+                    <div className="info-collection-detail">
+                      <div className="col-12 d-flex">
+                        <span className="info mr-1">
+                          <RiIcons.RiProductHuntLine className="icon mb-1" />{" "}
+                          Sản phẩm:{" "}
+                        </span>
+                        <p>{schedule?.productData?.product_name} </p>
+                      </div>
+                      <div className="col-12 ">
+                        <span className="info ml-2 mr-1"> Mô tả: </span>
+                        <p>{schedule?.productData?.description}</p>
+                      </div>
+                      <div className="col-12 d-flex">
+                        <span className="info mr-1">
+                          <ShoppingCartIcon className="icon sm" /> Số lượng:
+                        </span>
+                        <p>{schedule?.amount}</p>
+                      </div>
+                      <div className="col-12 ">
+                        <span className="info mr-1">
+                          <FiIcons.FiMapPin className="icon " /> Địa chỉ thu
+                          gom:{" "}
+                        </span>
+                        <p>
+                          {schedule?.addressData?.address_name} -{" "}
+                          {schedule?.addressData?.ward_name} -{" "}
+                          {schedule?.addressData?.district_name} -{" "}
+                          {schedule?.addressData?.city_name}
+                        </p>
+                      </div>
+                      <div className="col-12 d-flex">
+                        <span className="info mr-1">
+                          <BsIcons.BsCalendarDate className="icon" /> Thu gom từ
+                          ngày:{" "}
+                        </span>
+                        <p>{schedule?.date}</p>
+                        <span className="info ml-2 mr-1"> - Thời gian: </span>
+                        <p>{schedule?.timeTypeData?.valueVi}</p>
+                      </div>
+                      <div className="col-12 d-flex">
+                        {schedule?.statusData?.valueVi === "Chờ xác nhận" ||
+                        schedule?.statusData?.valueVi === "Chờ thu gom" ? (
+                          <button className="btn status-s3">
+                            <PriorityHighIcon className="icon mr-1" />
+                            {schedule?.statusData?.valueVi}
+                          </button>
+                        ) : (
+                          <>
+                            {schedule?.statusData?.valueVi === "Đơn bị hủy" ? (
+                              <button className="btn status-s5">
+                                <BsIcons.BsX className="icon" />{" "}
+                                {schedule?.statusData?.valueVi}
+                              </button>
+                            ) : (
+                              <>
+                                {schedule?.statusData?.valueVi ===
+                                "Đã thu gom" ? (
+                                  <button className="btn status-s4">
+                                    <CheckCircleOutlineIcon className="icon mr-1" />
+                                    {schedule?.statusData?.valueVi}
+                                  </button>
+                                ) : (
+                                  <button className="btn status-s1">
+                                    <PriorityHighIcon className="icon mr-1" />
+                                    {schedule?.statusData?.valueVi}
+                                  </button>
+                                )}
+                              </>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="collection-form-detail shadow col-5">
+                    <div className="title-collect">
+                      DANH SÁCH ĐĂNG KÝ THU GOM
+                    </div>
+                    <hr></hr>
+                    {arrCollect &&
+                      arrCollect.length > 0 &&
+                      arrCollect.map((arrCollect, index) => {
+                        imageBase64Recipient = new Buffer(
+                          arrCollect.recipientData.image,
+                          "base64"
+                        ).toString("binary");
+                        return (
+                          <>
+                            <div className="d-flex ">
+                              <div className="col-12">
+                                <div className="d-flex info-giver-recipient-detail">
+                                  <img
+                                    src={imageBase64Recipient}
+                                    className="col-4 img-pro"
+                                  />
+                                  <div className="col-8">
+                                    <p className="row">
+                                      <FaIcons.FaUserAlt className="icon " />
+                                      Người nhận:{" "}
+                                      {arrCollect.recipientData?.firstName}{" "}
+                                      {arrCollect.recipientData?.lastName}
+                                    </p>
+                                    <p className="row">
+                                      <HiIcons.HiOutlineMail className="icon" />
+                                      {arrCollect.recipientData?.email}{" "}
+                                    </p>
+                                    <p className="row">
+                                      <BsIcons.BsTelephoneInbound className="icon " />
+                                      {arrCollect.recipientData?.phone}{" "}
+                                    </p>
+                                  </div>
+                                  <p>
+                                    {" "}
+                                    <FiIcons.FiMapPin className="icon mb-2" />
+                                    {
+                                      arrCollect.recipientData.userData
+                                        ?.address_name
+                                    }
+                                    -{" "}
+                                    {
+                                      arrCollect.recipientData.userData
+                                        ?.ward_name
+                                    }
+                                    -{" "}
+                                    {
+                                      arrCollect.recipientData.userData
+                                        ?.district_name
+                                    }
+                                    -{" "}
+                                    {
+                                      arrCollect.recipientData.userData
+                                        ?.city_name
+                                    }
+                                  </p>
+                                  {arrCollect.statusType === "Yes" &&
+                                  arrCollect.scheduleData.statusType ===
+                                    "S3" ? (
+                                    <>
+                                      {" "}
+                                      <button className="btn status-recived">
+                                        <CheckCircleOutlineIcon className="icon mb-1 mr-1" />
+                                        Cho thu gom
+                                      </button>
+                                      <div className="update-status">
+                                        <button
+                                          className="btn btn-update-status"
+                                          onClick={(e) =>
+                                            this.handleUpdate(arrCollect)
+                                          }
+                                          disabled
+                                        >
+                                          Xác nhận
+                                        </button>
+                                      </div>
+                                    </>
+                                  ) : arrCollect.statusType === "No" &&
+                                    arrCollect.scheduleData.statusType ===
+                                      "S2" ? (
+                                    <>
+                                      <div className="text-registerDate">
+                                        {moment(arrCollect.registerDate).format(
+                                          "DD/MM/YYYY HH:mm"
+                                        )}
+                                      </div>
+                                      <div className="update-status">
+                                        <button
+                                          className="btn btn-update-status"
+                                          onClick={(e) =>
+                                            this.handleUpdate(arrCollect)
+                                          }
+                                        >
+                                          Xác nhận
+                                        </button>
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <div className="update-status">
+                                        <button
+                                          className="btn btn-update-status"
+                                          onClick={(e) =>
+                                            this.handleUpdate(arrCollect)
+                                          }
+                                          disabled
+                                        >
+                                          Xác nhận
+                                        </button>
+                                      </div>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <hr></hr>
+                          </>
+                        );
+                      })}
+
+                    {/* <hr></hr>
+                <div className="info-collection">
+                  <div className="col-6 d-flex">
+                    <span className="info mr-1">
+                      <RiIcons.RiProductHuntLine /> Sản phẩm:{" "}
+                    </span>
+                    <p>{productData?.product_name} </p>
+                  </div>
+                  <div className="col-6 d-flex">
+                    <span className="info ml-2 mr-1"> Mô tả: </span>
+                    <p>{productData?.description}</p>
+                  </div>
+                  <div className="col-6 d-flex">
+                    <span className="info mr-1">
+                      <ShoppingCartIcon className="icon sm" /> Số lượng:
+                    </span>
+                    <p>{arrSchedule.amount}</p>
+                  </div>
+                  <div className="col-6 d-flex">
+                    <span className="info mr-1">
+                      <FiIcons.FiMapPin className="icon " /> Địa chỉ thu gom:{" "}
+                    </span>
+                    <p>
+                      {addressData?.address_name} - {addressData?.ward_name} -{" "}
+                      {addressData?.district_name} - {addressData?.city_name}
+                    </p>
+                  </div>
+                  <div className="col-6 d-flex">
+                    <span className="info mr-1">
+                      <BsIcons.BsCalendarDate className="icon" /> Thu gom từ
+                      ngày:{" "}
+                    </span>
+                    <p>{date}</p>
+                    <span className="info ml-2 mr-1"> - Thời gian: </span>
+                    <p>{timeTypeData?.valueVi}</p>
+                  </div>
+                </div> */}
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

@@ -158,17 +158,18 @@ class UserManage extends Component {
   };
 
   handleDeleteUser = async (user) => {
-    try {
-      let res = await deleteUserSerVice(user.id);
-      if (res && res.errCode === 0) {
-        toast.success("Xóa người dùng thành công!");
-        await this.getAllUsersFromReact();
-      } else {
-        alert(res.errMessange);
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    console.log("user", user);
+    // try {
+    //   let res = await deleteUserSerVice(user.id);
+    //   if (res && res.errCode === 0) {
+    //     toast.success("Xóa người dùng thành công!");
+    //     await this.getAllUsersFromReact();
+    //   } else {
+    //     alert(res.errMessange);
+    //   }
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
 
   handleNotifications = () => {
@@ -189,7 +190,7 @@ class UserManage extends Component {
       currentDateTimeStop,
     } = this.state;
     let arrCollectionForms = this.state.arrCollectionForms;
-    currentDateTimeStop = moment(currentDateTimeStop);
+    let currentDateTime = moment(currentDateTimeStop);
     let { isShowNotification } = this.state;
     let { currentPage, todosPerPage } = this.state;
     const indexOfLastTodo = currentPage * todosPerPage;
@@ -273,9 +274,9 @@ class UserManage extends Component {
                             arrCollectsStatusByCurrentDate.map(
                               (item, index) => {
                                 let t = moment(item.createdAt);
-                                console.log("t", t);
+                                // console.log("t", t);
                                 let tt = moment(`${t}`);
-                                console.log("tt", tt);
+                                // console.log("tt", tt);
                                 return (
                                   <>
                                     <div
@@ -295,13 +296,11 @@ class UserManage extends Component {
                                         {/* {item.createdAt} */}
                                       </div>
                                       <div className="text-minutes">
-                                        {currentDateTimeStop.diff(
-                                          tt,
-                                          "minutes"
-                                        ) > 60 ? (
+                                        {currentDateTime.diff(tt, "minutes") >
+                                        60 ? (
                                           <>
                                             {Math.floor(
-                                              currentDateTimeStop.diff(
+                                              currentDateTime.diff(
                                                 tt,
                                                 "minutes"
                                               ) / 60
@@ -310,8 +309,11 @@ class UserManage extends Component {
                                           </>
                                         ) : (
                                           <>
-                                            {currentDateTimeStop.diff(tt)} phút
-                                            trước
+                                            {currentDateTime.diff(
+                                              tt,
+                                              "minutes"
+                                            )}{" "}
+                                            phút trước
                                           </>
                                         )}
                                       </div>
@@ -433,7 +435,7 @@ class UserManage extends Component {
                                 arrCollectionForms
                                   .map(
                                     (arrCollectionForms) =>
-                                      arrCollectionForms.giverId
+                                      arrCollectionForms.scheduleData?.giverId
                                   )
                                   .includes(item.id) ? (
                                   <>
@@ -532,13 +534,64 @@ class UserManage extends Component {
                                 >
                                   <AiIcons.AiOutlineEdit />
                                 </button> */}
-                                <button
-                                  type="button"
-                                  className="btn btn-delete  "
-                                  onClick={() => this.handleDeleteUser(item)}
-                                >
-                                  <AiIcons.AiOutlineDelete />
-                                </button>
+                                {arrCollectionForms &&
+                                arrCollectionForms
+                                  .map(
+                                    (arrCollectionForms) =>
+                                      arrCollectionForms.scheduleData?.giverId
+                                  )
+                                  .includes(item.id) ? (
+                                  <>
+                                    {" "}
+                                    <button
+                                      type="button"
+                                      className="btn btn-delete  "
+                                      onClick={() =>
+                                        this.handleDeleteUser(item)
+                                      }
+                                      disabled
+                                    >
+                                      <AiIcons.AiOutlineDelete />
+                                    </button>
+                                  </>
+                                ) : (
+                                  <>
+                                    {arrCollectionForms &&
+                                    arrCollectionForms
+                                      .map(
+                                        (arrCollectionForms) =>
+                                          arrCollectionForms.recipientId
+                                      )
+                                      .includes(item.id) ? (
+                                      <>
+                                        {" "}
+                                        <button
+                                          type="button"
+                                          className="btn btn-delete  "
+                                          onClick={() =>
+                                            this.handleDeleteUser(item)
+                                          }
+                                          disabled
+                                        >
+                                          <AiIcons.AiOutlineDelete />
+                                        </button>
+                                      </>
+                                    ) : (
+                                      <>
+                                        {" "}
+                                        <button
+                                          type="button"
+                                          className="btn btn-delete  "
+                                          onClick={() =>
+                                            this.handleDeleteUser(item)
+                                          }
+                                        >
+                                          <AiIcons.AiOutlineDelete />
+                                        </button>
+                                      </>
+                                    )}
+                                  </>
+                                )}
                               </td>
                             </tr>
                           );

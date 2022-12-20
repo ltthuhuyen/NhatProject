@@ -137,32 +137,41 @@ class AppointmentScheduleManage extends Component {
   };
 
   handleConfirm = async () => {
+    let userInfo = this.props.userInfo.id;
     let { addressId, currentDate, timeType, amount } = this.state;
     if (!addressId || !currentDate || !timeType || !amount) {
       toast.error("Vui lòng chọn đủ thông tin!");
       return;
     }
     let arrTemps = this.props.temps;
-    if (arrTemps && arrTemps.length > 0) {
-      arrTemps = arrTemps.map((item) => {
-        item.addressId = addressId;
-        item.date = currentDate;
-        item.timeType = timeType;
-        item.statusType = "S1";
-        item.amount = amount;
-        //recipientId = "";
-        return item;
-      });
-      console.log(arrTemps);
-    }
 
-    await saveBulkScheduleAppoinment({
-      arrSchedule: arrTemps,
+    // if (arrTemps && arrTemps.length > 0) {
+    //   arrTemps = arrTemps.map((item) => {
+    //     item.addressId = addressId;
+    //     item.date = currentDate;
+    //     item.timeType = timeType;
+    //     item.statusType = "S1";
+    //     item.amount = amount;
+    //     //recipientId = "";
+    //     return item;
+    //   });
+    //  f
+
+    // }
+
+    let response = await saveBulkScheduleAppoinment({
+      addressId: addressId,
+      date: currentDate,
+      timeType: timeType,
+      giverId: userInfo,
+      statusType: "S1",
+      amount: amount,
     });
-
-    await deleteAllTempOfGiverSerVice(this.state.giverId);
-    toast.success("Đặt lịch thu gom thành công");
-    this.props.history.push("/giver/collection-form");
+    if (response && response.errCode == 0) {
+      await deleteAllTempOfGiverSerVice(this.state.giverId);
+      toast.success("Đặt lịch thu gom thành công");
+      this.props.history.push("/giver/collection-form");
+    }
   };
 
   createAddress = async (data) => {

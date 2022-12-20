@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { Link, NavLink, Redirect, Route, Switch } from "react-router-dom";
 import * as actions from "../../../store/actions";
 import { withRouter } from "react-router";
+import moment from "moment";
 import * as AiIcons from "react-icons/ai";
 import * as BsIcons from "react-icons/bs";
 import * as HiIcons from "react-icons/hi";
@@ -34,6 +35,7 @@ class DetailCollectionFormStatusS2 extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      schedule: {},
       arrCollectionForms: {},
       arrCollect: [],
       arrRegistration: [],
@@ -52,6 +54,7 @@ class DetailCollectionFormStatusS2 extends Component {
       phone: "",
       recipientId: "",
       img: "",
+      avataGiver: {},
     };
   }
 
@@ -75,41 +78,37 @@ class DetailCollectionFormStatusS2 extends Component {
     await this.getAllAddressOfUserFromReact();
   }
 
-  // getAllCollectionFormReact = async () => {
-  //   if (
-  //     this.props.match &&
-  //     this.props.match.params &&
-  //     this.props.match.params.id
-  //   ) {
-  //     let collectId = this.props.match.params.id;
-  //     console.log("collectId", collectId);
-  //     let response = await getAllCollectionForm(collectId);
+  getAllCollectionFormReact = async () => {
+    if (
+      this.props.match &&
+      this.props.match.params &&
+      this.props.match.params.id
+    ) {
+      let scheduleId = this.props.match.params.id;
+      let response = await getAllCollectionFormBySchedule({
+        scheduleId: scheduleId,
+        status: "No",
+      });
 
-  //     if (response && response.errCode === 0) {
-  //       this.setState(
-  //         {
-  //           arrCollectionForms: response?.appointments,
-  //           scheduleData: response.appointments?.scheduleData,
-  //           giverData: response?.appointments?.scheduleData?.giverData,
-  //           recipientData: response?.appointments?.recipientData,
-  //           productData: response?.appointments?.scheduleData?.productData,
-  //           addressData: response?.appointments?.scheduleData?.addressData,
-  //           statusData: response?.appointments?.scheduleData?.statusData,
-  //           timeTypeData: response?.appointments?.scheduleData?.timeTypeData,
-  //           phone: response?.appointments?.scheduleData?.phone,
-  //           date: response?.appointments?.scheduleData?.date,
-  //           // status: response?.appointments?.statusTypeData.keyMap,
-  //           amount: response?.appointments?.scheduleData?.amount,
-  //           avataGiver: response?.appointments?.scheduleData?.giverData?.image,
-  //           avataRecipient: response?.appointments?.recipientData?.image,
-  //         },
-  //         () => {
-  //           console.log("vvv", this.state.scheduleData);
-  //         }
-  //       );
-  //     }
-  //   }
-  // };
+      if (response && response.errCode === 0) {
+        this.setState({
+          arrCollectionForms: response?.appointments,
+          scheduleData: response.appointments?.scheduleData,
+          giverData: response?.appointments?.scheduleData?.giverData,
+          recipientData: response?.appointments?.recipientData,
+          productData: response?.appointments?.scheduleData?.productData,
+          addressData: response?.appointments?.scheduleData?.addressData,
+          statusData: response?.appointments?.scheduleData?.statusData,
+          timeTypeData: response?.appointments?.scheduleData?.timeTypeData,
+          phone: response?.appointments?.scheduleData?.phone,
+          date: response?.appointments?.scheduleData?.date,
+          amount: response?.appointments?.scheduleData?.amount,
+          avataGiver: response?.appointments?.scheduleData?.giverData?.image,
+          avataRecipient: response?.appointments?.recipientData?.image,
+        });
+      }
+    }
+  };
 
   // getAllCollectionByScheduleOfGiver = async () => {
   //   let scheduleData = this.state.scheduleData;
@@ -133,7 +132,7 @@ class DetailCollectionFormStatusS2 extends Component {
 
   getAllAddressOfUserFromReact = async () => {
     let { arrRegistration } = this.state;
-    console.log("arrRegistration", arrRegistration);
+
     let response;
     for (let i = 0; i < arrRegistration.length; i++) {
       response = await getAllAddressOfUser(arrRegistration[i].recipientId);
@@ -166,45 +165,32 @@ class DetailCollectionFormStatusS2 extends Component {
       });
       let responseSchedule = await getAllSchedule(this.state.currentCollectId);
       if (responseSchedule && responseSchedule.errCode == 0) {
-        this.setState(
-          {
-            arrSchedule: responseSchedule.appointments,
-          },
-          () => {
-            console.log("arrSchedule", this.state.arrSchedule);
-          }
-        );
+        this.setState({
+          schedule: responseSchedule.appointments,
+        });
       }
       let responseCollect = await getAllCollectionFormBySchedule({
         scheduleId: this.state.currentCollectId,
       });
-
+      console.log("responseCollect", responseCollect);
       if (responseCollect && responseCollect.errCode === 0) {
-        this.setState(
-          {
-            arrCollectionForms: responseCollect?.appointments,
-            scheduleData: responseCollect.appointments?.scheduleData,
-            giverData: responseCollect?.appointments?.scheduleData?.giverData,
-            recipientData: responseCollect?.appointments?.recipientData,
-            productData:
-              responseCollect?.appointments?.scheduleData?.productData,
-            addressData:
-              responseCollect?.appointments?.scheduleData?.addressData,
-            statusData: responseCollect?.appointments?.scheduleData?.statusData,
-            timeTypeData:
-              responseCollect?.appointments?.scheduleData?.timeTypeData,
-            phone: responseCollect?.appointments?.scheduleData?.phone,
-            date: responseCollect?.appointments?.scheduleData?.date,
-            // status: responseCollect?.appointments?.statusTypeData.keyMap,
-            amount: responseCollect?.appointments?.scheduleData?.amount,
-            avataGiver:
-              responseCollect?.appointments?.scheduleData?.giverData?.image,
-            avataRecipient: responseCollect?.appointments?.recipientData?.image,
-          },
-          () => {
-            console.log("vvv", this.state.arrCollectionForms);
-          }
-        );
+        this.setState({
+          arrCollectionForms: responseCollect?.appointments,
+          scheduleData: responseCollect.appointments?.scheduleData,
+          giverData: responseCollect?.appointments?.scheduleData?.giverData,
+          recipientData: responseCollect?.appointments?.recipientData,
+          productData: responseCollect?.appointments?.scheduleData?.productData,
+          addressData: responseCollect?.appointments?.scheduleData?.addressData,
+          statusData: responseCollect?.appointments?.scheduleData?.statusData,
+          timeTypeData:
+            responseCollect?.appointments?.scheduleData?.timeTypeData,
+          phone: responseCollect?.appointments?.scheduleData?.phone,
+          date: responseCollect?.appointments?.scheduleData?.date,
+          // status: responseCollect?.appointments?.statusTypeData.keyMap,
+          avataGiver:
+            responseCollect?.appointments?.scheduleData?.giverData?.image,
+          avataRecipient: responseCollect?.appointments?.recipientData?.image,
+        });
       }
     }
   }
@@ -214,14 +200,15 @@ class DetailCollectionFormStatusS2 extends Component {
       id: collect.id,
     });
     if (response && response.errCode === 0) {
-      await this.getAllSchedule();
+      await getAllSchedule(this.props.match.params.id);
       await this.getAllCollectionFormReact();
       toast.success("Xác nhận thành công!");
+      window.location.reload();
     }
   };
   render() {
     let {
-      arrSchedule,
+      schedule,
       arrCollectionForms,
       arrRegistration,
       giverData,
@@ -241,11 +228,11 @@ class DetailCollectionFormStatusS2 extends Component {
     if (this.props.userInfo) {
       this.state.recipientId = this.props.userInfo.id;
     }
-    // console.log("arrCollect", arrCollect);
+    console.log("avataGiver", avataGiver);
 
     let imageBase64Giver = "";
     if (avataGiver) {
-      imageBase64Giver = new Buffer(avataGiver, "base64").toString("binary");
+      // imageBase64Giver = new Buffer(avataGiver, "base64").toString("binary");
     } else {
       imageBase64Giver = avata;
     }
@@ -338,7 +325,7 @@ class DetailCollectionFormStatusS2 extends Component {
                 <div className="icon">
                   <BsIcons.BsClipboardCheck />
                 </div>
-                <span className="mt-1 title-history">Xem lịch sử thu gom</span>
+                <span className="mt-1 title-history">Đã thu gom</span>
                 <div className="icon mr-0">
                   <MdIcons.MdOutlineNavigateNext />
                 </div>
@@ -352,28 +339,28 @@ class DetailCollectionFormStatusS2 extends Component {
                 <div className="d-flex ">
                   <div className="col-12">
                     <div className="row info-giver-recipient-detail">
-                      <img src={imageBase64Giver} className="col-5 img-pro" />
+                      <div className="col-5 img-pro"></div>
                       <div className="col-7">
                         <p className="row">
                           <FaIcons.FaUserAlt className="icon " />
-                          Người cho: {arrSchedule?.giverData?.firstName}{" "}
-                          {arrSchedule?.giverData?.lastName}
+                          Người cho: {schedule?.giverData?.firstName}{" "}
+                          {schedule?.giverData?.lastName}
                         </p>
                         <p className="row">
                           <HiIcons.HiOutlineMail className="icon" />
-                          {arrSchedule?.giverData?.email}{" "}
+                          {schedule?.giverData?.email}{" "}
                         </p>
                         <p className="row">
                           <BsIcons.BsTelephoneInbound className="icon " />
-                          {arrSchedule?.giverData?.phone}{" "}
+                          {schedule?.giverData?.phone}{" "}
                         </p>
                       </div>
                       <p>
                         <FiIcons.FiMapPin className="icon mb-2" />
-                        {arrSchedule?.addressData?.address_name} -{" "}
-                        {arrSchedule?.addressData?.ward_name} -{" "}
-                        {arrSchedule?.addressData?.district_name} -{" "}
-                        {arrSchedule?.addressData?.city_name}
+                        {schedule?.addressData?.address_name} -{" "}
+                        {schedule?.addressData?.ward_name} -{" "}
+                        {schedule?.addressData?.district_name} -{" "}
+                        {schedule?.addressData?.city_name}
                       </p>
                     </div>
                   </div>
@@ -385,27 +372,27 @@ class DetailCollectionFormStatusS2 extends Component {
                       <RiIcons.RiProductHuntLine className="icon mb-1" /> Sản
                       phẩm:{" "}
                     </span>
-                    <p>{arrSchedule?.productData?.product_name} </p>
+                    <p>{schedule?.productData?.product_name} </p>
                   </div>
                   <div className="col-12 ">
                     <span className="info ml-2 mr-1"> Mô tả: </span>
-                    <p>{arrSchedule?.productData?.description}</p>
+                    <p>{schedule?.productData?.description}</p>
                   </div>
                   <div className="col-12 d-flex">
                     <span className="info mr-1">
                       <ShoppingCartIcon className="icon sm" /> Số lượng:
                     </span>
-                    <p>{arrSchedule?.amount}</p>
+                    <p>{schedule?.amount}</p>
                   </div>
                   <div className="col-12 ">
                     <span className="info mr-1">
                       <FiIcons.FiMapPin className="icon " /> Địa chỉ thu gom:{" "}
                     </span>
                     <p>
-                      {arrSchedule?.addressData?.address_name} -{" "}
-                      {arrSchedule?.addressData?.ward_name} -{" "}
-                      {arrSchedule?.addressData?.district_name} -{" "}
-                      {arrSchedule?.addressData?.city_name}
+                      {schedule?.addressData?.address_name} -{" "}
+                      {schedule?.addressData?.ward_name} -{" "}
+                      {schedule?.addressData?.district_name} -{" "}
+                      {schedule?.addressData?.city_name}
                     </p>
                   </div>
                   <div className="col-12 d-flex">
@@ -413,70 +400,41 @@ class DetailCollectionFormStatusS2 extends Component {
                       <BsIcons.BsCalendarDate className="icon" /> Thu gom từ
                       ngày:{" "}
                     </span>
-                    <p>{arrSchedule?.date}</p>
+                    <p>{schedule?.date}</p>
                     <span className="info ml-2 mr-1"> - Thời gian: </span>
-                    <p>{arrSchedule?.timeTypeData?.valueVi}</p>
+                    <p>{schedule?.timeTypeData?.valueVi}</p>
                   </div>
                   <div className="col-12 d-flex">
-                    {arrSchedule?.statusData?.valueVi === "Chờ xác nhận" ||
-                    arrSchedule?.statusData?.valueVi === "Chờ thu gom" ? (
+                    {schedule?.statusData?.valueVi === "Chờ xác nhận" ||
+                    schedule?.statusData?.valueVi === "Chờ thu gom" ? (
                       <button className="btn status-s3">
                         <PriorityHighIcon className="icon mr-1" />
-                        {arrSchedule?.statusData?.valueVi}
+                        {schedule?.statusData?.valueVi}
                       </button>
                     ) : (
                       <>
-                        {arrSchedule?.statusData?.valueVi === "Đơn bị hủy" ? (
+                        {schedule?.statusData?.valueVi === "Đơn bị hủy" ? (
                           <button className="btn status-s5">
                             <BsIcons.BsX className="icon" />{" "}
-                            {arrSchedule?.statusData?.valueVi}
+                            {schedule?.statusData?.valueVi}
                           </button>
                         ) : (
                           <>
-                            {arrSchedule?.statusData?.valueVi ===
-                            "Đã thu gom" ? (
+                            {schedule?.statusData?.valueVi === "Đã thu gom" ? (
                               <button className="btn status-s4">
                                 <CheckCircleOutlineIcon className="icon mr-1" />
-                                {arrSchedule?.statusData?.valueVi}
+                                {schedule?.statusData?.valueVi}
                               </button>
                             ) : (
                               <button className="btn status-s1">
                                 <PriorityHighIcon className="icon mr-1" />
-                                {arrSchedule?.statusData?.valueVi}
+                                {schedule?.statusData?.valueVi}
                               </button>
                             )}
                           </>
                         )}
                       </>
                     )}
-
-                    {/* <div className="d-flex update-status">
-                      {statusData?.valueVi === "Chờ thu gom" ? (
-                        <>
-                          <select
-                            id="status"
-                            class="form-control col-8"
-                            onChange={(e) => {
-                              this.handleOnChangeInput(e, "status");
-                            }}
-                            value={status}
-                          >
-                            <option value="S4">Đã thu gom</option>
-                            <option value="S5">Hủy đơn</option>
-                          </select>
-                          <button
-                            className="btn btn-update-status col-12"
-                            onClick={() =>
-                              this.handleUpdate(this.props.match.params.id)
-                            }
-                          >
-                            Cập nhật
-                          </button>
-                        </>
-                      ) : (
-                        ""
-                      )}
-                    </div> */}
                   </div>
                 </div>
               </div>
@@ -544,6 +502,7 @@ class DetailCollectionFormStatusS2 extends Component {
                                     <button
                                       className="btn btn-update-status"
                                       onClick={(e) => this.handleUpdate(item)}
+                                      disabled
                                     >
                                       Xác nhận
                                     </button>
@@ -552,6 +511,11 @@ class DetailCollectionFormStatusS2 extends Component {
                               ) : item.statusType === "No" &&
                                 item.scheduleData.statusType === "S2" ? (
                                 <>
+                                  <div className="text-registerDate">
+                                    {moment(item.registerDate).format(
+                                      "DD/MM/YYYY HH:mm"
+                                    )}
+                                  </div>
                                   <div className="update-status">
                                     <button
                                       className="btn btn-update-status"

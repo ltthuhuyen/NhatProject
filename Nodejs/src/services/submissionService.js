@@ -140,6 +140,11 @@ let getAllSubmissions = (submissionId) => {
           nest: true,
         });
       }
+      if (submissions && submissions.avatar) {
+        submissions.avatar = new Buffer(submissions.avatar, "base64").toString(
+          "binary"
+        );
+      }
       resolve(submissions);
     } catch (error) {
       reject(error);
@@ -156,6 +161,7 @@ let getAllSubmissionsByCompetition = (competitionId) => {
           where: {
             competitionId: competitionId,
           },
+
           include: [
             {
               model: db.Competition,
@@ -169,6 +175,11 @@ let getAllSubmissionsByCompetition = (competitionId) => {
           raw: true,
           nest: true,
         });
+      }
+      if (submissions && submissions.avatar) {
+        submissions.avatar = new Buffer(submissions.avatar, "base64").toString(
+          "binary"
+        );
       }
       resolve(submissions);
     } catch (error) {

@@ -14,10 +14,8 @@ import * as actions from "../../../store/actions";
 import avata from "../../../assets/images/avata.jpg";
 import "./CollectionFormStatus.scss";
 import {
-  getAllCollectionForm,
   getAllScheduleStatus,
   getAllCollectionFormBySchedule,
-  getCollectionFormOfRecipientByStatus,
 } from "../../../services/collectionformService";
 import Footer from "../../Footer/Footer";
 import ScrollUp from "../../../components/ScrollUp";
@@ -41,14 +39,9 @@ class CollectionFormStatusS2 extends Component {
   handleOnChangeInput = (e, id) => {
     let copyState = { ...this.state };
     copyState[id] = e.target.value;
-    this.setState(
-      {
-        ...copyState,
-      },
-      () => {
-        console.log("check good state", this.state);
-      }
-    );
+    this.setState({
+      ...copyState,
+    });
   };
 
   async componentDidMount() {
@@ -56,27 +49,6 @@ class CollectionFormStatusS2 extends Component {
     await this.getAllCollectionByScheduleOfRecipient();
     await this.props.getStatusStart();
   }
-
-  // getAllSchedule = async () => {
-  //   let response = await getAllCollectionForm("ALL");
-  //   console.log(response);
-  //   if (response && response.errCode == 0) {
-  //     this.setState({
-  //       arrSchedule: response.appointments,
-  //     });
-  //   }
-  // };
-  // getCollectionFormOfRecipientStatusS2 = async () => {
-  //   let response = await getCollectionFormOfRecipientByStatus({
-  //     recipientId: this.state.recipientId,
-  //     status: "S2",
-  //   });
-  //   if (response && response.errCode == 0) {
-  //     this.setState({
-  //       arrCollectionFormsStatusS2: response.appointments,
-  //     });
-  //   }
-  // };
 
   getScheduleS2 = async () => {
     let response = await getAllScheduleStatus("S2");
@@ -104,12 +76,18 @@ class CollectionFormStatusS2 extends Component {
 
       if (arr) {
         for (let i = 0; i < arr.length; i++) {
-          console.log("arrSchedule1", arr);
           response = await getAllCollectionFormBySchedule({
             scheduleId: arr[i],
             recipientId: this.state.recipientId,
+            status: "No",
           });
-          temp.push(response.appointments);
+          if (
+            response &&
+            response.errCode === 0 &&
+            response.appointments != null
+          ) {
+            temp.push(response.appointments);
+          }
         }
       }
       if (temp) {
@@ -138,7 +116,9 @@ class CollectionFormStatusS2 extends Component {
   }
 
   handleLook = async (schedule) => {
-    this.props.history.push(`/recipient/collection-form-detail/${schedule.id}`);
+    this.props.history.push(
+      `/recipient/collection-form-detail-status-s2/${schedule.id}`
+    );
   };
 
   render() {
@@ -159,7 +139,7 @@ class CollectionFormStatusS2 extends Component {
           <div className="container-collection-form-status shadow-lg ">
             <div className="d-flex wrapper-link">
               <NavLink
-                to="/recipient/collection-form"
+                to="/recipient/check-calendar"
                 className="d-flex"
                 activeStyle={{
                   background: "white",
@@ -169,10 +149,11 @@ class CollectionFormStatusS2 extends Component {
                 }}
               >
                 <div className="icon">
-                  <AiIcons.AiOutlineUnorderedList />
+                  <BsIcons.BsCalendar2Week />
                 </div>
-                <span className="mt-1">Đơn thu gom</span>
+                <span className="mt-1">Xem lịch</span>
               </NavLink>
+
               <NavLink
                 to="/recipient/collection-form-status-s2"
                 className="d-flex"
@@ -229,13 +210,19 @@ class CollectionFormStatusS2 extends Component {
                 <div className="icon">
                   <BsIcons.BsClipboardCheck />
                 </div>
-                <span className="mt-1 title-history">Xem lịch sử thu gom</span>
+                <span className="mt-1 title-history">Đã thu gom</span>
                 <div className="icon mr-0">
                   <MdIcons.MdOutlineNavigateNext />
                 </div>
               </NavLink>
             </div>
             <div className="title">CHỜ XÁC NHẬN</div>
+            <div className="wrapper-title-sum-statistic d-flex">
+              <span className="wrapper-sum d-flex">
+                <div className="">Tổng cộng:</div>
+                <div className="text-sum">{arrCollect.length} đơn</div>
+              </span>
+            </div>
             <div className="row ">
               {arrCollect &&
                 arrCollect.map((item, index) => {
@@ -289,7 +276,7 @@ class CollectionFormStatusS2 extends Component {
                           </button>
                           <button
                             className="btn btn-detail "
-                            onClick={() => this.handleLook(item)}
+                            onClick={() => this.handleLook(item.scheduleData)}
                           >
                             Chi tiết
                           </button>

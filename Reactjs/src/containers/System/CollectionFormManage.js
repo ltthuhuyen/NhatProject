@@ -23,14 +23,14 @@ import {
 } from "../../services/collectionformService";
 import CustomScrollbars from "../../components/CustomScrollbars";
 import CloseIcon from "@mui/icons-material/Close";
-import ModalDetailCollectForm from "./ModalDetailCollectForm";
+import ModalDetailAllCollect from "./ModalDetailAllCollect";
 
 class CollectionFormManage extends Component {
   constructor(props) {
     super(props);
     this.state = {
       arrCollectsStatusByCurrentDate: [],
-      arrCollectionForms: [],
+      arrSchedule: [],
       arrCollectStatusYes: [],
       arrCollect: [],
       statusArr: [],
@@ -62,57 +62,44 @@ class CollectionFormManage extends Component {
   getAllCollectionFormReact = async () => {
     let responseSchedlue = await getAllSchedule("ALL");
     if (responseSchedlue && responseSchedlue.errCode == 0) {
-      this.setState({
-        arrCollectionForms: responseSchedlue.appointments,
-      });
+      this.setState(
+        {
+          arrSchedule: responseSchedlue.appointments,
+        },
+        () => {
+          console.log("arrSchedule", this.state.arrSchedule);
+        }
+      );
     }
-    let { arrCollectionForms } = this.state;
+    let { arrSchedule } = this.state;
     let arr = [];
     let responseCollect;
-    for (let i = 0; i < arrCollectionForms.length; i++) {
-      // let responseCollect = {};
-
+    for (let i = 0; i < arrSchedule.length; i++) {
       responseCollect = await getAllCollectionFormBySchedule({
-        scheduleId: arrCollectionForms[i].id,
+        scheduleId: arrSchedule[i].id,
       });
-      // console.log("responseCollect", responseCollect);
-
       if (responseCollect) {
-        this.setState(
-          {
-            arrCollect: responseCollect.appointments,
-          },
-          () => {
-            // console.log("arrCollect", this.state.arrCollect);
-          }
-        );
+        this.setState({
+          arrCollect: responseCollect.appointments,
+        });
       }
-
       let { arrCollect } = this.state;
       for (let i = 0; i < arrCollect.length; i++) {
         if (arrCollect[i].statusType == "Yes") {
           arr.push(arrCollect[i]);
         }
       }
-
       if (arr) {
-        this.setState({
-          arrCollectStatusYes: arr,
-        });
+        this.setState(
+          {
+            arrCollectStatusYes: arr,
+          },
+          () => {
+            console.log("arrCollectStatusYes", this.state.arrCollectStatusYes);
+          }
+        );
       }
     }
-
-    // if (arr) {
-    //   for (let i = 0; i < arr.length; i++) {}
-    //   this.setState(
-    //     {
-    //       arrCollect: arr,
-    //     },
-    //     () => {
-    //       // console.log("arrCollect", this.state.arrCollect);
-    //     }
-    //   );
-    // }
   };
 
   // getAllCollectFormStatusByCurrentDateFromReact = async () => {
@@ -159,19 +146,11 @@ class CollectionFormManage extends Component {
     });
 
     if (response) {
-      this.setState(
-        {
-          arrCollectsStatusByCurrentDate: response.collects,
-          currentDateTimeBegin: currentDateTimeBegin,
-          currentDateTimeStop: currentDateTimeStop,
-        },
-        () => {
-          console.log(
-            "arrCollectsStatusByCurrentDate",
-            this.state.arrCollectsStatusByCurrentDate
-          );
-        }
-      );
+      this.setState({
+        arrCollectsStatusByCurrentDate: response.collects,
+        currentDateTimeBegin: currentDateTimeBegin,
+        currentDateTimeStop: currentDateTimeStop,
+      });
     }
   };
 
@@ -192,10 +171,11 @@ class CollectionFormManage extends Component {
     });
   };
 
-  handleLook = (collect) => {
+  handleLook = (schedule) => {
+    // console.log("schedule", schedule);
     this.setState({
       isOpenModalDetailCollect: true,
-      detailCollect: collect,
+      detailCollect: schedule,
     });
   };
 
@@ -218,31 +198,22 @@ class CollectionFormManage extends Component {
 
   render() {
     let {
+      arrSchedule,
       arrCollectStatusYes,
       isShowNotification,
       arrCollectsStatusByCurrentDate,
       currentDateTimeStop,
     } = this.state;
-    console.log(
-      "arrCollectsStatusByCurrentDate",
-      arrCollectsStatusByCurrentDate
-    );
+
     currentDateTimeStop = moment(currentDateTimeStop);
-    console.log(currentDateTimeStop);
+
     let { currentPage, todosPerPage } = this.state;
     const indexOfLastTodo = currentPage * todosPerPage;
     const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
-    const currentTodos = arrCollectStatusYes.slice(
-      indexOfFirstTodo,
-      indexOfLastTodo
-    );
+    const currentTodos = arrSchedule.slice(indexOfFirstTodo, indexOfLastTodo);
 
     const pageNumbers = [];
-    for (
-      let i = 1;
-      i <= Math.ceil(arrCollectStatusYes.length / todosPerPage);
-      i++
-    ) {
+    for (let i = 1; i <= Math.ceil(arrSchedule.length / todosPerPage); i++) {
       pageNumbers.push(i);
     }
     const { processLogout, userInfo } = this.props;
@@ -254,7 +225,7 @@ class CollectionFormManage extends Component {
     return (
       <>
         <NavAdmin />
-        <ModalDetailCollectForm
+        <ModalDetailAllCollect
           isOpen={this.state.isOpenModalDetailCollect}
           toggleFromParent={this.toggleDetailCollectModal}
           currentCollect={this.state.detailCollect}
@@ -283,9 +254,9 @@ class CollectionFormManage extends Component {
                             arrCollectsStatusByCurrentDate.map(
                               (item, index) => {
                                 let t = moment(item.createdAt);
-                                console.log("t", t);
+                                // console.log("t", t);
                                 let tt = moment(`${t}`);
-                                console.log("tt", tt);
+                                // console.log("tt", tt);
                                 return (
                                   <>
                                     <div
@@ -320,8 +291,11 @@ class CollectionFormManage extends Component {
                                           </>
                                         ) : (
                                           <>
-                                            {currentDateTimeStop.diff(tt)} phút
-                                            trước
+                                            {currentDateTimeStop.diff(
+                                              tt,
+                                              "minutes"
+                                            )}{" "}
+                                            phút trước
                                           </>
                                         )}
                                       </div>
@@ -377,9 +351,7 @@ class CollectionFormManage extends Component {
               <div className="wrapper-title-sum-statistic d-flex">
                 <span className="wrapper-sum d-flex">
                   <div className="">Tổng cộng:</div>
-                  <div className="text-sum">
-                    {arrCollectStatusYes.length} đơn
-                  </div>
+                  <div className="text-sum">{arrSchedule.length} đơn</div>
                 </span>
               </div>
               <Table className="shadow table">
@@ -404,60 +376,64 @@ class CollectionFormManage extends Component {
                       {" "}
                       {currentTodos &&
                         currentTodos.map((item, index) => {
-                          console.log(item.scheduleData?.giverData);
                           return (
                             <tr key={index}>
                               <td>{item.id}</td>
                               <td>
-                                {item.scheduleData?.giverData?.firstName}{" "}
-                                {item.scheduleData?.giverData?.lastName}
+                                {item?.giverData?.firstName}{" "}
+                                {item?.giverData?.lastName}
                               </td>
-                              <td>{item.scheduleData.giverData.email}</td>
-                              <td>{item.scheduleData.giverData.phone}</td>
-                              <td>
-                                {item.scheduleData.productData.product_name}
-                              </td>
+                              <td>{item.giverData.email}</td>
+                              <td>{item.giverData.phone}</td>
+                              <td>{item.productData.product_name}</td>
 
-                              {/* <td>{item.scheduleData.timeTypeData.valueVi}</td>  */}
+                              {/* <td>{item.timeTypeData.valueVi}</td>  */}
                               <td>
-                                {item.recipientData.firstName}{" "}
-                                {item.recipientData.lastName}
+                                {arrCollectStatusYes &&
+                                  arrCollectStatusYes.map(
+                                    (arrCollectStatusYes, index) => {
+                                      if (
+                                        arrCollectStatusYes.scheduleId ===
+                                        item.id
+                                      ) {
+                                        return (
+                                          arrCollectStatusYes.recipientData
+                                            .firstName +
+                                          " " +
+                                          arrCollectStatusYes.recipientData
+                                            .lastName
+                                        );
+                                      }
+                                    }
+                                  )}
                               </td>
                               <td>
-                                {item.scheduleData.statusData.valueVi ===
-                                  "Chờ xác nhận" ||
-                                item.scheduleData.statusData.valueVi ===
-                                  "Chờ thu gom" ? (
+                                {item.statusData.valueVi === "Chờ xác nhận" ||
+                                item.statusData.valueVi === "Chờ thu gom" ? (
                                   <button className="btn status-s2">
                                     <PriorityHighIcon className="icon mr-1" />
-                                    {item.scheduleData.statusData.valueVi}
+                                    {item.statusData.valueVi}
                                   </button>
                                 ) : (
                                   <>
-                                    {item.scheduleData.statusData.valueVi ===
+                                    {item.statusData.valueVi ===
                                     "Đơn bị hủy" ? (
                                       <button className="btn status-s5">
                                         <BsIcons.BsX className="icon" />{" "}
-                                        {item.scheduleData.statusData.valueVi}
+                                        {item.statusData.valueVi}
                                       </button>
                                     ) : (
                                       <>
-                                        {item.scheduleData.statusData
-                                          .valueVi === "Đã thu gom" ? (
+                                        {item.statusData.valueVi ===
+                                        "Đã thu gom" ? (
                                           <button className="btn status-s4">
                                             <CheckCircleOutlineIcon className="icon mr-1" />
-                                            {
-                                              item.scheduleData.statusData
-                                                .valueVi
-                                            }
+                                            {item.statusData.valueVi}
                                           </button>
                                         ) : (
                                           <button className="btn status-s1">
                                             <PriorityHighIcon className="icon mr-1" />
-                                            {
-                                              item.scheduleData.statusData
-                                                .valueVi
-                                            }
+                                            {item.statusData.valueVi}
                                           </button>
                                         )}
                                       </>
@@ -481,8 +457,8 @@ class CollectionFormManage extends Component {
                   ) : (
                     <>
                       {" "}
-                      {arrCollectStatusYes &&
-                        arrCollectStatusYes.map((item, index) => {
+                      {arrSchedule &&
+                        arrSchedule.map((item, index) => {
                           return (
                             <tr key={index}>
                               <td>{item.id}</td>
@@ -498,8 +474,23 @@ class CollectionFormManage extends Component {
                               {/* <td>{item.scheduleData.date}</td>
                                         <td>{item.scheduleData.timeTypeData.valueVi}</td>  */}
                               <td>
-                                {item.recipientData.firstName}{" "}
-                                {item.recipientData.lastName}
+                                {arrCollectStatusYes &&
+                                  arrCollectStatusYes.map(
+                                    (arrCollectStatusYes, index) => {
+                                      if (
+                                        arrCollectStatusYes.scheduleId ===
+                                        item.id
+                                      ) {
+                                        return (
+                                          arrCollectStatusYes.recipientData
+                                            .firstName +
+                                          " " +
+                                          arrCollectStatusYes.recipientData
+                                            .lastName
+                                        );
+                                      }
+                                    }
+                                  )}
                               </td>
                               <td>
                                 {item.statusTypeData.valueVi ===

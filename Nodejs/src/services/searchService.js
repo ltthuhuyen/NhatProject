@@ -4,7 +4,6 @@ const Op = Sequelize.Op;
 import appointmentService from "./appointmentService";
 
 let searchProduct = (search) => {
-  console.log("search", search);
   return new Promise(async (resolve, reject) => {
     try {
       let data = await db.Product.findAll({
@@ -64,9 +63,10 @@ let searchCollectionByAddress = (search) => {
       if (
         search.city_name &&
         search.district_name &&
-        search.ward_name &&
-        search.date === ""
+        !search.ward_name &&
+        search.date
       ) {
+        console.log("th1");
         let searchCollection = await db.Address.findAll({
           where: {
             city_name: {
@@ -75,14 +75,12 @@ let searchCollectionByAddress = (search) => {
             district_name: {
               [Op.like]: `%${search.district_name}%`,
             },
-            ward_name: {
-              [Op.like]: `%${search.ward_name}%`,
-            },
           },
         });
         let arrAddress = [];
         let collectionForm;
         let arrCollectionFormByAddress = [];
+
         // đưa addressId vào mảng
         for (let i = 0; i < searchCollection.length; i++) {
           let addressId = searchCollection[i].id;
@@ -95,6 +93,13 @@ let searchCollectionByAddress = (search) => {
           );
           arrCollectionFormByAddress.push(...collectionForm);
         }
+        console.log(
+          "arrCollectionFormByAddress",
+          arrCollectionFormByAddress.length
+        );
+        arrCollectionFormByAddress = arrCollectionFormByAddress.filter(
+          (item) => item.date === search.date
+        );
         resolve(arrCollectionFormByAddress);
       } else if (
         search.city_name &&
@@ -102,6 +107,7 @@ let searchCollectionByAddress = (search) => {
         search.ward_name &&
         search.date
       ) {
+        console.log("th2");
         let searchCollection = await db.Address.findAll({
           where: {
             city_name: {

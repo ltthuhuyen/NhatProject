@@ -21,13 +21,11 @@
     }
     .row{ 
         .content {
-            border: 5px solid #8CC63E;
-            border-radius: 15px;
-            margin: 30px;
-            padding: 30px 20px;
+          
+            margin: 30px 0;
+            // padding: 30px 20px;
             &:hover{
-                scale: (1.1);
-              
+                scale: (1.08);
             }
             .img .img-pro{
                 border-radius: 20px;
@@ -36,7 +34,7 @@
               
             }
             .info-news{
-                padding: 30px 15px;
+                padding: 10px;
                 .link{
                     text-decoration: none;
                     .title{
@@ -59,7 +57,7 @@
 }
 
 .news-detail{
-    margin: 220px;
+    margin: 220px 220px 120px 220px;
     justify-content: center;
     .title-news-detail{
         text-align: center;
@@ -79,7 +77,39 @@
         width: 80px;
 
     }
+         .time {
+            font-style: italic;
+            font-size: 15px;
+            top: 50%;
+            right: 15%;
+            position: absolute;
+        
+    
+             .title-text {
+                 color: #a9a9a9;
+    
+                 margin-right: 3px;
+             }
+    
+             .info-text {
+                 color: #000;
+    
+             }
+         }
+    .news-detail-content{
+        .frames-img{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            .img{
+                height: 250px;
+                width: 100%;
+                margin: 0 500px;
+            }
+        }
+    }
 }
+
 .create-submission {
     margin: 0 200px 0 200px;
     max-width: 100%;
@@ -398,7 +428,7 @@
 }
 
 .competition-detail {
-    margin: 220px;
+    margin: 220px 220px 120px 220px;
     justify-content: center;
 
     .title-competition-detail {
@@ -849,7 +879,7 @@
 }
 
 .submission-detail {
-    margin: 220px;
+    margin: 220px 220px 150px 220px;
     justify-content: center;
 
     .title-submission-detail {
@@ -872,7 +902,8 @@
 
     }
     .wrapper-info-submission{
-        right: 230px;
+        right: 15%;
+        top: 50%;
         position: absolute;
        
         .info-submisser{
@@ -887,6 +918,20 @@
             .info-text{
                 color: #000;
               
+            }
+        }
+    }
+    .submission-detail-content {
+        margin-top: 30px !important;
+        .frames-img {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .img {
+                height: 250px;
+                width: 100%;
+                margin: 0 500px;
             }
         }
     }

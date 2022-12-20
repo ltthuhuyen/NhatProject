@@ -1,0 +1,575 @@
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import { Redirect, Route, Switch } from "react-router-dom";
+import { FormattedMessage } from "react-intl";
+import { Modal, ModalHeader, ModalBody } from "reactstrap";
+import Lightbox from "react-image-lightbox";
+import * as actions from "../../store/actions";
+import { withRouter } from "react-router";
+import { saveUpdateStatic } from "../../services/appointmentService";
+import { getAllAddressOfUser } from "../../services/addressService";
+import * as BsIcons from "react-icons/bs";
+import * as FiIcons from "react-icons/fi";
+import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import "./ModalDetailCollectForm.scss";
+import {
+  getAllCollectionForm,
+  getAllCollectionFormBySchedule,
+} from "../../services/collectionformService";
+import NavAdmin from "../../components/NavAdmin";
+import moment from "moment";
+import { dateFormat } from "../../utils";
+
+class ModalDetailAllCollect extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      arrCollectionForms: {},
+      arrCollect: [],
+      statusArr: [],
+      status: "",
+      statusType: "",
+      giverData: {},
+      recipientData: {},
+      productData: {},
+      statusTypeData: {},
+      timeTypeData: {},
+      date: "",
+      phone: "",
+      currentCollectId: "",
+      detail: {},
+    };
+  }
+
+  async componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevState.currentCollectId !== this.props?.currentCollect?.id) {
+      this.setState({
+        currentCollectId: this.props.currentCollect.id,
+        detail: this.props.currentCollect,
+      });
+      if (this.state.detail) {
+        let responseCollect = await getAllCollectionFormBySchedule({
+          scheduleId: this.state.detail.id,
+        });
+        if (responseCollect) {
+          this.setState({
+            arrCollect: responseCollect.appointments,
+          });
+          let response = await getAllAddressOfUser(
+            this.state.detail?.recipientData?.id
+          );
+
+          if (response && response.errCode === 0) {
+            this.setState({
+              addressRecipient: response.addresses,
+            });
+          }
+        }
+      }
+    }
+  }
+
+  toggle = () => {
+    this.props.toggleFromParent();
+  };
+
+  handleOnChangeInput = (e, id) => {
+    let copyState = { ...this.state };
+    copyState[id] = e.target.value;
+    this.setState({
+      ...copyState,
+    });
+  };
+
+  handleUpdate = async (id, status) => {
+    let response = await saveUpdateStatic({
+      id: id,
+      status: status,
+    });
+    this.props.history.push(`/system/collection-form-manage/`);
+  };
+
+  render() {
+    let {
+      giverData,
+      addressData,
+      recipientData,
+      recipientId,
+      productData,
+      arrCollect,
+      amount,
+      timeTypeData,
+      date,
+      statusData,
+      addressRecipient,
+      status,
+      detail,
+    } = this.state;
+    let statuses = this.state.statusArr;
+
+    return (
+      <Modal
+        isOpen={this.props.isOpen}
+        toggle={() => {
+          this.toggle();
+        }}
+        className={"modal-user-container"}
+        size="lg"
+        // centered
+      >
+        <ModalHeader
+          toggle={() => {
+            this.toggle();
+          }}
+        >
+          CHI TIẾT ĐƠN THU GOM
+        </ModalHeader>
+        <ModalBody>
+          <form className="modal-detail-collect">
+            <div className="">
+              {detail.statusType == "S1" ||
+              detail.statusType == "S3" ||
+              detail.statusType == "S4" ||
+              detail.statusType == "S5" ? (
+                <>
+                  <div className="row d-flex">
+                    <div className="col-6">
+                      <div className="form-row">
+                        <p className="col-12 d-flex">
+                          <div className="lable">Người cho:</div>
+                          <div className="text">
+                            {detail.giverData?.firstName}{" "}
+                            {detail.giverData?.lastName}
+                          </div>
+                        </p>
+                      </div>
+                      <div className="form-row">
+                        <p className="col-12 d-flex">
+                          <div className="lable">Email:</div>
+                          <div className="text">{detail.giverData?.email}</div>
+                        </p>
+                      </div>
+                      <div className="form-row">
+                        <p className="col-12 d-flex">
+                          <div className="lable">SĐT:</div>
+                          <div className="text">{detail.giverData?.phone}</div>
+                        </p>
+                      </div>
+                      <div className="form-row">
+                        <p className="col-12 d-flex">
+                          <div className="lable">
+                            <FiIcons.FiMapPin className="icon " />{" "}
+                          </div>
+                          <div className="text">
+                            {detail.addressData?.address_name}
+                            {" - "}
+                            {detail.addressData?.ward_name}
+                            {"- "}
+                            {detail.addressData?.district_name}
+                            {" - "}
+                            {detail.addressData?.city_name}
+                          </div>
+                        </p>
+                      </div>
+                    </div>
+                    <div className="col-6">
+                      {arrCollect &&
+                        arrCollect.map((arrCollect, index) => {
+                          if (
+                            arrCollect.scheduleId === detail.id &&
+                            arrCollect.statusType === "Yes"
+                          ) {
+                            return (
+                              <>
+                                {" "}
+                                <div className="form-row">
+                                  <p className="col-12 d-flex">
+                                    <div className="lable">Người nhận:</div>
+                                    <div className="text">
+                                      {arrCollect.recipientData?.firstName}{" "}
+                                      {arrCollect.recipientData?.lastName}
+                                    </div>
+                                  </p>
+                                </div>
+                                <div className="form-row">
+                                  <p className="col-12 d-flex">
+                                    <div className="lable">Email:</div>
+                                    <div className="text">
+                                      {arrCollect.recipientData?.email}
+                                    </div>
+                                  </p>
+                                </div>
+                                <div className="form-row">
+                                  <p className="col-12 d-flex">
+                                    <div className="lable">SĐT:</div>
+                                    <div className="text">
+                                      {arrCollect.recipientData?.phone}
+                                    </div>
+                                  </p>
+                                </div>
+                                <div className="form-row">
+                                  <p className="col-12 d-flex">
+                                    <div className="lable">
+                                      <FiIcons.FiMapPin className="icon " />{" "}
+                                    </div>
+                                    <div className="text">
+                                      {
+                                        arrCollect.recipientData.userData
+                                          ?.address_name
+                                      }
+                                      {" - "}
+                                      {
+                                        arrCollect.recipientData.userData
+                                          ?.ward_name
+                                      }
+                                      {"- "}
+                                      {
+                                        arrCollect.recipientData.userData
+                                          ?.district_name
+                                      }
+                                      {" - "}
+                                      {
+                                        arrCollect.recipientData.userData
+                                          ?.city_name
+                                      }
+                                    </div>
+                                  </p>
+                                </div>
+                              </>
+                            );
+                          }
+                        })}
+                    </div>
+                  </div>
+                  <hr></hr>
+                  <div className="form-row">
+                    <p className="col-12 d-flex">
+                      <div className="lable">Sản phẩm:</div>
+                      <div className="text">
+                        {detail.productData?.product_name}
+                      </div>
+                      <div className="lable"> - Mô tả:</div>
+                      <div className="text">
+                        {detail.productData?.description}
+                      </div>
+                    </p>
+                  </div>
+                  <div className="form-row">
+                    <p className="col-12 d-flex">
+                      <div className="lable">Só lượng: </div>
+                      <div className="text">{detail.amount}</div>
+                    </p>
+                  </div>
+                  <div className="form-row">
+                    <p className="col-12 d-flex">
+                      <div className="lable">
+                        <FiIcons.FiMapPin className="icon " />{" "}
+                      </div>
+                      <div className="text">
+                        {detail.addressData?.address_name}
+                        {" - "}
+                        {detail.addressData?.ward_name}
+                        {"- "}
+                        {detail.addressData?.district_name}
+                        {" - "}
+                        {detail.addressData?.city_name}
+                      </div>
+                    </p>
+                  </div>
+                  <div className="form-row">
+                    <p className="col-12 d-flex">
+                      <div className="lable">Thu gom từ ngày:</div>
+                      <div className="text">{detail.date}</div>
+                      <div className="lable"> - Thời gian:</div>
+                      <div className="text">{detail.timeTypeData?.valueVi}</div>
+                    </p>
+                  </div>
+                  <div className="form-row">
+                    {detail.statusData?.valueVi === "Chờ xác nhận" ||
+                    detail.statusData?.valueVi === "Chờ thu gom" ? (
+                      <button className="btn status-s2">
+                        <PriorityHighIcon className="icon" />{" "}
+                        {detail.statusData?.valueVi}
+                      </button>
+                    ) : (
+                      <>
+                        {detail.statusData?.valueVi === "Đơn bị hủy" ? (
+                          <button className="btn status-s5">
+                            <BsIcons.BsX className="icon" />{" "}
+                            {detail.statusData?.valueVi}
+                          </button>
+                        ) : (
+                          <>
+                            {detail.statusData?.valueVi === "Đã thu gom" ? (
+                              <>
+                                <button className="btn status-s4">
+                                  <CheckCircleOutlineIcon className="icon mr-1" />
+                                  {detail.statusData?.valueVi}
+                                </button>
+                              </>
+                            ) : (
+                              <button className="btn status-s1">
+                                <PriorityHighIcon className="icon mr-1" />
+                                {detail.statusData?.valueVi}
+                              </button>
+                            )}
+                          </>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="row d-flex">
+                    <div className="col-6">
+                      <div className="title-collect">ĐƠN THU GOM</div>
+                      <hr></hr>
+                      <div className="form-row">
+                        <p className="col-12 d-flex">
+                          <div className="lable">Người cho:</div>
+                          <div className="text">
+                            {detail.giverData?.firstName}{" "}
+                            {detail.giverData?.lastName}
+                          </div>
+                        </p>
+                      </div>
+                      <div className="form-row">
+                        <p className="col-12 d-flex">
+                          <div className="lable">Email:</div>
+                          <div className="text">{detail.giverData?.email}</div>
+                        </p>
+                      </div>
+                      <div className="form-row">
+                        <p className="col-12 d-flex">
+                          <div className="lable">SĐT:</div>
+                          <div className="text">{detail.giverData?.phone}</div>
+                        </p>
+                      </div>
+                      {/* <div className="form-row">
+                        <p className="col-12 d-flex">
+                          <div className="lable d-flex">Địa chỉ:</div>
+                          <div className="text">
+                            {detail.addressData?.address_name}
+                            {" - "}
+                            {detail.addressData?.ward_name}
+                            {"- "}
+                            {detail.addressData?.district_name}
+                            {" - "}
+                            {detail.addressData?.city_name}
+                          </div>
+                        </p>
+                      </div> */}
+                      <div className="form-row">
+                        <p className="col-12 d-flex">
+                          <div className="lable">Sản phẩm:</div>
+                          <div className="text">
+                            {detail.productData?.product_name}
+                          </div>
+                        </p>
+                      </div>
+                      <div className="form-row">
+                        <p className="col-12 d-flex">
+                          <div className="lable">Mô tả:</div>
+                          <div className="text">
+                            {detail.productData?.description}
+                          </div>
+                        </p>
+                      </div>
+                      <div className="form-row">
+                        <p className="col-12 d-flex">
+                          <div className="lable">Só lượng: </div>
+                          <div className="text">{detail.amount}</div>
+                        </p>
+                      </div>
+                      <div className="form-row">
+                        <p className="col-12 d-flex">
+                          <div className="lable">
+                            {" "}
+                            <FiIcons.FiMapPin className="icon " />{" "}
+                          </div>
+                          <div className="text">
+                            {detail.addressData?.address_name}
+                            {" - "}
+                            {detail.addressData?.ward_name}
+                            {"- "}
+                            {detail.addressData?.district_name}
+                            {" - "}
+                            {detail.addressData?.city_name}
+                          </div>
+                        </p>
+                      </div>
+                      <div className="form-row">
+                        <p className="col-12 d-flex">
+                          <div className="lable">Thu gom từ ngày:</div>
+                          <div className="text">{detail.date}</div>
+                          <div className="lable"> - Thời gian:</div>
+                          <div className="text">
+                            {detail.timeTypeData?.valueVi}
+                          </div>
+                        </p>
+                      </div>
+                      <div className="form-row mb-0">
+                        {detail.statusData?.valueVi === "Chờ xác nhận" ||
+                        detail.statusData?.valueVi === "Chờ thu gom" ? (
+                          <button className="btn status-s2">
+                            <PriorityHighIcon className="icon" />{" "}
+                            {detail.statusData?.valueVi}
+                          </button>
+                        ) : (
+                          <>
+                            {detail.statusData?.valueVi === "Đơn bị hủy" ? (
+                              <button className="btn status-s5">
+                                <BsIcons.BsX className="icon" />{" "}
+                                {detail.statusData?.valueVi}
+                              </button>
+                            ) : (
+                              <>
+                                {detail.statusData?.valueVi === "Đã thu gom" ? (
+                                  <>
+                                    <button className="btn status-s4">
+                                      <CheckCircleOutlineIcon className="icon mr-1" />
+                                      {detail.statusData?.valueVi}
+                                    </button>
+                                  </>
+                                ) : (
+                                  <button className="btn status-s1">
+                                    <PriorityHighIcon className="icon mr-1" />
+                                    {detail.statusData?.valueVi}
+                                  </button>
+                                )}
+                              </>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="col-6">
+                      <div className="title-collect">
+                        DANH SÁCH ĐĂNG KÝ THU GOM
+                      </div>
+                      {arrCollect &&
+                        arrCollect.map((arrCollect, index) => {
+                          if (arrCollect.scheduleId === detail.id) {
+                            return (
+                              <>
+                                <hr></hr>
+                                <div className="form-row">
+                                  <p className="col-12 d-flex">
+                                    <div className="lable">Người nhận:</div>
+                                    <div className="text">
+                                      {arrCollect.recipientData?.firstName}{" "}
+                                      {arrCollect.recipientData?.lastName}
+                                    </div>
+                                  </p>
+                                </div>
+                                <div className="form-row">
+                                  <p className="col-12 d-flex">
+                                    <div className="lable">Email:</div>
+                                    <div className="text">
+                                      {arrCollect.recipientData?.email}
+                                    </div>
+                                  </p>
+                                </div>
+                                <div className="form-row">
+                                  <p className="col-12 d-flex">
+                                    <div className="lable">SĐT:</div>
+                                    <div className="text">
+                                      {arrCollect.recipientData?.phone}
+                                    </div>
+                                  </p>
+                                </div>
+                                <div className="form-row">
+                                  <p className="col-12 d-flex">
+                                    <div className="lable">
+                                      <FiIcons.FiMapPin className="icon " />{" "}
+                                    </div>
+                                    <div className="text">
+                                      {
+                                        arrCollect.recipientData.userData
+                                          ?.address_name
+                                      }
+                                      {" - "}
+                                      {
+                                        arrCollect.recipientData.userData
+                                          ?.ward_name
+                                      }
+                                      {"- "}
+                                      {
+                                        arrCollect.recipientData.userData
+                                          ?.district_name
+                                      }
+                                      {" - "}
+                                      {
+                                        arrCollect.recipientData.userData
+                                          ?.city_name
+                                      }
+                                    </div>
+                                  </p>
+                                </div>
+                                <div className="form-row">
+                                  <p className="col-12 d-flex">
+                                    <div className="lable d-flex">
+                                      Thời gian đăng ký:
+                                    </div>
+                                    <div className="text">
+                                      {moment(arrCollect.registerDate).format(
+                                        "DD/MM/YYYY HH:mm:ss"
+                                      )}
+                                    </div>
+                                  </p>
+                                </div>
+                              </>
+                            );
+                          }
+                        })}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+            {/* <button
+              type="submit"
+              class="btn btn-save"
+              onClick={() => this.handleSaveProduct()}
+            >
+              {" "}
+              Lưu
+            </button> */}
+            {this.state.isOpen === true && (
+              <Lightbox
+                mainSrc={this.state.previewImgURL}
+                onCloseRequest={() => this.setState({ isOpen: false })}
+              />
+            )}
+          </form>
+        </ModalBody>
+        {/* <ModalFooter>   
+                    <Button color="primary" className='px-2' onClick={() => {this.handleSaveProduct()}}>Lưu</Button>
+                    <Button color="danger" className='px-2' onClick={() => {this.toggle()}}>Close</Button>
+                </ModalFooter> */}
+      </Modal>
+    );
+  }
+}
+
+const mapStateToProps = (state) => {
+  return {
+    language: state.app.language,
+    statusRedux: state.admin.statuses,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    getStatusStart: () => dispatch(actions.fetchStatusStart()),
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ModalDetailAllCollect);

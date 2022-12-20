@@ -92,20 +92,6 @@ class CreateNews extends Component {
     });
   };
 
-  checkValidateInput = () => {
-    let isValid = true;
-
-    let arrCheck = ["contentMarkdown", "contentHTML", "description", "title"];
-    for (let i = 0; i < arrCheck.length; i++) {
-      if (!this.state[arrCheck[i]]) {
-        isValid = false;
-        alert("this input is required: " + arrCheck[i]);
-        break;
-      }
-    }
-    return isValid;
-  };
-
   getAllNews = async () => {
     let response = await allNews("ALL");
     if (response && response.errCode == 0) {
@@ -124,7 +110,7 @@ class CreateNews extends Component {
     } else if (res && res.errCode === 1) {
       toast.error("Tin tức này đã tôn tại");
     } else if (res && res.errCode === 2) {
-      toast.error("Thêm không thành công");
+      toast.error("Vui lòng điền đầy đủ thông tin");
     }
   };
 
@@ -163,16 +149,13 @@ class CreateNews extends Component {
   };
 
   handleSaveNews = () => {
-    let isValid = this.checkValidateInput();
-    if (isValid === true) {
-      this.createNewsFromReact({
-        contentHTML: this.state.contentHTML,
-        contentMarkdown: this.state.contentMarkdown,
-        description: this.state.description,
-        title: this.state.title,
-        avatar: this.state.avatar,
-      });
-    }
+    this.createNewsFromReact({
+      contentHTML: this.state.contentHTML,
+      contentMarkdown: this.state.contentMarkdown,
+      description: this.state.description,
+      title: this.state.title,
+      avatar: this.state.avatar,
+    });
   };
 
   handleEditFromParent = (news) => {
@@ -277,8 +260,11 @@ class CreateNews extends Component {
                                           </>
                                         ) : (
                                           <>
-                                            {currentDateTimeStop.diff(tt)} phút
-                                            trước
+                                            {currentDateTimeStop.diff(
+                                              tt,
+                                              "minutes"
+                                            )}{" "}
+                                            phút trước
                                           </>
                                         )}
                                       </div>

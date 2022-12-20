@@ -26,7 +26,7 @@ class Container extends Component {
       arrScheduleStatusS1: [],
       addressUser: [],
       currentPage: 1,
-      todosPerPage: 10,
+      todosPerPage: 4,
       active: 1,
     };
   }
@@ -107,7 +107,6 @@ class Container extends Component {
               {" "}
               {currentTodos &&
                 currentTodos.map((item, index) => {
-                  // console.log("item", item);
                   let imageBase64 = "";
                   if (item.giverData?.image) {
                     imageBase64 = new Buffer(
@@ -156,18 +155,6 @@ class Container extends Component {
                           </div>
                           <div className="d-flex">
                             <span className="info-collection mr-1">
-                              <FiIcons.FiMapPin className="icon" />
-                              Thu gom:
-                            </span>
-                            <p>
-                              {item.addressData.address_name} -{" "}
-                              {item.addressData.ward_name} -{" "}
-                              {item.addressData.district_name} -{" "}
-                              {item.addressData.city_name}
-                            </p>
-                          </div>
-                          <div className="d-flex">
-                            <span className="info-collection mr-1">
                               <BsIcons.BsCalendarDate className="icon" /> Đến
                               thu gom từ ngày:{" "}
                             </span>
@@ -178,15 +165,44 @@ class Container extends Component {
                             </span>
                             <p>{item.timeTypeData.valueVi}</p>
                           </div>
+                          <div className="d-flex">
+                            <span className="info-collection mr-1">
+                              <FiIcons.FiMapPin className="icon" />
+                            </span>
+                            <p>
+                              {item.addressData.address_name} -{" "}
+                              {item.addressData.ward_name} -{" "}
+                              {item.addressData.district_name} -{" "}
+                              {item.addressData.city_name}
+                            </p>
+                          </div>
                         </div>
-                        <button
-                          className="btn-register-receive"
-                          onClick={() =>
-                            this.handleRegisterCollectionForm(item)
-                          }
-                        >
-                          <IoIcons.IoMdArrowRoundForward /> Đăng ký
-                        </button>
+                        {item.soluongdangky >= 3 ? (
+                          <>
+                            {" "}
+                            <button
+                              disabled
+                              className="btn-register-receive"
+                              onClick={() =>
+                                this.handleRegisterCollectionForm(item)
+                              }
+                            >
+                              <IoIcons.IoMdArrowRoundForward /> Đăng ký
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            {" "}
+                            <button
+                              className="btn-register-receive"
+                              onClick={() =>
+                                this.handleRegisterCollectionForm(item)
+                              }
+                            >
+                              <IoIcons.IoMdArrowRoundForward /> Đăng ký
+                            </button>
+                          </>
+                        )}
                       </div>
                     </>
                   );
@@ -235,8 +251,7 @@ class Container extends Component {
                           </div>
                           <div className="d-flex">
                             <span className="info-collection mr-1">
-                              <FiIcons.FiMapPin className="icon" /> Địa chỉ thu
-                              gom:{" "}
+                              <FiIcons.FiMapPin className="icon" />
                             </span>
                             <p>
                               {item.addressData.address_name} -{" "}
@@ -258,14 +273,32 @@ class Container extends Component {
                             <p>{item.timeTypeData.valueVi}</p>
                           </div>
                         </div>
-                        <button
-                          className="btn-register-receive"
-                          onClick={() =>
-                            this.handleRegisterCollectionForm(item)
-                          }
-                        >
-                          <IoIcons.IoMdArrowRoundForward /> Đăng ký
-                        </button>
+                        {item.soluongdangky >= 3 ? (
+                          <>
+                            {" "}
+                            <button
+                              disabled
+                              className="btn-register-receive"
+                              onClick={() =>
+                                this.handleRegisterCollectionForm(item)
+                              }
+                            >
+                              <IoIcons.IoMdArrowRoundForward /> Đăng ký
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            {" "}
+                            <button
+                              className="btn-register-receive"
+                              onClick={() =>
+                                this.handleRegisterCollectionForm(item)
+                              }
+                            >
+                              <IoIcons.IoMdArrowRoundForward /> Đăng ký
+                            </button>
+                          </>
+                        )}
                       </div>
                     </>
                   );

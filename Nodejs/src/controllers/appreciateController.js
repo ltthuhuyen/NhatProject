@@ -2,7 +2,7 @@ import { use } from "express/lib/router";
 import appreciateService from "../services/appreciateService";
 
 let handleCountAppreciate = async (req, res) => {
-  let id = req.query.id; //all, id
+  let id = req.query.submissionId; //all, id
   if (!id) {
     return res.status(200).json({
       errCode: 0,

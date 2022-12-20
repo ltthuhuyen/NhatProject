@@ -81,7 +81,8 @@ class ForgotPassword extends Component {
     }
   };
 
-  handleConfirmSendEmail = async () => {
+  handleConfirmSendEmail = async (e) => {
+    e.preventDefault();
     await handleSendEmailForgotPassword({
       email: this.state.email,
     });
@@ -131,7 +132,7 @@ class ForgotPassword extends Component {
             <button
               type="submit"
               class="btn btn-confirm"
-              onClick={() => this.handleConfirmSendEmail()}
+              onClick={(e) => this.handleConfirmSendEmail(e)}
             >
               Xác nhận
             </button>

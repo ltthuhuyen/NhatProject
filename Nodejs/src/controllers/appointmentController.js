@@ -117,25 +117,25 @@ let handleRegisterCollect = async (req, res) => {
   return res.status(200).json(message);
 };
 
-let handleAppointmentsOfRecipientStatus = async (req, res) => {
-  let data = req.body; //all, data
-  if (!data) {
-    return res.status(200).json({
-      errCode: 0,
-      errMessage: "Missing required parmeters",
-      appointments: [],
-    });
-  }
+// let handleAppointmentsOfRecipientStatus = async (req, res) => {
+//   let data = req.body; //all, data
+//   if (!data) {
+//     return res.status(200).json({
+//       errCode: 0,
+//       errMessage: "Missing required parmeters",
+//       appointments: [],
+//     });
+//   }
 
-  let appointments = await appointmentService.getAppointmentsOfRecipientStatus(
-    data
-  );
-  return res.status(200).json({
-    errCode: 0,
-    errMessage: "Ok",
-    appointments,
-  });
-};
+//   let appointments = await appointmentService.getAppointmentsOfRecipientStatus(
+//     data
+//   );
+//   return res.status(200).json({
+//     errCode: 0,
+//     errMessage: "Ok",
+//     appointments,
+//   });
+// };
 
 // let handleAppointmentsStatusS2 = async (req, res) => {
 //   let id = req.query.id; //all, id
@@ -466,10 +466,27 @@ let handleGetAllCollectsByDate = async (req, res) => {
   });
 };
 
+let handleGetAllCollectsByAppointmentDate = async (req, res) => {
+  let data = req.body; //all, id
+  if (!data) {
+    return res.status(200).json({
+      errCode: 0,
+      errMessage: "Missing required parmeters",
+      collects: [],
+    });
+  }
+
+  let collects = await appointmentService.getAllCollectsByAppointmentDate(data);
+  return res.status(200).json({
+    errCode: 0,
+    errMessage: "Ok",
+    collects,
+  });
+};
+
 // // Đơn thu gom được tạo bởi ngày hiện tại theo từng trạng thái
 let handleGetAllCollectsStatusByCurrentDate = async (req, res) => {
   let collectionForm = req.body; //all, id
-
   if (!collectionForm) {
     return res.status(200).json({
       errCode: 0,
@@ -552,22 +569,13 @@ let handleThongketheotuan = async (req, res) => {
   });
 };
 
-// let handleAppointmentsStatusS3Expire = async (req, res) => {
-//   let id = req.query.id; //all, id
-//   if (!id) {
-//     return res.status(200).json({
-//       errCode: 0,
-//       errMessage: "Missing required parmeters",
-//       appointments: [],
-//     });
-//   }
-//   let appointments = await appointmentService.getAllAppointmentsExpire(id);
-//   return res.status(200).json({
-//     errCode: 0,
-//     errMessage: "Ok",
-//     appointments,
-//   });
-// };
+let handleAppointmentsStatusS3Expire = async (req, res) => {
+  await appointmentService.getAllAppointmentsExpire();
+  return res.status(200).json({
+    errCode: 0,
+    errMessage: "Ok",
+  });
+};
 
 module.exports = {
   handleGetAllSchedules: handleGetAllSchedules,
@@ -579,7 +587,7 @@ module.exports = {
     handleGetAllAppointmentsByScheduleByStatusByRecipientDate,
   handleRegisterCollect: handleRegisterCollect,
   handleScheduleOfGiver: handleScheduleOfGiver,
-  handleAppointmentsOfRecipientStatus: handleAppointmentsOfRecipientStatus,
+  // handleAppointmentsOfRecipientStatus: handleAppointmentsOfRecipientStatus,
   // handleAppointmentsNew: handleAppointmentsNew,
   // handleAppointmentsStatusS2: handleAppointmentsStatusS2,
   // handleAppointmentsStatusS3: handleAppointmentsStatusS3,
@@ -600,6 +608,7 @@ module.exports = {
   // handleAppointmentsOfRecipientStatusS5: handleAppointmentsOfRecipientStatusS5,
   handleGetAllCollectsByAddress: handleGetAllCollectsByAddress,
   handleGetAllCollectsByDate: handleGetAllCollectsByDate,
+  handleGetAllCollectsByAppointmentDate: handleGetAllCollectsByAppointmentDate,
   handleGetAllCollectsStatusByCurrentDate:
     handleGetAllCollectsStatusByCurrentDate,
   handleCollectFormStatisticByCurrentDate:
@@ -608,5 +617,5 @@ module.exports = {
   handleCollectFormStatisticByStatusOfCurrentDate:
     handleCollectFormStatisticByStatusOfCurrentDate,
   handleThongketheotuan: handleThongketheotuan,
-  // handleAppointmentsStatusS3Expire: handleAppointmentsStatusS3Expire,
+  handleAppointmentsStatusS3Expire: handleAppointmentsStatusS3Expire,
 };

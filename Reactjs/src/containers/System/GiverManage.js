@@ -308,8 +308,11 @@ class UserManage extends Component {
                                           </>
                                         ) : (
                                           <>
-                                            {currentDateTimeStop.diff(tt)} phút
-                                            trước
+                                            {currentDateTimeStop.diff(
+                                              tt,
+                                              "minutes"
+                                            )}{" "}
+                                            phút trước
                                           </>
                                         )}
                                       </div>

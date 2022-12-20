@@ -1,7 +1,7 @@
 import axios from "../axios";
 
 const countAppreciateBySubmission = (submissionId) => {
-  return axios.get(`/api/count-appreciates?id=${submissionId}`);
+  return axios.get(`/api/count-appreciates?submissionId=${submissionId}`);
 };
 
 const allApprecicateBySubmission = (submissionId) => {

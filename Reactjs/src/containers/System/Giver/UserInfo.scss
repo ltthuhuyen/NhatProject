@@ -1,5 +1,5 @@
 .user-info {
-    margin: 190px 200px;
+    margin: 190px 200px 130px 200px;
     .title-user-info{
         text-align: center;
         font-family: monospace;
@@ -79,6 +79,14 @@
                         background-color: #fc394d;
                         clip-path: circle(40%);
                     }
+                }
+                .btn-save {
+                    width: auto;
+                    padding: 5px 20px;
+                    margin: 30px 0px 30px 675px;
+                    border-radius: 13px;
+                    background-color: #e2f9f9;
+                    color: #017110;
                 }
 
         }

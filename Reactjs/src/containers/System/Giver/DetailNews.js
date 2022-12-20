@@ -5,6 +5,7 @@ import { allNews } from "../../../services/newsService";
 import { dateFormat } from "../../../utils";
 import moment from "moment";
 import "./News.scss";
+import * as BsIcons from "react-icons/bs";
 import HeaderR2 from "../../Header/Giver/Header";
 import HeaderR3 from "../../Header/Recipient/Header";
 import Footer from "../../Footer/Footer";
@@ -48,10 +49,17 @@ class DetailNews extends Component {
         <div className="news-detail">
           <div className="title-news-detail">{newsDetail.title}</div>
           <div className="line"></div>
+          <div className="d-flex time row ">
+            <div className="title-text">Ngày đăng: </div>
+            <div className="info-text">
+              {moment(newsDetail.createdAt).format("DD/MM/YYYY HH:mm:ss")}
+            </div>
+          </div>
+
           <div className="news-detail-content">
             <div className="frames-header row">
-              <div className="frames-img col-3">
-                <img src={newsDetail.avatar} />
+              <div className="frames-img ">
+                <img src={newsDetail.avatar} className="img" />
               </div>
             </div>
 

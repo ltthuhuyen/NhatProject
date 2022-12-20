@@ -10,13 +10,14 @@ import "./Manage.scss";
 import { withRouter } from "react-router";
 
 import NavAdmin from "../../components/NavAdmin";
-import ModalDetailCollectForm from "./ModalDetailCollectForm";
+import ModalDetailAllCollect from "./ModalDetailAllCollect";
 import moment from "moment";
 import { dateFormat } from "../../utils";
 import {
   getAllScheduleStatus,
   getAllCollectionFormBySchedule,
   getCollectionFormStatusByCurrentDate,
+  getCollectionExpire,
 } from "../../services/collectionformService";
 import CustomScrollbars from "../../components/CustomScrollbars";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
@@ -60,7 +61,7 @@ class CollectionFormStatusS3Manage extends Component {
   }
 
   getAllCollectionFormReact = async () => {
-    let responseSchedlue = await getAllScheduleStatus("S5");
+    let responseSchedlue = await getAllScheduleStatus("S3");
     if (responseSchedlue && responseSchedlue.errCode == 0) {
       this.setState({
         arrCollectionForms: responseSchedlue.appointments,
@@ -70,49 +71,26 @@ class CollectionFormStatusS3Manage extends Component {
     let arr = [];
     let responseCollect;
     for (let i = 0; i < arrCollectionForms.length; i++) {
-      // let responseCollect = {};
-
       responseCollect = await getAllCollectionFormBySchedule({
         scheduleId: arrCollectionForms[i].id,
       });
-      // console.log("responseCollect", responseCollect);
-
       if (responseCollect) {
-        this.setState(
-          {
-            arrCollect: responseCollect.appointments,
-          },
-          () => {
-            // console.log("arrCollect", this.state.arrCollect);
-          }
-        );
+        this.setState({
+          arrCollect: responseCollect.appointments,
+        });
       }
-
       let { arrCollect } = this.state;
       for (let i = 0; i < arrCollect.length; i++) {
         if (arrCollect[i].statusType == "Yes") {
           arr.push(arrCollect[i]);
         }
       }
-
       if (arr) {
         this.setState({
           arrCollectStatusYes: arr,
         });
       }
     }
-
-    // if (arr) {
-    //   for (let i = 0; i < arr.length; i++) {}
-    //   this.setState(
-    //     {
-    //       arrCollect: arr,
-    //     },
-    //     () => {
-    //       // console.log("arrCollect", this.state.arrCollect);
-    //     }
-    //   );
-    // }
   };
 
   getAllCollectFormStatusByCurrentDateFromReact = async () => {
@@ -169,10 +147,10 @@ class CollectionFormStatusS3Manage extends Component {
     });
   }
 
-  handleLook = (collect) => {
+  handleLook = (schedule) => {
     this.setState({
       isOpenModalDetailCollect: true,
-      detailCollect: collect,
+      detailCollect: schedule,
     });
   };
 
@@ -182,6 +160,9 @@ class CollectionFormStatusS3Manage extends Component {
     });
   };
 
+  updateStatusExpire = async () => {
+    await getCollectionExpire();
+  };
   // handleLook = async (schedule) => {
   //   console.log(schedule);
   //   this.props.history.push(`/system/collection-form-detail/${schedule.id}`);
@@ -190,6 +171,7 @@ class CollectionFormStatusS3Manage extends Component {
   render() {
     let {
       arrCollectStatusYes,
+      arrCollectionForms,
       arrCollectsStatusByCurrentDate,
       isShowNotification,
       currentDateTimeStop,
@@ -198,7 +180,7 @@ class CollectionFormStatusS3Manage extends Component {
     let { currentPage, todosPerPage } = this.state;
     const indexOfLastTodo = currentPage * todosPerPage;
     const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
-    const currentTodos = arrCollectStatusYes.slice(
+    const currentTodos = arrCollectionForms.slice(
       indexOfFirstTodo,
       indexOfLastTodo
     );
@@ -206,7 +188,7 @@ class CollectionFormStatusS3Manage extends Component {
     const pageNumbers = [];
     for (
       let i = 1;
-      i <= Math.ceil(arrCollectStatusYes.length / todosPerPage);
+      i <= Math.ceil(arrCollectionForms.length / todosPerPage);
       i++
     ) {
       pageNumbers.push(i);
@@ -219,7 +201,7 @@ class CollectionFormStatusS3Manage extends Component {
     return (
       <>
         <NavAdmin />
-        <ModalDetailCollectForm
+        <ModalDetailAllCollect
           isOpen={this.state.isOpenModalDetailCollect}
           toggleFromParent={this.toggleDetailCollectModal}
           currentCollect={this.state.detailCollect}
@@ -285,8 +267,11 @@ class CollectionFormStatusS3Manage extends Component {
                                           </>
                                         ) : (
                                           <>
-                                            {currentDateTimeStop.diff(tt)} phút
-                                            trước
+                                            {currentDateTimeStop.diff(
+                                              tt,
+                                              "minutes"
+                                            )}{" "}
+                                            phút trước
                                           </>
                                         )}
                                       </div>
@@ -372,55 +357,60 @@ class CollectionFormStatusS3Manage extends Component {
                             <tr key={index}>
                               <td>{item.id}</td>
                               <td>
-                                {item.scheduleData?.giverData?.firstName}{" "}
-                                {item.scheduleData?.giverData?.lastName}
+                                {item.giverData?.firstName}{" "}
+                                {item.giverData?.lastName}
                               </td>
-                              <td>{item.scheduleData.giverData.email}</td>
-                              <td>{item.scheduleData.giverData.phone}</td>
-                              <td>
-                                {item.scheduleData.productData.product_name}
-                              </td>
+                              <td>{item.giverData.email}</td>
+                              <td>{item.giverData.phone}</td>
+                              <td>{item.productData.product_name}</td>
 
-                              {/* <td>{item.scheduleData.timeTypeData.valueVi}</td>  */}
+                              {/* <td>{item.timeTypeData.valueVi}</td>  */}
                               <td>
-                                {item.recipientData.firstName}{" "}
-                                {item.recipientData.lastName}
+                                {arrCollectStatusYes &&
+                                  arrCollectStatusYes.map(
+                                    (arrCollectStatusYes, index) => {
+                                      if (
+                                        arrCollectStatusYes.scheduleId ===
+                                        item.id
+                                      ) {
+                                        return (
+                                          arrCollectStatusYes.recipientData
+                                            .firstName +
+                                          " " +
+                                          arrCollectStatusYes.recipientData
+                                            .lastName
+                                        );
+                                      }
+                                    }
+                                  )}
                               </td>
                               <td>
-                                {item.scheduleData.statusData.valueVi ===
-                                  "Chờ xác nhận" ||
-                                item.scheduleData.statusData.valueVi ===
-                                  "Chờ thu gom" ? (
+                                {item.statusData.valueVi === "Chờ xác nhận" ||
+                                item.statusData.valueVi === "Chờ thu gom" ? (
                                   <button className="btn status-s2">
                                     <PriorityHighIcon className="icon mr-1" />
-                                    {item.scheduleData.statusData.valueVi}
+                                    {item.statusData.valueVi}
                                   </button>
                                 ) : (
                                   <>
-                                    {item.scheduleData.statusData.valueVi ===
+                                    {item.statusData.valueVi ===
                                     "Đơn bị hủy" ? (
                                       <button className="btn status-s5">
                                         <BsIcons.BsX className="icon" />{" "}
-                                        {item.scheduleData.statusData.valueVi}
+                                        {item.statusData.valueVi}
                                       </button>
                                     ) : (
                                       <>
-                                        {item.scheduleData.statusData
-                                          .valueVi === "Đã thu gom" ? (
+                                        {item.statusData.valueVi ===
+                                        "Đã thu gom" ? (
                                           <button className="btn status-s4">
                                             <CheckCircleOutlineIcon className="icon mr-1" />
-                                            {
-                                              item.scheduleData.statusData
-                                                .valueVi
-                                            }
+                                            {item.statusData.valueVi}
                                           </button>
                                         ) : (
                                           <button className="btn status-s1">
                                             <PriorityHighIcon className="icon mr-1" />
-                                            {
-                                              item.scheduleData.statusData
-                                                .valueVi
-                                            }
+                                            {item.statusData.valueVi}
                                           </button>
                                         )}
                                       </>
@@ -444,55 +434,66 @@ class CollectionFormStatusS3Manage extends Component {
                   ) : (
                     <>
                       {" "}
-                      {arrCollectStatusYes &&
-                        arrCollectStatusYes.map((item, index) => {
+                      {arrCollectionForms &&
+                        arrCollectionForms.map((item, index) => {
                           return (
                             <tr key={index}>
                               <td>{item.id}</td>
                               <td>
-                                {item.scheduleData.giverData.firstName}{" "}
-                                {item.scheduleData.giverData.lastName}
+                                {item.giverData?.firstName}{" "}
+                                {item.giverData?.lastName}
                               </td>
-                              <td>{item.scheduleData.giverData.email}</td>
-                              <td>{item.scheduleData.giverData.phone}</td>
+                              <td>{item.giverData.email}</td>
+                              <td>{item.giverData.phone}</td>
+                              <td>{item.productData.product_name}</td>
+
+                              {/* <td>{item.timeTypeData.valueVi}</td>  */}
                               <td>
-                                {item.scheduleData.productData.product_name}
+                                {arrCollectStatusYes &&
+                                  arrCollectStatusYes.map(
+                                    (arrCollectStatusYes, index) => {
+                                      if (
+                                        arrCollectStatusYes.scheduleId ===
+                                        item.id
+                                      ) {
+                                        return (
+                                          arrCollectStatusYes.recipientData
+                                            .firstName +
+                                          " " +
+                                          arrCollectStatusYes.recipientData
+                                            .lastName
+                                        );
+                                      }
+                                    }
+                                  )}
                               </td>
-                              {/* <td>{item.scheduleData.date}</td>
-                                        <td>{item.scheduleData.timeTypeData.valueVi}</td>  */}
                               <td>
-                                {item.recipientData.firstName}{" "}
-                                {item.recipientData.lastName}
-                              </td>
-                              <td>
-                                {item.statusTypeData.valueVi ===
-                                  "Chờ xác nhận" ||
-                                item.statusTypeData.valueVi ===
-                                  "Chờ thu gom" ? (
+                                {item.statusData.valueVi === "Chờ xác nhận" ||
+                                item.statusData.valueVi === "Chờ thu gom" ? (
                                   <button className="btn status-s2">
                                     <PriorityHighIcon className="icon mr-1" />
-                                    {item.statusTypeData.valueVi}
+                                    {item.statusData.valueVi}
                                   </button>
                                 ) : (
                                   <>
-                                    {item.statusTypeData.valueVi ===
+                                    {item.statusData.valueVi ===
                                     "Đơn bị hủy" ? (
                                       <button className="btn status-s5">
                                         <BsIcons.BsX className="icon" />{" "}
-                                        {item.statusTypeData.valueVi}
+                                        {item.statusData.valueVi}
                                       </button>
                                     ) : (
                                       <>
-                                        {item.statusTypeData.valueVi ===
+                                        {item.statusData.valueVi ===
                                         "Đã thu gom" ? (
                                           <button className="btn status-s4">
                                             <CheckCircleOutlineIcon className="icon mr-1" />
-                                            {item.statusTypeData.valueVi}
+                                            {item.statusData.valueVi}
                                           </button>
                                         ) : (
                                           <button className="btn status-s1">
                                             <PriorityHighIcon className="icon mr-1" />
-                                            {item.statusTypeData.valueVi}
+                                            {item.statusData.valueVi}
                                           </button>
                                         )}
                                       </>

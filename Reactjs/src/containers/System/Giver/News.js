@@ -69,7 +69,7 @@ class News extends Component {
                   }
                   return (
                     <div
-                      className="col-4"
+                      className="col-4 content"
                       onClick={() => this.handleDetailNews(item)}
                     >
                       <div className="img-pro ">
@@ -79,9 +79,7 @@ class News extends Component {
                         <div className="title">{item.title}</div>
                         <div className="time">
                           <BsIcons.BsCalendarDate className="icon" />{" "}
-                          {moment(item.createdAt).format(
-                            dateFormat.SEND_TO_SERVER
-                          )}
+                          {moment(item.createdAt).format("DD/MM/YYYY HH:mm")}
                         </div>
                       </div>
                     </div>

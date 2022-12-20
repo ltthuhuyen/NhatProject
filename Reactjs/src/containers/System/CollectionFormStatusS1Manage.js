@@ -6,7 +6,7 @@ import * as FiIcons from "react-icons/fi";
 import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
 import * as actions from "../../store/actions";
 import { Table } from "reactstrap";
-import ModalDetailCollectFormStatusS1 from "./ModalDetailCollectFormStatusS1";
+import ModalDetailAllCollect from "./ModalDetailAllCollect";
 import "./Manage.scss";
 import { withRouter } from "react-router";
 import { getNewCollectionForm } from "../../services/collectionformService";
@@ -184,7 +184,7 @@ class CollectionFormStatusS1Manage extends Component {
     return (
       <>
         <NavAdmin />
-        <ModalDetailCollectFormStatusS1
+        <ModalDetailAllCollect
           isOpen={this.state.isOpenModalDetailCollect}
           toggleFromParent={this.toggleDetailCollectModal}
           currentCollect={this.state.detailCollect}
@@ -250,8 +250,11 @@ class CollectionFormStatusS1Manage extends Component {
                                           </>
                                         ) : (
                                           <>
-                                            {currentDateTimeStop.diff(tt)} phút
-                                            trước
+                                            {currentDateTimeStop.diff(
+                                              tt,
+                                              "minutes"
+                                            )}{" "}
+                                            phút trước
                                           </>
                                         )}
                                       </div>

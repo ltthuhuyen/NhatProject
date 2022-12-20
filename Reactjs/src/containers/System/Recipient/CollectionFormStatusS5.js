@@ -283,7 +283,7 @@ class CollectionFormStatusS5 extends Component {
           <div className="container-collection-form-status shadow-lg ">
             <div className="d-flex wrapper-link">
               <NavLink
-                to="/recipient/collection-form"
+                to="/recipient/check-calendar"
                 className="d-flex"
                 activeStyle={{
                   background: "white",
@@ -293,9 +293,9 @@ class CollectionFormStatusS5 extends Component {
                 }}
               >
                 <div className="icon">
-                  <AiIcons.AiOutlineUnorderedList />
+                  <BsIcons.BsCalendar2Week />
                 </div>
-                <span className="mt-1">Đơn thu gom</span>
+                <span className="mt-1">Xem lịch</span>
               </NavLink>
               <NavLink
                 to="/recipient/collection-form-status-s2"
@@ -353,13 +353,19 @@ class CollectionFormStatusS5 extends Component {
                 <div className="icon">
                   <BsIcons.BsClipboardCheck />
                 </div>
-                <span className="mt-1 title-history">Xem lịch sử thu gom</span>
+                <span className="mt-1 title-history">Đã thu gom</span>
                 <div className="icon mr-0">
                   <MdIcons.MdOutlineNavigateNext />
                 </div>
               </NavLink>
             </div>
             <div className="title">ĐƠN BỊ HỦY</div>
+            <div className="wrapper-title-sum-statistic d-flex">
+              <span className="wrapper-sum d-flex">
+                <div className="">Tổng cộng:</div>
+                <div className="text-sum">{arrCollect.length} đơn</div>
+              </span>
+            </div>
             <div className="row ">
               {arrCollect &&
                 arrCollect.map((item, index) => {
@@ -413,7 +419,7 @@ class CollectionFormStatusS5 extends Component {
                           </button>
                           <button
                             className="btn btn-detail "
-                            onClick={() => this.handleLook(item)}
+                            onClick={() => this.handleLook(item.scheduleData)}
                           >
                             Chi tiết
                           </button>

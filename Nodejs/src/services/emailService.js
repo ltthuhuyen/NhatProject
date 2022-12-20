@@ -32,7 +32,7 @@ let sendEmail = async (dataSend) => {
 };
 
 let sendEmailForgotPassword = async (dataSend) => {
-  console.log(dataSend);
+  console.log("data", dataSend);
   // create reusable transporter object using the default SMTP transport
   let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",

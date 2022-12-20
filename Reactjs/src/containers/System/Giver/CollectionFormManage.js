@@ -27,7 +27,7 @@ class CollectionFormManage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      arrScheduleStatusS1: [],
+      arrSchedule: [],
       arrCollect: [],
       statusArr: [],
       status: "",
@@ -53,38 +53,46 @@ class CollectionFormManage extends Component {
   getAllScheduleOfGiver = async () => {
     let response = await getScheduleOfGiver({
       giverId: this.state.giverId,
-      status: "S1",
     });
     if (response && response.errCode == 0) {
       this.setState(
         {
-          arrScheduleStatusS1: response.appointments,
+          arrSchedule: response.appointments,
         },
         () => {
-          console.log("arrScheduleStatusS1", this.state.arrScheduleStatusS1);
+          console.log("arrSchedule", this.state.arrSchedule);
         }
       );
     }
   };
 
   getAllCollectionByScheduleOfGiver = async () => {
-    let { arrScheduleStatusS1 } = this.state;
+    let { arrSchedule } = this.state;
     let response;
-    if (arrScheduleStatusS1) {
-      for (let i = 0; i < arrScheduleStatusS1.length; i++) {
-        response = await getAllCollectionFormBySchedule({
-          scheduleId: arrScheduleStatusS1[i].id,
+    let arr = [];
+    if (arrSchedule) {
+      let responseCollect;
+      for (let i = 0; i < arrSchedule.length; i++) {
+        responseCollect = await getAllCollectionFormBySchedule({
+          scheduleId: arrSchedule[i].id,
         });
-      }
-      if (response) {
-        this.setState(
-          {
-            arrCollect: response.appointments,
-          },
-          () => {
-            console.log("arrCollect", this.state.arrCollect);
+        if (responseCollect.appointments) {
+          for (let i = 0; i < responseCollect.appointments.length; i++) {
+            if (responseCollect.appointments[i].statusType == "Yes") {
+              arr.push(responseCollect.appointments[i]);
+            }
           }
-        );
+          if (arr) {
+            this.setState(
+              {
+                arrCollect: arr,
+              },
+              () => {
+                console.log("arrCollect", this.state.arrCollect);
+              }
+            );
+          }
+        }
       }
     }
   };
@@ -102,13 +110,17 @@ class CollectionFormManage extends Component {
   }
 
   handleLook = async (schedule) => {
-    this.props.history.push(
-      `/giver/collection-form-detail-status-s2/${schedule.id}`
-    );
+    if (schedule.statusType === "S2") {
+      this.props.history.push(
+        `/giver/collection-form-detail-status-s2/${schedule.id}`
+      );
+    } else {
+      this.props.history.push(`/giver/collection-form-detail/${schedule.id}`);
+    }
   };
 
   render() {
-    let { arrScheduleStatusS1 } = this.state;
+    let { arrSchedule, arrCollect } = this.state;
 
     if (this.props.userInfo) {
       this.state.giverId = this.props.userInfo.id;
@@ -116,6 +128,7 @@ class CollectionFormManage extends Component {
 
     return (
       <>
+        {" "}
         <ScrollUp />
         <Header />
         <Banner />
@@ -195,7 +208,7 @@ class CollectionFormManage extends Component {
                 <div className="icon">
                   <BsIcons.BsClipboardCheck />
                 </div>
-                <span className="mt-1 title-history">Xem lịch sử thu gom</span>
+                <span className="mt-1 title-history">Đã thu gom</span>
                 <div className="icon mr-0">
                   <MdIcons.MdOutlineNavigateNext />
                 </div>
@@ -205,12 +218,12 @@ class CollectionFormManage extends Component {
             <div className="wrapper-title-sum-statistic d-flex">
               <span className="wrapper-sum d-flex">
                 <div className="">Tổng cộng:</div>
-                <div className="text-sum">{arrScheduleStatusS1.length} đơn</div>
+                <div className="text-sum">{arrSchedule.length} đơn</div>
               </span>
             </div>
             <div className="row ">
-              {arrScheduleStatusS1 &&
-                arrScheduleStatusS1.map((item, index) => {
+              {arrSchedule &&
+                arrSchedule.map((item, index) => {
                   let imageBase64 = "";
                   if (item.giverData.image) {
                     imageBase64 = new Buffer(
@@ -253,8 +266,16 @@ class CollectionFormManage extends Component {
                             gom:{" "}
                           </span>
                           <p>
-                            {/* {item.recipientData.firstName}{" "}
-                            {item.recipientData.lastName} */}
+                            {arrCollect &&
+                              arrCollect.map((arrCollect, index) => {
+                                if (arrCollect.scheduleId === item.id) {
+                                  return (
+                                    arrCollect.recipientData.firstName +
+                                    " " +
+                                    arrCollect.recipientData.lastName
+                                  );
+                                }
+                              })}
                           </p>
                         </div>
                         <div className="d-flex">
@@ -302,7 +323,6 @@ class CollectionFormManage extends Component {
             </div>
           </div>
         </div>
-
         <Footer />
       </>
     );

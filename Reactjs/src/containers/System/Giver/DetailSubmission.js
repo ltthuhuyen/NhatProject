@@ -77,8 +77,8 @@ class DetailSubmission extends Component {
           </div>
           <div className="submission-detail-content mt-5">
             <div className="frames-header row">
-              <div className="frames-img col-3">
-                <img src={submissionDetail?.avata} />
+              <div className="frames-img ">
+                <img src={submissionDetail.avatar} className="img" />
               </div>
             </div>
 

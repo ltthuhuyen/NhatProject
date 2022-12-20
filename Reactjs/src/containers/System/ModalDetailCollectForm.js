@@ -9,6 +9,7 @@ import { withRouter } from "react-router";
 import { saveUpdateStatic } from "../../services/appointmentService";
 import { getAllAddressOfUser } from "../../services/addressService";
 import * as BsIcons from "react-icons/bs";
+import * as FiIcons from "react-icons/fi";
 import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
@@ -29,7 +30,7 @@ class ModalDetailCollectForm extends Component {
       responseCollect: [],
       statusArr: [],
       status: "",
-      statusType: "",
+      statusData: {},
       giverData: {},
       recipientData: {},
       productData: {},
@@ -44,19 +45,15 @@ class ModalDetailCollectForm extends Component {
 
   async componentDidUpdate(prevProps, prevState, snapshot) {
     if (prevState.currentCollectId !== this.props?.currentCollect?.id) {
-      this.setState(
-        {
-          currentCollectId: this.props.currentCollect.id,
-          detail: this.props.currentCollect,
-        },
-        () => {
-          console.log("currentCollectId", this.state.detail);
-        }
-      );
+      this.setState({
+        currentCollectId: this.props.currentCollect.id,
+        detail: this.props.currentCollect,
+      });
       if (this.state.detail) {
         this.setState({
           detailCollect: this.state.detail?.appointments,
           giverData: this.state.detail?.scheduleData?.giverData,
+          addressData: this.state.detail?.scheduleData?.addressData,
           recipientData: this.state.detail?.recipientData,
           recipientId: this.state.detail?.recipientId,
           addressData: this.state.detail?.scheduleData?.addressData,
@@ -86,14 +83,9 @@ class ModalDetailCollectForm extends Component {
   handleOnChangeInput = (e, id) => {
     let copyState = { ...this.state };
     copyState[id] = e.target.value;
-    this.setState(
-      {
-        ...copyState,
-      },
-      () => {
-        console.log("check good state", this.state);
-      }
-    );
+    this.setState({
+      ...copyState,
+    });
   };
 
   handleUpdate = async (id, status) => {
@@ -179,7 +171,10 @@ class ModalDetailCollectForm extends Component {
                 </div>
                 <div className="form-row">
                   <p className="col-6 d-flex">
-                    <div className="lable d-flex">Địa chỉ:</div>
+                    <div className="lable">
+                      {" "}
+                      <FiIcons.FiMapPin className="icon " />{" "}
+                    </div>
                     <div className="text">
                       {addressData?.address_name}
                       {" - "}
@@ -191,7 +186,10 @@ class ModalDetailCollectForm extends Component {
                     </div>
                   </p>
                   <p className="col-6 d-flex">
-                    <div className="lable">Địa chỉ:</div>
+                    <div className="lable">
+                      {" "}
+                      <FiIcons.FiMapPin className="icon " />{" "}
+                    </div>
                     {addressRecipient &&
                       addressRecipient.length > 0 &&
                       addressRecipient.map((item, index) => {
@@ -200,7 +198,7 @@ class ModalDetailCollectForm extends Component {
                             {item.address_name} {" - "}
                             {item.ward_name} {" - "}
                             {item.district_name} {" - "}
-                            {item.city_name} {" - "}
+                            {item.city_name}
                           </div>
                         );
                       })}
@@ -223,7 +221,10 @@ class ModalDetailCollectForm extends Component {
                 </div>
                 <div className="form-row">
                   <p className="col-12 d-flex">
-                    <div className="lable">Địa chỉ: </div>
+                    <div className="lable">
+                      {" "}
+                      <FiIcons.FiMapPin className="icon " />{" "}
+                    </div>
                     <div className="text">
                       {addressData?.address_name}
                       {" - "}
@@ -243,154 +244,40 @@ class ModalDetailCollectForm extends Component {
                     <div className="text">{timeTypeData?.valueVi}</div>
                   </p>
                 </div>
-                {/* <div className="form-row">
+                <div className="form-row">
                   {statusData?.valueVi === "Chờ xác nhận" ||
                   statusData?.valueVi === "Chờ thu gom" ? (
-                    <p className="status-s2">
+                    <button className="btn status-s2">
                       <PriorityHighIcon className="icon" />{" "}
                       {statusData?.valueVi}
-                    </p>
-                  ) : (
-                    <>
-                      {statusData?.valueVi === "Đơn bị hủy" ? (
-                        <p className="status-s5">
-                          <BsIcons.BsX className="icon" /> {statusData?.valueVi}
-                        </p>
-                      ) : (
-                        <>
-                          {statusData?.valueVi === "Đã thu gom" ? (
-                            <p className="status-s4">
-                              <CheckCircleOutlineIcon className="icon mr-1" />
-                              {statusData?.valueVi}
-                            </p>
-                          ) : (
-                            <p className="status-s1">
-                              <PriorityHighIcon className="icon mr-1" />
-                              {statusData?.valueVi}
-                            </p>
-                          )}
-                        </>
-                      )}
-                    </>
-                  )}
-                </div> */}
-              </>
-            ) : (
-              <>
-                {" "}
-                <div className="form-row">
-                  <p className="col-4 d-flex"></p>
-                  <p className="col-4 d-flex">
-                    <div className="lable">Người cho:</div>
-                    <div className="text">
-                      {detail?.firstName} {detail?.lastName}
-                    </div>
-                  </p>
-                  <p className="col-4 d-flex"></p>
-                </div>
-                <div className="form-row">
-                  <p className="col-4 d-flex"></p>
-                  <p className="col-4 d-flex">
-                    <div className="lable">Email:</div>
-                    <div className="text">{detail?.email}</div>
-                  </p>
-                  <p className="col-4 d-flex"></p>
-                </div>
-                <div className="form-row">
-                  <p className="col-4 d-flex"></p>
-                  <p className="col-4 d-flex">
-                    <div className="lable">SĐT:</div>
-                    <div className="text">{detail?.phone}</div>
-                  </p>
-                  <p className="col-4 d-flex"></p>
-                </div>
-                <div className="form-row">
-                  <p className="col-1 d-flex"></p>
-                  <p className="col-10 d-flex">
-                    <div className="lable d-flex">Địa chỉ:</div>
-                    <div className="text">
-                      {" "}
-                      {addressData?.address_name}
-                      {" - "}
-                      {addressData?.ward_name}
-                      {"- "}
-                      {addressData?.district_name}
-                      {" - "}
-                      {addressData?.city_name}{" "}
-                    </div>
-                  </p>
-                  <p className="col-1 d-flex"></p>
-                </div>
-                <hr></hr>
-                <div className="form-row">
-                  <p className="col-12 d-flex">
-                    <div className="lable">Sản phẩm:</div>
-                    <div className="text">{productData?.product_name}</div>
-                    <div className="lable"> - Mô tả:</div>
-                    <div className="text">{productData?.description}</div>
-                  </p>
-                </div>
-                <div className="form-row">
-                  <p className="col-12 d-flex">
-                    <div className="lable">Só lượng: </div>
-                    <div className="text">{amount}</div>
-                  </p>
-                </div>
-                <div className="form-row">
-                  <p className="col-12 d-flex">
-                    <div className="lable">Địa chỉ: </div>
-                    <div className="text">
-                      {addressData?.address_name}
-                      {" - "}
-                      {addressData?.ward_name}
-                      {"- "}
-                      {addressData?.district_name}
-                      {" - "}
-                      {addressData?.city_name}
-                    </div>
-                  </p>
-                </div>
-                <div className="form-row">
-                  <p className="col-12 d-flex">
-                    <div className="lable">Thu gom từ ngày:</div>
-                    <div className="text">{date}</div>
-                    <div className="lable"> - Thời gian:</div>
-                    <div className="text">{timeTypeData?.valueVi}</div>
-                  </p>
-                </div>
-                {/* <div className="form-row">
-                  {statusData.valueVi === "Chờ xác nhận" ||
-                  statusData.valueVi === "Chờ thu gom" ? (
-                    <button className="btn status-s2">
-                      <PriorityHighIcon className="icon mr-1 mb-1" />
-                      {statusData.valueVi}
                     </button>
                   ) : (
                     <>
-                      {statusData.valueVi === "Đơn bị hủy" ? (
+                      {statusData?.valueVi === "Đơn bị hủy" ? (
                         <button className="btn status-s5">
-                          <BsIcons.BsX className="icon mb-1" />{" "}
-                          {statusData.valueVi}
+                          <BsIcons.BsX className="icon" /> {statusData?.valueVi}
                         </button>
                       ) : (
                         <>
-                          {statusData.valueVi === "Đã thu gom" ? (
+                          {statusData?.valueVi === "Đã thu gom" ? (
                             <button className="btn status-s4">
-                              <CheckCircleOutlineIcon className="icon mr-1 mb-1" />
-                              {statusData.valueVi}
+                              <CheckCircleOutlineIcon className="icon mr-1" />
+                              {statusData?.valueVi}
                             </button>
                           ) : (
                             <button className="btn status-s1">
-                              <PriorityHighIcon className="icon mr-1 mb-1" />
-                              {statusData.valueVi}
+                              <PriorityHighIcon className="icon mr-1" />
+                              {statusData?.valueVi}
                             </button>
                           )}
                         </>
                       )}
                     </>
                   )}
-                </div> */}
+                </div>
               </>
+            ) : (
+              <> </>
             )}
 
             {/* <button

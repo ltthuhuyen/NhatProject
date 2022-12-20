@@ -11,6 +11,7 @@ import { FormattedMessage } from "react-intl";
 import "./Header.scss";
 import ModalEditUser from "../../System/ModalEditUser";
 import { editUserService } from "../../../services/userService";
+import { getCollectionExpire } from "../../../services/collectionformService";
 import { toast } from "react-toastify";
 import avata from "../../../assets/images/avata.jpg";
 
@@ -46,6 +47,14 @@ class Header extends Component {
   //         isOpenModalEditUser: !this.state.isOpenModalEditUser,
   //     })
   // }
+
+  async componentDidMount() {
+    await this.updateStatusExpire();
+  }
+
+  updateStatusExpire = async () => {
+    await getCollectionExpire();
+  };
 
   handleOnChangeInput = (e, id) => {
     let copyState = { ...this.state };
@@ -279,7 +288,7 @@ class Header extends Component {
                   CUỘC THI
                 </NavLink>
               </div>
-              <div className="child-content">
+              {/* <div className="child-content">
                 <NavLink
                   to="/identification"
                   className="link-homepage"
@@ -292,7 +301,7 @@ class Header extends Component {
                 >
                   NHẬN DẠNG
                 </NavLink>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

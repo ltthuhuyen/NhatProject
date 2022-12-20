@@ -45,44 +45,37 @@ class ModalEditUser extends Component {
   }
 
   async componentDidMount() {
+    await this.props.getGenderStart();
+    await this.props.getRoleStart();
+
     let user = this.props.currentUser;
+    let imageBase64 = "";
+    if (this.props.currentUser) {
+      //Lấy giá trị hiện tại
+      this.setState({
+        id: user?.id,
+        email: user?.userData?.email,
+        password: "HARDCODES",
+        firstName: user?.userData?.firstName,
+        lastName: user?.userData?.lastName,
+        phone: user?.userData?.phone,
+        gender: user?.userData?.gender,
+        roleId: user?.userData?.roleId,
+        image: imageBase64,
+        previewImgURL: new Buffer(user?.userData.image, "base64").toString(
+          "binary"
+        ),
+        city_name: user?.city_name,
+        district_name: user?.district_name,
+        ward_name: user?.ward_name,
+        address_name: user?.address_name,
+
+        action: CRUD_ACTIONS.EDIT,
+      });
+    }
     await this.getAllCitiesFromReact();
     await this.getAllDistrictsFromReact();
     await this.getAllWardFromReact();
-    await this.props.getGenderStart();
-    await this.props.getRoleStart();
-    let imageBase64 = "";
-    // if (user.image) {
-    //   imageBase64 = new Buffer(user.image, "base64").toString("binary");
-    // }
-    if (user && !_.isEmpty(user)) {
-      //Lấy giá trị hiện tại
-      this.setState(
-        {
-          id: user.id,
-          email: user.userData.email,
-          password: "HARDCODES",
-          firstName: user.userData.firstName,
-          lastName: user.userData.lastName,
-          phone: user.userData.phone,
-          gender: user.userData.gender,
-          roleId: user.userData.roleId,
-          image: imageBase64,
-          previewImgURL: new Buffer(user.userData.image, "base64").toString(
-            "binary"
-          ),
-          city_name: user.city_name,
-          district_name: user.district_name,
-          ward_name: user.ward_name,
-          address_name: user.address_name,
-
-          action: CRUD_ACTIONS.EDIT,
-        },
-        () => {
-          console.log("image", this.state.image);
-        }
-      );
-    }
   }
 
   toggle = () => {
@@ -94,14 +87,15 @@ class ModalEditUser extends Component {
       let arrGenders = this.props.genderRedux;
       this.setState({
         genderArr: arrGenders,
-        // gender: arrGenders && arrGenders.length > 0 ? arrGenders[0].key : ''
+        // gender: arrGenders && arrGenders.length > 0 ? arrGenders[0].key : "",
       });
     }
     if (prevProps.roleRedux !== this.props.roleRedux) {
       let arrRoles = this.props.roleRedux;
+      console.log("arrRoles", arrRoles);
       this.setState({
         roleArr: arrRoles,
-        // role: arrRoles && arrRoles.length > 0 ? arrRoles[0].key : ''
+        // role: arrRoles && arrRoles.length > 0 ? arrRoles[0].key : "",
       });
     }
   }
@@ -207,6 +201,7 @@ class ModalEditUser extends Component {
     let language = this.props.language;
     let genders = this.state.genderArr;
     let roles = this.state.roleArr;
+    console.log("roles", roles);
     let { arrCities, districts, wards } = this.state;
     let {
       email,
@@ -255,7 +250,7 @@ class ModalEditUser extends Component {
                   onChange={(e) => {
                     this.handleOnChangeInput(e, "email");
                   }}
-                  value={email}
+                  value={this.state.email}
                   disabled
                 />
               </div>
@@ -364,6 +359,7 @@ class ModalEditUser extends Component {
                   {roles &&
                     roles.length > 0 &&
                     roles.map((item, index) => {
+                      console.log("roles", roles);
                       return (
                         <option key={index} value={item.keyMap}>
                           {language === LANGUAGES.VI

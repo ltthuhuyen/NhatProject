@@ -46,6 +46,8 @@ class Submission extends Component {
       isClickHeart: "",
       arrAppreciate: [],
       appreciateOfReviewer: [],
+      appreciateId: "",
+      appreciateOfUserInfo: {},
     };
   }
 
@@ -83,9 +85,17 @@ class Submission extends Component {
       let competitionID = this.props.match.params.id;
       let res = await allSubmissionsByCompetition(competitionID);
       if (res && res.errCode === 0) {
-        this.setState({
-          arrSubmissionsByCompetition: res.submissions,
-        });
+        this.setState(
+          {
+            arrSubmissionsByCompetition: res.submissions,
+          },
+          () => {
+            console.log(
+              "arrSubmissionsByCompetition",
+              this.state.arrSubmissionsByCompetition
+            );
+          }
+        );
       }
     }
   };
@@ -138,16 +148,19 @@ class Submission extends Component {
 
   countAllAppreciateBySubmissionFromReact = async () => {
     let allSubmissionsByCompetition = this.state.arrSubmissionsByCompetition;
+    let arr = [];
+
     for (let i = 0; i < allSubmissionsByCompetition.length; i++) {
       let res = await countAppreciateBySubmission(
         allSubmissionsByCompetition[i].id
       );
+      arr.push(res.appreciates);
+    }
 
-      if (res && res.errCode === 0) {
-        this.setState({
-          countAppreciate: res.appreciates,
-        });
-      }
+    if (arr) {
+      this.setState({
+        countAppreciate: arr,
+      });
     }
   };
 
@@ -169,60 +182,102 @@ class Submission extends Component {
   getAllAppreciateOfReviewerBySubmissionFromReact = async () => {
     let allSubmissionsByCompetition = this.state.arrSubmissionsByCompetition;
     let userInfo = this.props.userInfo;
+    let arr = [];
     if (userInfo) {
       let reviewerId = this.props.userInfo.id;
       for (let i = 0; i < allSubmissionsByCompetition.length; i++) {
-        let res = await allApprecicateOfReviewerBySubmission({
+        let response = await allApprecicateOfReviewerBySubmission({
           submissionId: allSubmissionsByCompetition[i].id,
           reviewerId: reviewerId,
         });
-        if (res && res.errCode === 0) {
-          this.setState({
-            appreciateOfReviewer: res.appreciates,
-          });
+
+        if (response) {
+          this.setState(
+            {
+              appreciateOfUserInfo: response.appreciates,
+            },
+            () => {
+              console.log(
+                "appreciateOfUserInfo",
+                this.state.appreciateOfUserInfo
+              );
+            }
+          );
+          if (this.state.appreciateOfUserInfo != null) {
+            arr.push(this.state.appreciateOfUserInfo);
+          }
         }
+      }
+      if (arr) {
+        this.setState(
+          {
+            appreciateOfReviewer: arr,
+          },
+          () => {
+            console.log(
+              "appreciateOfReviewer",
+              this.state.appreciateOfReviewer
+            );
+          }
+        );
       }
     }
   };
 
   handleHeart = async (submission) => {
     let submissionId = submission.id;
+    console.log("submissionId", submissionId);
     let appreciateOfReviewer = this.state.appreciateOfReviewer;
     if (appreciateOfReviewer && appreciateOfReviewer.length > 0) {
-      let appreciate = appreciateOfReviewer.filter(
-        (item) => item.submissionId == submissionId
-      );
-      for (let i = 0; i < appreciate.length; i++) {
-        this.setState({
-          appreciateId: appreciate[i].id,
-        });
-        let res = await deleteAppreciate(this.state.appreciateId);
-        if (res && res.errCode === 0) {
-          await this.countAllAppreciateBySubmissionFromReact();
-          await this.getAllAppreciateOfReviewerBySubmissionFromReact();
-          let userInfo = this.props.userInfo;
-          if (userInfo && userInfo.roleId === "R2") {
-            this.props.history.push(
-              `/giver/submission-by-competition/${submission.competitionId}`
-            );
-          } else if (userInfo && userInfo.roleId === "R3") {
-            this.props.history.push(
-              `/recipient/submission-by-competition/${submission.competitionId}`
-            );
+      for (let i = 0; i < appreciateOfReviewer.length; i++) {
+        if (appreciateOfReviewer[i].submissionId === submissionId) {
+          let res = await deleteAppreciate(appreciateOfReviewer[i].id);
+          console.log("res", res);
+          if (res && res.errCode === 0) {
+            await this.countAllAppreciateBySubmissionFromReact();
+            await this.getAllAppreciateOfReviewerBySubmissionFromReact();
+            let userInfo = this.props.userInfo;
+            if (userInfo && userInfo.roleId === "R2") {
+              this.props.history.push(
+                `/giver/submission-by-competition/${submission.competitionId}`
+              );
+            } else if (userInfo && userInfo.roleId === "R3") {
+              this.props.history.push(
+                `/recipient/submission-by-competition/${submission.competitionId}`
+              );
+            }
+          }
+        } else {
+          let reviewerId = this.props.userInfo.id;
+          let res = await createAppreciate({
+            submissionId: submissionId,
+            reviewerId: reviewerId,
+          });
+          console.log("hh");
+          if (res && res.errCode === 0) {
+            await this.countAllAppreciateBySubmissionFromReact();
+            await this.getAllAppreciateOfReviewerBySubmissionFromReact();
+            let userInfo = this.props.userInfo;
+            if (userInfo && userInfo.roleId === "R2") {
+              this.props.history.push(
+                `/giver/submission-by-competition/${submission.competitionId}`
+              );
+            } else if (userInfo && userInfo.roleId === "R3") {
+              this.props.history.push(
+                `/recipient/submission-by-competition/${submission.competitionId}`
+              );
+            }
           }
         }
       }
     } else {
       let submissionId = submission.id;
       let reviewerId = this.props.userInfo.id;
-      // this.setState({
-      //   isClickHeart: true,
-      // });
-
       let res = await createAppreciate({
         submissionId: submissionId,
         reviewerId: reviewerId,
       });
+      console.log("hh2");
       if (res && res.errCode === 0) {
         await this.countAllAppreciateBySubmissionFromReact();
         await this.getAllAppreciateOfReviewerBySubmissionFromReact();
@@ -273,7 +328,6 @@ class Submission extends Component {
       arrAppreciate,
       appreciateOfReviewer,
     } = this.state;
-    console.log("countAppreciate", arrAppreciate);
 
     let imageBase64 = "";
     if (arrCompetitions?.avatar) {
@@ -345,12 +399,27 @@ class Submission extends Component {
                       );
                     })}
                 </div>
-                <button
-                  className="btn btn-upload-competion"
-                  onClick={() => this.handleCreateSubmission(arrCompetitions)}
-                >
-                  Tham gia
-                </button>
+                {userInfo.roleId === "R3" ? (
+                  <>
+                    {" "}
+                    <button
+                      className="btn btn-upload-competion"
+                      onClick={() =>
+                        this.handleCreateSubmission(arrCompetitions)
+                      }
+                      disabled={arrSubmissionsByCompetition
+                        .map(
+                          (arrSubmissionsByCompetition) =>
+                            arrSubmissionsByCompetition.participantId
+                        )
+                        .includes(userInfo.id)}
+                    >
+                      Tham gia
+                    </button>
+                  </>
+                ) : (
+                  <></>
+                )}
               </div>
               {this.state.isShow ? (
                 <div className="col-12 submission-container">
@@ -416,13 +485,76 @@ class Submission extends Component {
                                 {countAppreciate.length > 0 &&
                                   countAppreciate.map(
                                     (countAppreciate, index) => {
-                                      return (
-                                        <button className="btn text-count-heart">
-                                          {countAppreciate?.count} lượt thích
-                                        </button>
-                                      );
+                                      if (
+                                        countAppreciate.submissionId == item.id
+                                      )
+                                        return (
+                                          <>
+                                            <button className="btn text-count-heart">
+                                              {countAppreciate?.count} lượt
+                                              thích
+                                            </button>
+                                          </>
+                                        );
                                     }
                                   )}
+                                {userInfo ? (
+                                  <>
+                                    <button className="btn btn-heart">
+                                      <FavoriteBorderIcon
+                                        className=""
+                                        onClick={(e) => this.handleHeart(item)}
+                                        activeStyle={{
+                                          color: "red",
+                                          background: "red",
+                                        }}
+                                      />
+                                    </button>
+
+                                    {item.participantId === userInfo.id ? (
+                                      <>
+                                        {" "}
+                                        <button
+                                          className="btn btn-delete"
+                                          onClick={(e) =>
+                                            this.handleDeleteSubmission(item)
+                                          }
+                                        >
+                                          <DeleteIcon />
+                                        </button>
+                                      </>
+                                    ) : (
+                                      <></>
+                                    )}
+                                  </>
+                                ) : (
+                                  <>
+                                    {/* {" "}
+                                              {arrAppreciate.map(
+                                                (arrAppreciate) =>
+                                                  arrAppreciate.reviewerId
+                                              ) ? (
+                                                <button
+                                                  className="btn btn-heart"
+                                                  disabled
+                                                >
+                                                  <FavoriteBorderIcon
+                                                    className=""
+                                                    activeStyle={{
+                                                      color: "red",
+                                                    }}
+                                                  />
+                                                </button>
+                                              ) : (
+                                                <button
+                                                  className="btn btn-heart"
+                                                  disabled
+                                                >
+                                                  <FavoriteBorderIcon className="" />
+                                                </button>
+                                              )} */}
+                                  </>
+                                )}
                               </>
                             ) : (
                               <>
@@ -430,69 +562,6 @@ class Submission extends Component {
                                 <button className="btn text-count-heart">
                                   0 lượt thích
                                 </button>
-                              </>
-                            )}
-
-                            {userInfo ? (
-                              <>
-                                {" "}
-                                {appreciateOfReviewer.map(
-                                  (appreciateOfReviewer) =>
-                                    appreciateOfReviewer.reviewerId
-                                ) ? (
-                                  <button className="btn btn-heart">
-                                    <FavoriteBorderIcon
-                                      className=""
-                                      onClick={(e) => this.handleHeart(item)}
-                                      activeStyle={{
-                                        color: "red",
-                                        background: "red",
-                                      }}
-                                    />
-                                  </button>
-                                ) : (
-                                  <button className="btn btn-heart">
-                                    <FavoriteBorderIcon
-                                      className=""
-                                      onClick={(e) => this.handleHeart(item)}
-                                    />
-                                  </button>
-                                )}
-                                {item.participantId === userInfo.id ? (
-                                  <>
-                                    {" "}
-                                    <button
-                                      className="btn btn-delete"
-                                      onClick={(e) =>
-                                        this.handleDeleteSubmission(item)
-                                      }
-                                    >
-                                      <DeleteIcon />
-                                    </button>
-                                  </>
-                                ) : (
-                                  <></>
-                                )}
-                              </>
-                            ) : (
-                              <>
-                                {" "}
-                                {arrAppreciate.map(
-                                  (arrAppreciate) => arrAppreciate.reviewerId
-                                ) ? (
-                                  <button className="btn btn-heart" disabled>
-                                    <FavoriteBorderIcon
-                                      className=""
-                                      activeStyle={{
-                                        color: "red",
-                                      }}
-                                    />
-                                  </button>
-                                ) : (
-                                  <button className="btn btn-heart" disabled>
-                                    <FavoriteBorderIcon className="" />
-                                  </button>
-                                )}
                               </>
                             )}
                           </div>

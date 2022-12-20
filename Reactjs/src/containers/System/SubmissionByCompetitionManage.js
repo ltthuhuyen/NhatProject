@@ -74,19 +74,21 @@ class SubmissionByCompetitionManage extends Component {
 
   countAllAppreciateBySubmissionFromReact = async () => {
     let allSubmissionsByCompetition = this.state.arrSubmissionsByCompetition;
+    let arr = [];
+
     for (let i = 0; i < allSubmissionsByCompetition.length; i++) {
       let res = await countAppreciateBySubmission(
         allSubmissionsByCompetition[i].id
       );
+      arr.push(res.appreciates);
+    }
 
-      if (res && res.errCode === 0) {
-        this.setState({
-          countAppreciate: res.appreciates,
-        });
-      }
+    if (arr) {
+      this.setState({
+        countAppreciate: arr,
+      });
     }
   };
-
   getAllCollectFormStatusByCurrentDateFromReact = async () => {
     let today = new Date();
     let currentDate = moment(today).format("YYYY-MM-DD");
@@ -407,16 +409,20 @@ class SubmissionByCompetitionManage extends Component {
                               <>
                                 {countAppreciate.map(
                                   (countAppreciate, index) => {
-                                    return (
-                                      <div>
-                                        {countAppreciate.count}{" "}
-                                        <FavoriteBorderIcon
-                                          style={{
-                                            color: "#fa4848",
-                                          }}
-                                        />
-                                      </div>
-                                    );
+                                    if (
+                                      countAppreciate.submissionId == item.id
+                                    ) {
+                                      return (
+                                        <div>
+                                          {countAppreciate.count}{" "}
+                                          <FavoriteBorderIcon
+                                            style={{
+                                              color: "#fa4848",
+                                            }}
+                                          />
+                                        </div>
+                                      );
+                                    }
                                   }
                                 )}
                               </>

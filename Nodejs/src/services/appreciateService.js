@@ -12,17 +12,19 @@ let countAppreciateBySubmission = (submissionId) => {
             "submissionId",
             [Sequelize.fn("count", Sequelize.col("id")), "count"],
           ],
+          order: [["id", "DESC"]],
         });
       }
 
       if (submissionId && submissionId !== "ALL") {
-        appreciates = await db.Appreciate.findAll({
+        appreciates = await db.Appreciate.findOne({
           where: { submissionId: submissionId },
           group: "submissionId",
           attributes: [
             "submissionId",
             [Sequelize.fn("count", Sequelize.col("id")), "count"],
           ],
+          order: [["id", "DESC"]],
         });
       }
 
@@ -40,32 +42,26 @@ let countAppreciateBySubmission = (submissionId) => {
   });
 };
 
-let checkAppreciate = (checkSubmission, checkReviewer) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let submissionID = await db.Appreciate.findOne({
-        where: { submissionId: checkSubmission },
-      });
-      let reviewerID = await db.Appreciate.findOne({
-        where: { reviewerId: checkReviewer },
-      });
-      if (submissionID && reviewerID) {
-        resolve(true);
-      } else {
-        resolve(false);
-      }
-    } catch (e) {
-      reject(e);
-    }
-  });
-};
-
 let createNewAppreciate = (data) => {
-  console.log("create", data);
   return new Promise(async (resolve, reject) => {
     try {
-      let check = await checkAppreciate(data.submissionId, data.reviewerId);
-      if (check == true) {
+      if (data.submissionId && data.reviewerId) {
+        let check = await db.Appreciate.findOne({
+          where: {
+            submissionId: data.submissionId,
+            reviewerId: data.reviewerId,
+          },
+        });
+        if (check == null) {
+          await db.Appreciate.create({
+            submissionId: data.submissionId,
+            reviewerId: data.reviewerId,
+          });
+          resolve({
+            errCode: 0,
+            errMessange: "OK",
+          });
+        }
         resolve({
           errCode: 1,
           errMessange: "Không được đánh giá nữa",
@@ -74,15 +70,6 @@ let createNewAppreciate = (data) => {
         resolve({
           errCode: 2,
           errMessange: "Vui lòng điền đầy đủ thông tin",
-        });
-      } else {
-        await db.Appreciate.create({
-          submissionId: data.submissionId,
-          reviewerId: data.reviewerId,
-        });
-        resolve({
-          errCode: 0,
-          errMessange: "OK",
         });
       }
     } catch (error) {
@@ -126,7 +113,7 @@ let getAllAppreciateOfReviewerBySubmission = (data) => {
     try {
       let appreciates = "";
       if (data.submissionId && data.reviewerId) {
-        appreciates = await db.Appreciate.findAll({
+        appreciates = await db.Appreciate.findOne({
           where: {
             submissionId: data.submissionId,
             reviewerId: data.reviewerId,
@@ -153,7 +140,6 @@ let getAllAppreciateOfReviewerBySubmission = (data) => {
 };
 
 let deleteAppreciate = (id) => {
-  console.log("xóa", id);
   return new Promise(async (resolve, reject) => {
     let appreciate = await db.Appreciate.findOne({
       where: { ID: id },

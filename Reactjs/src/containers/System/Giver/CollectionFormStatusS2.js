@@ -101,7 +101,7 @@ class CollectionFormStatusS2 extends Component {
   }
 
   handleLook = async (schedule) => {
-    console.log("res", schedule);
+   
     this.props.history.push(
       `/giver/collection-form-detail-status-s2/${schedule.id}`
     );
@@ -195,7 +195,7 @@ class CollectionFormStatusS2 extends Component {
                 <div className="icon">
                   <BsIcons.BsClipboardCheck />
                 </div>
-                <span className="mt-1 title-history">Xem lịch sử thu gom</span>
+                <span className="mt-1 title-history">Đã thu gom</span>
                 <div className="icon mr-0">
                   <MdIcons.MdOutlineNavigateNext />
                 </div>

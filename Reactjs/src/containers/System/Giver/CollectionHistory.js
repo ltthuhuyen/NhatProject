@@ -200,7 +200,7 @@ class CollectionHistory extends Component {
                 <div className="icon">
                   <BsIcons.BsClipboardCheck />
                 </div>
-                <span className="mt-1 title-history">Xem lịch sử thu gom</span>
+                <span className="mt-1 title-history">Đã thu gom</span>
                 <div className="icon mr-0">
                   <MdIcons.MdOutlineNavigateNext />
                 </div>
@@ -270,7 +270,7 @@ class CollectionHistory extends Component {
                           </button>
                           <button
                             className="btn btn-detail "
-                            onClick={() => this.handleLook(item)}
+                            onClick={() => this.handleLook(item.scheduleData)}
                           >
                             Chi tiết
                           </button>

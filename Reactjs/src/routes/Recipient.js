@@ -6,10 +6,12 @@ import HomePage from "../containers/HomePage/Recipient/HomePage";
 import UserInfo from "../containers/System/Recipient/UserInfo";
 import ModalChangePassword from "../containers/System/Recipient/ModalChangePassword";
 import AddressInfo from "../containers/System/Recipient/AddressInfo";
+import CheckCalendar from "../containers/System/Recipient/CheckCalendar";
 import CollectionFormStatusS2 from "../containers/System/Recipient/CollectionFormStatusS2";
 import CollectionFormStatusS3 from "../containers/System/Recipient/CollectionFormStatusS3";
 import CollectionFormStatusS5 from "../containers/System/Recipient/CollectionFormStatusS5";
 import DetailCollectionForm from "../containers/System/Recipient/DetailCollectionForm";
+import DetailCollectionFormStatusS2 from "../containers/System/Recipient/DetailCollectFormStatusS2";
 import CollectionHistory from "../containers/System/Recipient/CollectionHistory";
 import CollectionFormManage from "../containers/System/Recipient/CollectionFormManage";
 import Submission from "../containers/System/Giver/Submission";
@@ -36,6 +38,10 @@ class Recipient extends Component {
                 />
                 <Route path="/recipient/address-info" component={AddressInfo} />
                 <Route
+                  path="/recipient/check-calendar"
+                  component={CheckCalendar}
+                />
+                <Route
                   path="/recipient/collection-form"
                   component={CollectionFormManage}
                 />
@@ -54,6 +60,10 @@ class Recipient extends Component {
                 <Route
                   path="/recipient/collection-form-detail/:id"
                   component={DetailCollectionForm}
+                />
+                <Route
+                  path="/recipient/collection-form-detail-status-s2/:id"
+                  component={DetailCollectionFormStatusS2}
                 />
                 <Route
                   path="/recipient/collection-history"

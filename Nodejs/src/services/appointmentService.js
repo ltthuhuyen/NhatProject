@@ -27,6 +27,10 @@ let getAllSchedules = (appointmentId) => {
               model: db.Allcode,
               as: "timeTypeData",
             },
+            {
+              model: db.Allcode,
+              as: "statusData",
+            },
           ],
 
           raw: true,
@@ -34,6 +38,7 @@ let getAllSchedules = (appointmentId) => {
         });
       }
       if (appointmentId && appointmentId !== "ALL") {
+        console.log("appointmentId", appointmentId);
         appointments = await db.Schedule.findOne({
           where: { id: appointmentId },
           include: [
@@ -125,10 +130,7 @@ let getAllAppointments = (appointment) => {
               model: db.User,
               as: "recipientData",
             },
-            {
-              model: db.Allcode,
-              as: "statusTypeData",
-            },
+
             {
               model: db.Schedule,
               as: "scheduleData",
@@ -225,6 +227,7 @@ let getScheduleBetweenTwoStatus = (data) => {
               [Op.or]: [data.status1, data.status2],
             },
           },
+
           include: [
             {
               model: db.User,
@@ -252,8 +255,16 @@ let getScheduleBetweenTwoStatus = (data) => {
           raw: true,
           nest: true,
         });
+        for (let i = 0; i < appointments.length; i++) {
+          let check = await db.Collectionform.count({
+            where: { scheduleId: appointments[i].id },
+          });
+          console.log("============> check", check);
+          appointments[i].soluongdangky = check;
+        }
+
+        resolve(appointments);
       }
-      resolve(appointments);
     } catch (e) {
       reject(e);
     }
@@ -268,6 +279,37 @@ let getScheduleOfGiver = (schedule) => {
         appointments = await db.Schedule.findAll({
           where: {
             giverId: schedule.giverId,
+          },
+          include: [
+            {
+              model: db.User,
+              as: "giverData",
+            },
+            {
+              model: db.Product,
+              as: "productData",
+            },
+            {
+              model: db.Address,
+              as: "addressData",
+            },
+            {
+              model: db.Allcode,
+              as: "timeTypeData",
+            },
+            {
+              model: db.Allcode,
+              as: "statusData",
+            },
+          ],
+          raw: true,
+          nest: true,
+        });
+      } else if (schedule.giverId && schedule.status) {
+        appointments = await db.Schedule.findAll({
+          where: {
+            giverId: schedule.giverId,
+            statusType: schedule.status,
           },
           include: [
             {
@@ -353,11 +395,14 @@ let getAllAppointmentsByScheduleByStatusByReceivedDate = (appointment) => {
             {
               model: db.User,
               as: "recipientData",
+              include: [
+                {
+                  model: db.Address,
+                  as: "userData",
+                },
+              ],
             },
-            {
-              model: db.Allcode,
-              as: "statusTypeData",
-            },
+
             {
               model: db.Schedule,
               as: "scheduleData",
@@ -388,7 +433,6 @@ let getAllAppointmentsByScheduleByStatusByReceivedDate = (appointment) => {
           raw: true,
           nest: true,
         });
-        console.log("TH1");
       } else if (
         appointment.scheduleId &&
         appointment.recipientId &&
@@ -406,10 +450,7 @@ let getAllAppointmentsByScheduleByStatusByReceivedDate = (appointment) => {
               model: db.User,
               as: "recipientData",
             },
-            {
-              model: db.Allcode,
-              as: "statusTypeData",
-            },
+
             {
               model: db.Schedule,
               as: "scheduleData",
@@ -440,7 +481,6 @@ let getAllAppointmentsByScheduleByStatusByReceivedDate = (appointment) => {
           raw: true,
           nest: true,
         });
-        console.log("TH2");
       } else if (
         appointment.scheduleId &&
         !appointment.recipientId &&
@@ -458,10 +498,7 @@ let getAllAppointmentsByScheduleByStatusByReceivedDate = (appointment) => {
               model: db.User,
               as: "recipientData",
             },
-            {
-              model: db.Allcode,
-              as: "statusTypeData",
-            },
+
             {
               model: db.Schedule,
               as: "scheduleData",
@@ -492,13 +529,13 @@ let getAllAppointmentsByScheduleByStatusByReceivedDate = (appointment) => {
           raw: true,
           nest: true,
         });
-        console.log("TH3");
       } else if (
         appointment.scheduleId &&
         appointment.recipientId &&
         appointment.status &&
         !appointment.receivedDate
       ) {
+        // console.log("th1");
         appointments = await db.Collectionform.findOne({
           where: {
             scheduleId: appointment.scheduleId,
@@ -511,10 +548,7 @@ let getAllAppointmentsByScheduleByStatusByReceivedDate = (appointment) => {
               model: db.User,
               as: "recipientData",
             },
-            {
-              model: db.Allcode,
-              as: "statusTypeData",
-            },
+
             {
               model: db.Schedule,
               as: "scheduleData",
@@ -545,7 +579,6 @@ let getAllAppointmentsByScheduleByStatusByReceivedDate = (appointment) => {
           raw: true,
           nest: true,
         });
-        console.log("TH4");
       }
 
       resolve(appointments);
@@ -648,9 +681,15 @@ let registerCollectionForm = (data) => {
           registerDate: data.registerDate,
           statusType: "No",
         });
-        await scheduleService.updateStatusS2({
-          id: collect.scheduleId,
-        });
+        if (collect) {
+          let schedule = await db.Schedule.findOne({
+            where: { id: collect.scheduleId },
+            raw: false,
+          });
+          if (schedule) {
+            (schedule.statusType = "S2"), await schedule.save();
+          }
+        }
 
         resolve({
           errCode: 0,
@@ -663,90 +702,90 @@ let registerCollectionForm = (data) => {
   });
 };
 
-let getAppointmentsOfRecipientStatus = (data) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let appointments = "";
-      if (data.recipientId && !data.status) {
-        appointments = await db.Collectionform.findAll({
-          where: {
-            recipientId: data.recipientId,
-          },
-          include: [
-            {
-              model: db.User,
-              as: "recipientData",
-            },
-            {
-              model: db.Schedule,
-              as: "scheduleData",
-              include: [
-                {
-                  model: db.User,
-                  as: "giverData",
-                },
-                {
-                  model: db.Product,
-                  as: "productData",
-                },
-                {
-                  model: db.Allcode,
-                  as: "timeTypeData",
-                },
-                {
-                  model: db.Allcode,
-                  as: "statusData",
-                },
-              ],
-            },
-          ],
-          raw: true,
-          nest: true,
-        });
-      } else if (data.recipientId && data.status) {
-        appointments = await db.Collectionform.findAll({
-          where: {
-            recipientId: data.recipientId,
-            statusType: data.status,
-          },
-          include: [
-            {
-              model: db.User,
-              as: "recipientData",
-            },
-            {
-              model: db.Schedule,
-              as: "scheduleData",
-              include: [
-                {
-                  model: db.User,
-                  as: "giverData",
-                },
-                {
-                  model: db.Product,
-                  as: "productData",
-                },
-                {
-                  model: db.Allcode,
-                  as: "timeTypeData",
-                },
-                {
-                  model: db.Allcode,
-                  as: "statusData",
-                },
-              ],
-            },
-          ],
-          raw: true,
-          nest: true,
-        });
-      }
-      resolve(appointments);
-    } catch (e) {
-      reject(e);
-    }
-  });
-};
+// let getAppointmentsOfRecipientStatus = (data) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       let appointments = "";
+//       if (data.recipientId && !data.status) {
+//         appointments = await db.Collectionform.findAll({
+//           where: {
+//             recipientId: data.recipientId,
+//           },
+//           include: [
+//             {
+//               model: db.User,
+//               as: "recipientData",
+//             },
+//             {
+//               model: db.Schedule,
+//               as: "scheduleData",
+//               include: [
+//                 {
+//                   model: db.User,
+//                   as: "giverData",
+//                 },
+//                 {
+//                   model: db.Product,
+//                   as: "productData",
+//                 },
+//                 {
+//                   model: db.Allcode,
+//                   as: "timeTypeData",
+//                 },
+//                 {
+//                   model: db.Allcode,
+//                   as: "statusData",
+//                 },
+//               ],
+//             },
+//           ],
+//           raw: true,
+//           nest: true,
+//         });
+//       } else if (data.recipientId && data.status) {
+//         appointments = await db.Collectionform.findAll({
+//           where: {
+//             recipientId: data.recipientId,
+//             statusType: data.status,
+//           },
+//           include: [
+//             {
+//               model: db.User,
+//               as: "recipientData",
+//             },
+//             {
+//               model: db.Schedule,
+//               as: "scheduleData",
+//               include: [
+//                 {
+//                   model: db.User,
+//                   as: "giverData",
+//                 },
+//                 {
+//                   model: db.Product,
+//                   as: "productData",
+//                 },
+//                 {
+//                   model: db.Allcode,
+//                   as: "timeTypeData",
+//                 },
+//                 {
+//                   model: db.Allcode,
+//                   as: "statusData",
+//                 },
+//               ],
+//             },
+//           ],
+//           raw: true,
+//           nest: true,
+//         });
+//       }
+//       resolve(appointments);
+//     } catch (e) {
+//       reject(e);
+//     }
+//   });
+// };
 
 // let getAppointmentStatusS2 = (appointmentId) => {
 //   return new Promise(async (resolve, reject) => {
@@ -1456,7 +1495,7 @@ let getAppointmentsOfRecipientStatus = (data) => {
 //   });
 // };
 
-// // đơn thu gom theo địa chỉ
+// Đơn thu gom theo địa chỉ
 let getAllCollectsByAddress = (addressId) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -1496,7 +1535,11 @@ let getAllCollectsByAddress = (addressId) => {
         collects = await db.Schedule.findAll({
           where: {
             addressId: addressId,
+            statusType: {
+              [Op.or]: ["S1", "S2"],
+            },
           },
+          order: [["createdAt", "DESC"]],
           include: [
             {
               model: db.User,
@@ -1650,9 +1693,131 @@ let getAllCollectsByDate = (collectForm) => {
     }
   });
 };
-// // Đơn thu gom được tạo bởi ngày hiện tại theo từng trạng thái
+
+// Đơn thu gom theo ngày hẹn thu gom
+let getAllCollectsByAppointmentDate = (collectForm) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let schedules = "";
+      let collectsTemp = [];
+      let collects = [];
+      let today = moment(new Date()).format("DD/MM/YYYY");
+      // console.log(today);
+      if (collectForm.status && !collectForm.date) {
+        schedules = await db.Schedule.findAll({
+          where: {
+            statusType: collectForm.status,
+            date: today,
+          },
+          include: [
+            {
+              model: db.User,
+              as: "giverData",
+            },
+
+            {
+              model: db.Product,
+              as: "productData",
+            },
+            {
+              model: db.Address,
+              as: "addressData",
+            },
+            {
+              model: db.Allcode,
+              as: "timeTypeData",
+            },
+            {
+              model: db.Allcode,
+              as: "statusData",
+            },
+          ],
+
+          raw: true,
+          nest: true,
+        });
+
+        if (schedules && collectForm.recipientId) {
+          for (let i = 0; i < schedules.length; i++) {
+            let temp = await getAllAppointmentsByScheduleByStatusByReceivedDate(
+              {
+                scheduleId: schedules[i].id,
+                recipientId: collectForm.recipientId,
+              }
+            );
+            if (temp != null) {
+              collectsTemp.push(temp);
+              if (collectsTemp) {
+                collects = collectsTemp.filter(
+                  (collectsTemp) => collectsTemp.statusType === "Yes"
+                );
+              }
+            }
+          }
+        }
+      } else if (collectForm.status && collectForm.date) {
+        // console.log("222");
+        schedules = await db.Schedule.findAll({
+          where: {
+            statusType: collectForm.status,
+            date: collectForm.date,
+          },
+          include: [
+            {
+              model: db.User,
+              as: "giverData",
+            },
+
+            {
+              model: db.Product,
+              as: "productData",
+            },
+            {
+              model: db.Address,
+              as: "addressData",
+            },
+            {
+              model: db.Allcode,
+              as: "timeTypeData",
+            },
+            {
+              model: db.Allcode,
+              as: "statusData",
+            },
+          ],
+
+          raw: true,
+          nest: true,
+        });
+
+        if (schedules && collectForm.recipientId) {
+          for (let i = 0; i < schedules.length; i++) {
+            let temp = await getAllAppointmentsByScheduleByStatusByReceivedDate(
+              {
+                scheduleId: schedules[i].id,
+                recipientId: collectForm.recipientId,
+              }
+            );
+            if (temp != null) {
+              collectsTemp.push(temp);
+              if (collectsTemp) {
+                collects = collectsTemp.filter(
+                  (collectsTemp) => collectsTemp.statusType === "Yes"
+                );
+              }
+            }
+          }
+        }
+      }
+      resolve(collects);
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+// Đơn thu gom được tạo bởi ngày hiện tại theo từng trạng thái
 let getAllAppointmentsStatusByCurrentDate = (collectionForm) => {
-  console.log(collectionForm);
   return new Promise(async (resolve, reject) => {
     try {
       let appointments = "";
@@ -1710,7 +1875,7 @@ let collectFormStatisticByCurrentDate = (data) => {
       if (data.date && data.currentDate && !data.status) {
         collects = await db.Schedule.findAll({
           where: {
-            date: {
+            receivedDate: {
               [Op.gte]: data.date,
               [Op.lte]: data.currentDate,
               // [Op.between]: [
@@ -1719,6 +1884,7 @@ let collectFormStatisticByCurrentDate = (data) => {
               // ],
             },
           },
+
           include: [
             {
               model: db.User,
@@ -1749,12 +1915,13 @@ let collectFormStatisticByCurrentDate = (data) => {
       } else if (data.date && data.currentDate && data.status) {
         collects = await db.Schedule.findAll({
           where: {
-            date: {
+            receivedDate: {
               [Op.gte]: data.date,
               [Op.lte]: data.currentDate,
             },
-            statusType: data.status,
+            statusType: "",
           },
+
           include: [
             {
               model: db.User,
@@ -1792,7 +1959,6 @@ let collectFormStatisticByCurrentDate = (data) => {
 
 // Thống kê đơn thu gom theo trạng thái tới ngày hiện tại
 let collectFormStatisticByStatusOfCurrentDate = (data) => {
-  console.log("data", data);
   return new Promise(async (resolve, reject) => {
     try {
       let collects = "";
@@ -1800,12 +1966,12 @@ let collectFormStatisticByStatusOfCurrentDate = (data) => {
       let arr = [];
       let today = moment(new Date()).format("YYYY-MM-DD");
       let todayTime = today + " " + "00:00:00";
-      console.log("today", todayTime);
       if (data.status) {
         schedules = await db.Schedule.findAll({
           where: {
             statusType: data.status,
           },
+
           include: [
             {
               model: db.User,
@@ -1832,52 +1998,8 @@ let collectFormStatisticByStatusOfCurrentDate = (data) => {
           raw: true,
           nest: true,
         });
-        // console.log("schedule", schedules);
 
-        if (schedules && !data.dateTimeBegin) {
-          for (let i = 0; i < schedules.length; i++) {
-            collects = await db.Collectionform.findAll({
-              where: {
-                scheduleId: schedules[i].id,
-                statusType: "Yes",
-                receivedDate: {
-                  [Op.gte]: todayTime,
-                  [Op.lte]: new Date(),
-                },
-              },
-              include: [
-                {
-                  model: db.User,
-                  as: "recipientData",
-                },
-                {
-                  model: db.Schedule,
-                  as: "scheduleData",
-                  include: [
-                    {
-                      model: db.User,
-                      as: "giverData",
-                    },
-                    {
-                      model: db.Product,
-                      as: "productData",
-                    },
-                    {
-                      model: db.Allcode,
-                      as: "timeTypeData",
-                    },
-                    {
-                      model: db.Allcode,
-                      as: "statusData",
-                    },
-                  ],
-                },
-              ],
-              raw: true,
-              nest: true,
-            });
-          }
-        } else if (schedules && data.dateTimeBegin) {
+        if (schedules && data.dateTimeBegin) {
           for (let i = 0; i < schedules.length; i++) {
             let obj = {};
             collects = await db.Collectionform.findOne({
@@ -1889,6 +2011,7 @@ let collectFormStatisticByStatusOfCurrentDate = (data) => {
                   [Op.lte]: new Date(),
                 },
               },
+
               include: [
                 {
                   model: db.User,
@@ -1901,6 +2024,10 @@ let collectFormStatisticByStatusOfCurrentDate = (data) => {
                     {
                       model: db.User,
                       as: "giverData",
+                    },
+                    {
+                      model: db.Address,
+                      as: "addressData",
                     },
                     {
                       model: db.Product,
@@ -1920,8 +2047,8 @@ let collectFormStatisticByStatusOfCurrentDate = (data) => {
               raw: true,
               nest: true,
             });
+
             arr.push(collects);
-            console.log("arr", arr);
           }
         }
       }
@@ -2217,29 +2344,39 @@ let getThongketheotuan = (week) => {
   });
 };
 
-// let getAllAppointmentsExpire = (collectionForm) => {
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       let arrCollectStatusS3 = "";
-//       let today = new Date();
-//       let currentDate = moment(today);
-//       let arrCollectExpire = [];
-//       if (collectionForm === "ALL") {
-//         arrCollectStatusS3 = await getAppointmentStatusS3(collectionForm);
-//         for (let i = 0; i < arrCollectStatusS3.length; i++) {
-//           currentDate = moment(currentDate);
-//           let date = moment(`${arrCollectStatusS3[i].date}`, "DD/MM/YYYY");
-//           if (currentDate.diff(date, "days") >= 5) {
-//             arrCollectExpire.push(arrCollectStatusS3[i]);
-//           }
-//         }
-//       }
-//       resolve(arrCollectExpire);
-//     } catch (e) {
-//       reject(e);
-//     }
-//   });
-// };
+let getAllAppointmentsExpire = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let arrCollectStatusS3 = "";
+      let status = "S3";
+      let today = new Date();
+      let currentDate = moment(today);
+      let arrCollectExpire = [];
+      arrCollectStatusS3 = await getScheduleByStatus(status);
+      for (let i = 0; i < arrCollectStatusS3.length; i++) {
+        currentDate = moment(currentDate);
+        let date = moment(`${arrCollectStatusS3[i].date}`, "DD/MM/YYYY");
+        if (currentDate.diff(date, "days") >= 5) {
+          arrCollectExpire.push(arrCollectStatusS3[i]);
+        }
+      }
+      if (arrCollectExpire) {
+        for (let i = 0; i < arrCollectExpire.length; i++) {
+          let schedule = await db.Schedule.findOne({
+            where: { id: arrCollectExpire[i].id },
+            raw: false,
+          });
+          if (schedule) {
+            schedule.statusType = "S5";
+            await schedule.save();
+          }
+        }
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
 
 module.exports = {
   getAllSchedules: getAllSchedules,
@@ -2251,7 +2388,7 @@ module.exports = {
   checkCollect: checkCollect,
   registerCollectionForm: registerCollectionForm,
   getScheduleOfGiver: getScheduleOfGiver,
-  getAppointmentsOfRecipientStatus: getAppointmentsOfRecipientStatus,
+  // getAppointmentsOfRecipientStatus: getAppointmentsOfRecipientStatus,
   collectFormStatisticByStatusOfCurrentDate:
     collectFormStatisticByStatusOfCurrentDate,
   // getAppointmentsNew: getAppointmentsNew,
@@ -2274,9 +2411,10 @@ module.exports = {
   // getAppointmentsOfRecipientStatusS5: getAppointmentsOfRecipientStatusS5,
   getAllCollectsByAddress: getAllCollectsByAddress,
   // getAllCollectsByDate: getAllCollectsByDate,
+  getAllCollectsByAppointmentDate: getAllCollectsByAppointmentDate,
   getAllAppointmentsStatusByCurrentDate: getAllAppointmentsStatusByCurrentDate,
   collectFormStatisticByCurrentDate: collectFormStatisticByCurrentDate,
   collectFormStatistic: collectFormStatistic,
   getThongketheotuan: getThongketheotuan,
-  // getAllAppointmentsExpire: getAllAppointmentsExpire,
+  getAllAppointmentsExpire: getAllAppointmentsExpire,
 };

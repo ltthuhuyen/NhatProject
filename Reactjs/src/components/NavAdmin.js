@@ -9,11 +9,19 @@ import * as RiIcons from "react-icons/ri";
 import * as GrIcons from "react-icons/gr";
 import * as FaIcons from "react-icons/fa";
 import CustomScrollbars from "../components/CustomScrollbars";
+import { getCollectionExpire } from "../services/collectionformService";
 import "./NavAdmin.scss";
 
 class NavAdmin extends Component {
   changeLanguage = (language) => {
     this.props.changeLanguageAppRedux(language);
+  };
+  async componentDidMount() {
+    await this.updateStatusExpire();
+  }
+
+  updateStatusExpire = async () => {
+    await getCollectionExpire();
   };
 
   render() {

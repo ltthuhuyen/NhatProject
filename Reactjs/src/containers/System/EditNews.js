@@ -156,6 +156,10 @@ class EditNews extends Component {
     });
   };
 
+  handleAddNews = async () => {
+    this.props.history.push("/system/create-news");
+  };
+
   handleEditorChange = ({ html, text }) => {
     this.setState({
       contentMarkdown: text,
@@ -168,7 +172,7 @@ class EditNews extends Component {
     if (response && response.errCode !== 0) {
       alert(response.errMessange);
     } else {
-      toast.success("Sửa thông tin tin tức thành công");
+      toast.success("Sửa nội dung tin tức thành công");
       await this.getAllNews();
       this.props.history.push("/system/news-manage");
     }
@@ -256,8 +260,11 @@ class EditNews extends Component {
                                           </>
                                         ) : (
                                           <>
-                                            {currentDateTimeStop.diff(tt)} phút
-                                            trước
+                                            {currentDateTimeStop.diff(
+                                              tt,
+                                              "minutes"
+                                            )}{" "}
+                                            phút trước
                                           </>
                                         )}
                                       </div>
@@ -308,7 +315,7 @@ class EditNews extends Component {
               </div>
               <button
                 className="col-1 btn btn-create "
-                onClick={this.handleAddNews}
+                onClick={() => this.handleAddNews()}
               >
                 <MdIcons.MdOutlineCreate />{" "}
                 <FormattedMessage id="manage-user.add" />

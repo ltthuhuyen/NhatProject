@@ -47,12 +47,13 @@ let handleUserLogin = (email, password) => {
           }
         } else {
           userData.errCode = 2;
-          userData.errMessage = `Không tìm thấy người dùng này`;
+          userData.errMessage = "Không tìm thấy người dùng này";
         }
       } else {
         //return error
         userData.errCode = 1;
-        userData.errMessage = `Your's Email isn't exist in your system. Please try other email`;
+        userData.errMessage =
+          "Email vừa nhập không tồn tại, vui lòng nhập lại !";
       }
       resolve(userData);
     } catch (e) {
@@ -75,11 +76,11 @@ let handleSendEmailForgotPassword = (email) => {
         if (user) {
           user.password = hashPasswordFromBcrypt;
           await user.save();
+          await emailService.sendEmailForgotPassword({
+            reciverEmail: email,
+            newPassword: fpSalt,
+          });
         }
-        await emailService.sendEmailForgotPassword({
-          reciverEmail: email,
-          newPassword: fpSalt,
-        });
       }
       resolve(email);
     } catch (e) {

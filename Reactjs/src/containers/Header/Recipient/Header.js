@@ -10,7 +10,8 @@ import CustomScrollbars from "../../../components/CustomScrollbars";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import CloseIcon from "@mui/icons-material/Close";
 import { FormattedMessage } from "react-intl";
-import { getCollectionFormOfWaittingRecipientByCurrentDate } from "../../../services/collectionformService";
+import { getCollectionFormByAppointmentDate } from "../../../services/collectionformService";
+import { getCollectionExpire } from "../../../services/collectionformService";
 
 class Header extends Component {
   changeLanguage = (language) => {
@@ -30,26 +31,60 @@ class Header extends Component {
     this.state = {
       isShowNotification: false,
       currentDate: date,
-      arrCollectionFormOfRecipientStatusS3: [],
+      arrCollectionFormsByAppointmentDate_CurrentDate: [],
     };
   }
 
+  // async componentDidMount() {
+  //   await this.getAllCollectionFormOfWaittingRecipientByCurrentDate();
+  // }
+
+  // getAllCollectionFormOfWaittingRecipientByCurrentDate = async () => {
+  //   let userInfo = this.props.userInfo;
+
+  //   let response = await getCollectionFormOfWaittingRecipientByCurrentDate({
+  //     recipientId: userInfo.id,
+  //     currentDate: this.state.currentDate,
+  //   });
+
+  //   if (response && response.errCode == 0) {
+  //     this.setState({
+  //       arrCollectionFormOfRecipientStatusS3: response.appointments,
+  //     });
+  //   }
+  // };
+
   async componentDidMount() {
-    await this.getAllCollectionFormOfWaittingRecipientByCurrentDate();
+    await this.updateStatusExpire();
+    await this.getAllCollectionFormByAppointmentDateFormReact();
   }
 
-  getAllCollectionFormOfWaittingRecipientByCurrentDate = async () => {
-    let userInfo = this.props.userInfo;
+  updateStatusExpire = async () => {
+    await getCollectionExpire();
+  };
 
-    let response = await getCollectionFormOfWaittingRecipientByCurrentDate({
-      recipientId: userInfo.id,
-      currentDate: this.state.currentDate,
-    });
-
-    if (response && response.errCode == 0) {
-      this.setState({
-        arrCollectionFormOfRecipientStatusS3: response.appointments,
-      });
+  getAllCollectionFormByAppointmentDateFormReact = async () => {
+    let res = await getCollectionFormByAppointmentDate(
+      {
+        status: "S3",
+        recipientId: this.state.recipientId,
+      },
+      () => {
+        console.log("res", res);
+      }
+    );
+    if (res && res.errCode === 0) {
+      this.setState(
+        {
+          arrCollectionFormsByAppointmentDate_CurrentDate: res.collects,
+        },
+        () => {
+          console.log(
+            "arrCollectionFormsByAppointmentDate_CurrentDate",
+            this.state.arrCollectionFormsByAppointmentDate_CurrentDate
+          );
+        }
+      );
     }
   };
 
@@ -76,10 +111,8 @@ class Header extends Component {
     });
   };
 
-  handleDetailCollectForm = (collectForm) => {
-    this.props.history.push(
-      `/recipient/collection-form-detail/${collectForm.id}`
-    );
+  handleDetailCollectForm = (scheduleId) => {
+    this.props.history.push(`/recipient/collection-form-detail/${scheduleId}`);
     setTimeout(() => {
       window.location.reload();
     }, 0);
@@ -90,9 +123,15 @@ class Header extends Component {
     let {
       isShowNotification,
       curentDate,
-      arrCollectionFormOfRecipientStatusS3,
+      arrCollectionFormsByAppointmentDate_CurrentDate,
     } = this.state;
-
+    if (this.props.userInfo) {
+      this.state.recipientId = this.props.userInfo.id;
+    }
+    console.log(
+      "arrCollectionFormsByAppointmentDate_CurrentDate",
+      arrCollectionFormsByAppointmentDate_CurrentDate
+    );
     let imageBase64 = "";
     if (userInfo) {
       imageBase64 = new Buffer(userInfo.image, "base64").toString("binary");
@@ -141,14 +180,16 @@ class Header extends Component {
                           <CustomScrollbars
                             style={{ height: "180px", width: "100%" }}
                           >
-                            {arrCollectionFormOfRecipientStatusS3.length > 0 &&
-                              arrCollectionFormOfRecipientStatusS3.map(
+                            {arrCollectionFormsByAppointmentDate_CurrentDate &&
+                              arrCollectionFormsByAppointmentDate_CurrentDate.length >
+                                0 &&
+                              arrCollectionFormsByAppointmentDate_CurrentDate.map(
                                 (item, index) => {
                                   return (
                                     <div
                                       className="info-notification"
                                       onClick={(e) =>
-                                        this.handleDetailCollectForm(item)
+                                        this.handleDetailCollectForm(item.id)
                                       }
                                     >
                                       Bạn có đơn thu gom {""}
@@ -210,6 +251,7 @@ class Header extends Component {
                   TRANG CHỦ
                 </NavLink>
               </div>
+
               <div className="child-content">
                 <NavLink
                   to="/recipient/collection-history"
@@ -252,20 +294,7 @@ class Header extends Component {
                   CUỘC THI
                 </NavLink>
               </div>
-              <div className="child-content">
-                <NavLink
-                  to="/recipient/contest"
-                  className="link-homepage"
-                  activeStyle={{
-                    background: "white",
-                    color: "#019117",
-                    padding: "10px",
-                    borderRadius: "13px",
-                  }}
-                >
-                  NHẬN DẠNG
-                </NavLink>
-              </div>
+
               {/* <div className="right-content">
                             <input type="text" class="form-control rounded-pill" id="exampleInputPassword1"
                                 onChange={(e) => {this.handleOnChangeInput(e, 'search')}}

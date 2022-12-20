@@ -25,7 +25,10 @@ import {
   saveUpdateStatic,
   saveUpdateRecivedDate,
 } from "../../../services/appointmentService";
-import { getAllCollectionForm } from "../../../services/collectionformService";
+import {
+  getAllCollectionForm,
+  getAllCollectionFormBySchedule,
+} from "../../../services/collectionformService";
 import { getAllAddressOfUser } from "../../../services/addressService";
 class DetailCollectionForm extends Component {
   constructor(props) {
@@ -74,12 +77,15 @@ class DetailCollectionForm extends Component {
       this.props.match.params.id
     ) {
       let scheduleId = this.props.match.params.id;
-      console.log(scheduleId);
-      let response = await getAllCollectionForm(scheduleId);
-
+      let response = await getAllCollectionFormBySchedule({
+        scheduleId: scheduleId,
+        recipientId: this.state.recipientId,
+        status: "Yes",
+      });
       if (response && response.errCode === 0) {
         this.setState({
           arrCollectionForms: response.appointments,
+          scheduleData: response.appointments.scheduleData.id,
           giverData: response.appointments.scheduleData.giverData,
           recipientData: response.appointments.recipientData,
           productData: response.appointments.scheduleData.productData,
@@ -88,7 +94,7 @@ class DetailCollectionForm extends Component {
           timeTypeData: response.appointments.scheduleData.timeTypeData,
           phone: response.appointments.scheduleData.phone,
           date: response.appointments.scheduleData.date,
-          status: response.appointments.statusTypeData.keyMap,
+          // status: response.appointments.statusData.keyMap,
           amount: response.appointments.scheduleData.amount,
           avataGiver: response.appointments.scheduleData.giverData?.image?.data,
           avataRecipient: response.appointments.recipientData?.image?.data,
@@ -151,6 +157,7 @@ class DetailCollectionForm extends Component {
 
   render() {
     let {
+      scheduleData,
       giverData,
       recipientData,
       productData,
@@ -190,7 +197,7 @@ class DetailCollectionForm extends Component {
           <div className="container-collection-form-status shadow-lg">
             <div className="d-flex wrapper-link">
               <NavLink
-                to="/recipient/collection-form"
+                to="/recipient/check-calendar"
                 className="d-flex"
                 activeStyle={{
                   background: "white",
@@ -200,9 +207,9 @@ class DetailCollectionForm extends Component {
                 }}
               >
                 <div className="icon">
-                  <AiIcons.AiOutlineUnorderedList />
+                  <BsIcons.BsCalendar2Week />
                 </div>
-                <span className="mt-1">Đơn thu gom</span>
+                <span className="mt-1">Xem lịch</span>
               </NavLink>
               <NavLink
                 to="/recipient/collection-form-status-s2"
@@ -260,7 +267,7 @@ class DetailCollectionForm extends Component {
                 <div className="icon">
                   <BsIcons.BsClipboardCheck />
                 </div>
-                <span className="mt-1 title-history">Xem lịch sử thu gom</span>
+                <span className="mt-1 title-history">Đã thu gom</span>
                 <div className="icon mr-0">
                   <MdIcons.MdOutlineNavigateNext />
                 </div>
@@ -451,9 +458,7 @@ class DetailCollectionForm extends Component {
                                 <button
                                   className="btn btn-update-status col-6"
                                   onClick={() =>
-                                    this.handleUpdate(
-                                      this.props.match.params.id
-                                    )
+                                    this.handleUpdate(scheduleData)
                                   }
                                 >
                                   Cập nhật

@@ -28,7 +28,8 @@ let createNewProduct = (data) => {
           errCode: 1,
           errMessange: "Sản phẩm này đã tồn tại ",
         });
-      } else if (!data.product_name || !data.image || !data.description) {
+      }
+      if (!data.product_name || !data.image || !data.description) {
         resolve({
           errCode: 2,
           errMessange: "Vui lòng điền đầy đủ thông tin",

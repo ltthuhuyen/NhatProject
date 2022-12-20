@@ -1,6 +1,6 @@
 
 .news{
-    margin: 100px 200px 130px 200px;
+    margin: 200px 200px 130px 200px;
     .title-news{
         justify-content: center;
         font-family: monospace;
@@ -21,30 +21,49 @@
     }
     .news-content{
         .row{
-            .img-pro .img-pro {
-                height: 250px;
-                width: 100%;
-                border: 5px solid #8CC63E;
-                border-radius: 15px;
-            }
-            .info-news{
-                .title{
-                    font-size: 15px;
-                    color: rgb(56, 56, 130);
-                    font-weight: 600;
-                }
-                .time{
-                    .icon{
-                        margin-bottom: 3px;
-                        color: #8CC63E;
-                        font-size: 14px;
-                        // color: #000;
+            .content{
+                .img-pro .img-pro {
+                        height: 250px;
+                        width: 100%;
+                        border: 5px solid #8CC63E;
+                        border-radius: 15px;
                     }
-                    font-size: 12px;
-                   
-                    
-                }  
-            }        
+
+                .info-news {
+                    .title {
+                            font-size: 15px;
+                            color: rgb(56, 56, 130);
+                            font-weight: 600;
+                        }
+                    .time {
+                        .icon {
+                            margin-bottom: 3px;
+                            color: #8CC63E;
+                            font-size: 14px;
+                            // color: #000;
+                        }
+                
+                        font-size: 12px;
+                
+                
+                    }
+                }
+            }
+              
         }
+    }
+    .btn-limit-news{
+        justify-content: center;
+        margin: 0 490px;
+        color: rgb(1, 113, 16);
+        font-size: 14px;
+        .icon{
+            margin: 5px ;
+        }
+        &:hover {
+                transform: scale(1.1);
+              
+            }
+       
     }
 }

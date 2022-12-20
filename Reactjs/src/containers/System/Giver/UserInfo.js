@@ -292,6 +292,7 @@ class UserInfo extends Component {
                       this.handleOnChangeInput(e, "email");
                     }}
                     value={this.state.email}
+                    disabled
                   />
                 </div>
                 <div className="col-4">

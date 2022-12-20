@@ -9,7 +9,7 @@ import "./Manage.scss";
 import { withRouter } from "react-router";
 import { getSuccessedCollectionForm } from "../../services/collectionformService";
 import NavAdmin from "../../components/NavAdmin";
-import ModalDetailCollectForm from "./ModalDetailCollectForm";
+import ModalDetailAllCollect from "./ModalDetailAllCollect";
 import moment from "moment";
 import { dateFormat } from "../../utils";
 import {
@@ -68,22 +68,14 @@ class CollectionFormStatusS4Manage extends Component {
     let arr = [];
     let responseCollect;
     for (let i = 0; i < arrCollectionForms.length; i++) {
-      // let responseCollect = {};
-
       responseCollect = await getAllCollectionFormBySchedule({
         scheduleId: arrCollectionForms[i].id,
       });
-      // console.log("responseCollect", responseCollect);
 
       if (responseCollect) {
-        this.setState(
-          {
-            arrCollect: responseCollect.appointments,
-          },
-          () => {
-            // console.log("arrCollect", this.state.arrCollect);
-          }
-        );
+        this.setState({
+          arrCollect: responseCollect.appointments,
+        });
       }
 
       let { arrCollect } = this.state;
@@ -99,18 +91,6 @@ class CollectionFormStatusS4Manage extends Component {
         });
       }
     }
-
-    // if (arr) {
-    //   for (let i = 0; i < arr.length; i++) {}
-    //   this.setState(
-    //     {
-    //       arrCollect: arr,
-    //     },
-    //     () => {
-    //       // console.log("arrCollect", this.state.arrCollect);
-    //     }
-    //   );
-    // }
   };
 
   getAllCollectFormStatusByCurrentDateFromReact = async () => {
@@ -188,6 +168,7 @@ class CollectionFormStatusS4Manage extends Component {
   render() {
     let {
       arrCollectStatusYes,
+      arrCollectionForms,
       arrCollectsStatusByCurrentDate,
       isShowNotification,
       currentDateTimeStop,
@@ -196,7 +177,7 @@ class CollectionFormStatusS4Manage extends Component {
     let { currentPage, todosPerPage } = this.state;
     const indexOfLastTodo = currentPage * todosPerPage;
     const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
-    const currentTodos = arrCollectStatusYes.slice(
+    const currentTodos = arrCollectionForms.slice(
       indexOfFirstTodo,
       indexOfLastTodo
     );
@@ -204,7 +185,7 @@ class CollectionFormStatusS4Manage extends Component {
     const pageNumbers = [];
     for (
       let i = 1;
-      i <= Math.ceil(arrCollectStatusYes.length / todosPerPage);
+      i <= Math.ceil(arrCollectionForms.length / todosPerPage);
       i++
     ) {
       pageNumbers.push(i);
@@ -217,7 +198,7 @@ class CollectionFormStatusS4Manage extends Component {
     return (
       <>
         <NavAdmin />
-        <ModalDetailCollectForm
+        <ModalDetailAllCollect
           isOpen={this.state.isOpenModalDetailCollect}
           toggleFromParent={this.toggleDetailCollectModal}
           currentCollect={this.state.detailCollect}
@@ -283,8 +264,11 @@ class CollectionFormStatusS4Manage extends Component {
                                           </>
                                         ) : (
                                           <>
-                                            {currentDateTimeStop.diff(tt)} phút
-                                            trước
+                                            {currentDateTimeStop.diff(
+                                              tt,
+                                              "minutes"
+                                            )}{" "}
+                                            phút trước
                                           </>
                                         )}
                                       </div>
@@ -352,8 +336,7 @@ class CollectionFormStatusS4Manage extends Component {
                       Thông tin người cho
                     </th>
                     <th scope="col">Sản phẩm</th>
-                    {/* <th scope="col">Ngày thu gom</th>
-                                <th scope="col">Thời gian</th> */}
+
                     <th scope="col">Người nhận thu gom</th>
                     <th scope="col">Trạng thái</th>
                     <th scope="col">Hành động</th>
@@ -366,60 +349,64 @@ class CollectionFormStatusS4Manage extends Component {
                       {" "}
                       {currentTodos &&
                         currentTodos.map((item, index) => {
-                          console.log(item.scheduleData?.giverData);
                           return (
                             <tr key={index}>
                               <td>{item.id}</td>
                               <td>
-                                {item.scheduleData?.giverData?.firstName}{" "}
-                                {item.scheduleData?.giverData?.lastName}
+                                {item.giverData?.firstName}{" "}
+                                {item.giverData?.lastName}
                               </td>
-                              <td>{item.scheduleData.giverData.email}</td>
-                              <td>{item.scheduleData.giverData.phone}</td>
-                              <td>
-                                {item.scheduleData.productData.product_name}
-                              </td>
+                              <td>{item.giverData.email}</td>
+                              <td>{item.giverData.phone}</td>
+                              <td>{item.productData.product_name}</td>
 
-                              {/* <td>{item.scheduleData.timeTypeData.valueVi}</td>  */}
+                              {/* <td>{item.timeTypeData.valueVi}</td>  */}
                               <td>
-                                {item.recipientData.firstName}{" "}
-                                {item.recipientData.lastName}
+                                {arrCollectStatusYes &&
+                                  arrCollectStatusYes.map(
+                                    (arrCollectStatusYes, index) => {
+                                      if (
+                                        arrCollectStatusYes.scheduleId ===
+                                        item.id
+                                      ) {
+                                        return (
+                                          arrCollectStatusYes.recipientData
+                                            .firstName +
+                                          " " +
+                                          arrCollectStatusYes.recipientData
+                                            .lastName
+                                        );
+                                      }
+                                    }
+                                  )}
                               </td>
                               <td>
-                                {item.scheduleData.statusData.valueVi ===
-                                  "Chờ xác nhận" ||
-                                item.scheduleData.statusData.valueVi ===
-                                  "Chờ thu gom" ? (
+                                {item.statusData.valueVi === "Chờ xác nhận" ||
+                                item.statusData.valueVi === "Chờ thu gom" ? (
                                   <button className="btn status-s2">
                                     <PriorityHighIcon className="icon mr-1" />
-                                    {item.scheduleData.statusData.valueVi}
+                                    {item.statusData.valueVi}
                                   </button>
                                 ) : (
                                   <>
-                                    {item.scheduleData.statusData.valueVi ===
+                                    {item.statusData.valueVi ===
                                     "Đơn bị hủy" ? (
                                       <button className="btn status-s5">
                                         <BsIcons.BsX className="icon" />{" "}
-                                        {item.scheduleData.statusData.valueVi}
+                                        {item.statusData.valueVi}
                                       </button>
                                     ) : (
                                       <>
-                                        {item.scheduleData.statusData
-                                          .valueVi === "Đã thu gom" ? (
+                                        {item.statusData.valueVi ===
+                                        "Đã thu gom" ? (
                                           <button className="btn status-s4">
                                             <CheckCircleOutlineIcon className="icon mr-1" />
-                                            {
-                                              item.scheduleData.statusData
-                                                .valueVi
-                                            }
+                                            {item.statusData.valueVi}
                                           </button>
                                         ) : (
                                           <button className="btn status-s1">
                                             <PriorityHighIcon className="icon mr-1" />
-                                            {
-                                              item.scheduleData.statusData
-                                                .valueVi
-                                            }
+                                            {item.statusData.valueVi}
                                           </button>
                                         )}
                                       </>
@@ -443,55 +430,66 @@ class CollectionFormStatusS4Manage extends Component {
                   ) : (
                     <>
                       {" "}
-                      {arrCollectStatusYes &&
-                        arrCollectStatusYes.map((item, index) => {
+                      {arrCollectionForms &&
+                        arrCollectionForms.map((item, index) => {
                           return (
                             <tr key={index}>
                               <td>{item.id}</td>
                               <td>
-                                {item.scheduleData.giverData.firstName}{" "}
-                                {item.scheduleData.giverData.lastName}
+                                {item.giverData?.firstName}{" "}
+                                {item.giverData?.lastName}
                               </td>
-                              <td>{item.scheduleData.giverData.email}</td>
-                              <td>{item.scheduleData.giverData.phone}</td>
+                              <td>{item.giverData.email}</td>
+                              <td>{item.giverData.phone}</td>
+                              <td>{item.productData.product_name}</td>
+
+                              {/* <td>{item.timeTypeData.valueVi}</td>  */}
                               <td>
-                                {item.scheduleData.productData.product_name}
+                                {arrCollectStatusYes &&
+                                  arrCollectStatusYes.map(
+                                    (arrCollectStatusYes, index) => {
+                                      if (
+                                        arrCollectStatusYes.scheduleId ===
+                                        item.id
+                                      ) {
+                                        return (
+                                          arrCollectStatusYes.recipientData
+                                            .firstName +
+                                          " " +
+                                          arrCollectStatusYes.recipientData
+                                            .lastName
+                                        );
+                                      }
+                                    }
+                                  )}
                               </td>
-                              {/* <td>{item.scheduleData.date}</td>
-                                        <td>{item.scheduleData.timeTypeData.valueVi}</td>  */}
                               <td>
-                                {item.recipientData.firstName}{" "}
-                                {item.recipientData.lastName}
-                              </td>
-                              <td>
-                                {item.statusTypeData.valueVi ===
-                                  "Chờ xác nhận" ||
-                                item.statusTypeData.valueVi ===
-                                  "Chờ thu gom" ? (
+                                {item.statusData.valueVi === "Chờ xác nhận" ||
+                                item.statusData.valueVi === "Chờ thu gom" ? (
                                   <button className="btn status-s2">
                                     <PriorityHighIcon className="icon mr-1" />
-                                    {item.statusTypeData.valueVi}
+                                    {item.statusData.valueVi}
                                   </button>
                                 ) : (
                                   <>
-                                    {item.statusTypeData.valueVi ===
+                                    {item.statusData.valueVi ===
                                     "Đơn bị hủy" ? (
                                       <button className="btn status-s5">
                                         <BsIcons.BsX className="icon" />{" "}
-                                        {item.statusTypeData.valueVi}
+                                        {item.statusData.valueVi}
                                       </button>
                                     ) : (
                                       <>
-                                        {item.statusTypeData.valueVi ===
+                                        {item.statusData.valueVi ===
                                         "Đã thu gom" ? (
                                           <button className="btn status-s4">
                                             <CheckCircleOutlineIcon className="icon mr-1" />
-                                            {item.statusTypeData.valueVi}
+                                            {item.statusData.valueVi}
                                           </button>
                                         ) : (
                                           <button className="btn status-s1">
                                             <PriorityHighIcon className="icon mr-1" />
-                                            {item.statusTypeData.valueVi}
+                                            {item.statusData.valueVi}
                                           </button>
                                         )}
                                       </>

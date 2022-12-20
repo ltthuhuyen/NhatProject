@@ -1,5 +1,10 @@
  // Modal xem chi tiết đơn thu gom
  .modal-detail-collect {
+    .title-collect {
+        color: #0015ff;
+        text-align: center;
+        font-size: 17px;
+    }
      .form-row {
          .lable {
              color: #adb8ee;
@@ -13,6 +18,7 @@
              margin-left: 5px;
              font-size: 13.5px;
          }
+       
         .status-s1 {
             //    font-family: Courier New;
             font-size: 11px;
@@ -62,19 +68,19 @@
         }
 
         .status-s4 {
-            font-size: 14px;
-            // padding: 3px 4px;
+            font-size: 11px;
+            padding: 3px 4px;
             // font-weight: 700;
-            // color: #fff;
-            // background: #7ed000;
-            color: #7ed000;
+            color: #fff;
+            background: #7ed000;
+            // color: #7ed000;
             width: auto;
 
             .icon {
-                font-size: 20px;
-                // color: #fff;
-                // background: #7ed000;
-                color: #7ed000;
+                font-size: 12px;
+                color: #fff;
+                background: #7ed000;
+               
             }
         }
 

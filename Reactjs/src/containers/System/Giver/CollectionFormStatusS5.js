@@ -74,7 +74,6 @@ class CollectionFormStatusS5 extends Component {
         for (let i = 0; i < arr.length; i++) {
           response = await getAllCollectionFormBySchedule({
             scheduleId: arr[i],
-
             status: "Yes",
           });
           temp.push(response.appointments);
@@ -197,7 +196,7 @@ class CollectionFormStatusS5 extends Component {
                 <div className="icon">
                   <BsIcons.BsClipboardCheck />
                 </div>
-                <span className="mt-1 title-history">Xem lịch sử thu gom</span>
+                <span className="mt-1 title-history">Đã thu gom</span>
                 <div className="icon mr-0">
                   <MdIcons.MdOutlineNavigateNext />
                 </div>
@@ -267,7 +266,7 @@ class CollectionFormStatusS5 extends Component {
                           </button>
                           <button
                             className="btn btn-detail "
-                            onClick={() => this.handleLook(item)}
+                            onClick={() => this.handleLook(item.scheduleData)}
                           >
                             Chi tiết
                           </button>

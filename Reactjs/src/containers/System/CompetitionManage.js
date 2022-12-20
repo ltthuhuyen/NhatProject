@@ -19,6 +19,7 @@ import {
 import { searchCompetitive } from "../../services/searchService";
 import moment from "moment";
 import { dateFormat } from "../../utils";
+import { allSubmissionsByCompetition } from "../../services/submissionService";
 import { getCollectionFormStatusByCurrentDate } from "../../services/collectionformService";
 import CustomScrollbars from "../../components/CustomScrollbars";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
@@ -40,12 +41,14 @@ class CompetitionManage extends Component {
       currentPage: 1,
       todosPerPage: 10,
       arrCompetitions: [],
+      arrSubmissionsByCompetition: [],
     };
     this.handleClick = this.handleClick.bind(this);
   }
 
   async componentDidMount() {
     await this.getAllCompetitionsFromReact();
+    await this.getAllSubmissionsByCompetitiveFromReact();
     await this.getAllCollectFormStatusByCurrentDateFromReact();
   }
 
@@ -55,6 +58,23 @@ class CompetitionManage extends Component {
       this.setState({
         arrCompetitions: response.competitions,
       });
+    }
+  };
+
+  getAllSubmissionsByCompetitiveFromReact = async () => {
+    let res = await allSubmissionsByCompetition("ALL");
+    if (res && res.errCode === 0) {
+      this.setState(
+        {
+          arrSubmissionsByCompetition: res.submissions,
+        },
+        () => {
+          console.log(
+            "arrSubmissionsByCompetition",
+            this.state.arrSubmissionsByCompetition
+          );
+        }
+      );
     }
   };
 
@@ -177,6 +197,7 @@ class CompetitionManage extends Component {
     let { processLogout, userInfo } = this.props;
     let {
       arrCompetitions,
+      arrSubmissionsByCompetition,
       arrCollectsStatusByCurrentDate,
       isShowNotification,
       currentDateTimeStop,
@@ -266,8 +287,11 @@ class CompetitionManage extends Component {
                                           </>
                                         ) : (
                                           <>
-                                            {currentDateTimeStop.diff(tt)} phút
-                                            trước
+                                            {currentDateTimeStop.diff(
+                                              tt,
+                                              "minutes"
+                                            )}{" "}
+                                            phút trước
                                           </>
                                         )}
                                       </div>
@@ -438,14 +462,64 @@ class CompetitionManage extends Component {
                                 >
                                   <AiIcons.AiOutlineEdit />
                                 </button>
-                                <button
-                                  className="btn btn-delete"
-                                  onClick={() =>
-                                    this.handleDeleteCompetion(item)
-                                  }
-                                >
-                                  <AiIcons.AiOutlineDelete />
-                                </button>
+
+                                {arrSubmissionsByCompetition &&
+                                arrSubmissionsByCompetition
+                                  .map(
+                                    (arrSubmissionsByCompetition) =>
+                                      arrSubmissionsByCompetition.competitionId
+                                  )
+                                  .includes(item.id) ? (
+                                  <>
+                                    {" "}
+                                    <button
+                                      type="button"
+                                      className="btn btn-delete  "
+                                      onClick={() =>
+                                        this.handleDeleteCompetion(item)
+                                      }
+                                      disabled
+                                    >
+                                      <AiIcons.AiOutlineDelete />
+                                    </button>
+                                  </>
+                                ) : (
+                                  <>
+                                    {arrSubmissionsByCompetition &&
+                                    arrSubmissionsByCompetition
+                                      .map(
+                                        (arrSubmissionsByCompetition) =>
+                                          arrSubmissionsByCompetition.competitionId
+                                      )
+                                      .includes(item.id) ? (
+                                      <>
+                                        {" "}
+                                        <button
+                                          type="button"
+                                          className="btn btn-delete  "
+                                          onClick={() =>
+                                            this.handleDeleteCompetion(item)
+                                          }
+                                          disabled
+                                        >
+                                          <AiIcons.AiOutlineDelete />
+                                        </button>
+                                      </>
+                                    ) : (
+                                      <>
+                                        {" "}
+                                        <button
+                                          className="btn btn-delete"
+                                          onClick={() =>
+                                            this.handleDeleteCompetion(item)
+                                          }
+                                        >
+                                          <AiIcons.AiOutlineDelete />
+                                        </button>
+                                      </>
+                                    )}
+                                  </>
+                                )}
                               </td>
                             </tr>
                           );

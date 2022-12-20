@@ -35,30 +35,38 @@
                             border-radius: 10px;
 
                             .title-notification {
-                                font-size: 18px;
-                                background: #eaf6c4;
-                                padding: 15px;
-                                font-family: cursive;
-                                border-bottom: 1px solid #e1e1e1;
-
-                                .icon-close {
-                                    float: right;
+                                    background: #eaf6c4;
+                                    font-size: 18px;
+                                    padding: 15px;
+                                    font-family: cursive;
+                                    border-bottom: 1px solid #e1e1e1;
+                            
+                                    .icon-close {
+                                        float: right;
+                                    }
                                 }
-                            }
-
-                            .info-notification {
-                                color: rgb(18, 17, 17);
-                                font-size: 14px;
-                                padding: 20px;
-                                border-bottom: 1px solid rgb(225, 225, 225);
-
-                                &:hover {
-                                    color: #077709;
-                                    background: #F8F8FF;
-                                    opacity: 0.7;
+                            
+                                .info-notification {
+                                    color: rgb(18, 17, 17);
+                                    font-size: 14px;
+                                    padding: 20px;
+                                    border-bottom: 1px solid rgb(225, 225, 225);
+                            
+                                    &:hover {
+                                        color: #1530b9 !important;
+                                        background: #F8F8FF;
+                                        opacity: 0.7;
+                                    }
+                            
+                                    .text-minutes {
+                                        color: rgb(136, 152, 152) !important;
+                                        font-size: 11px;
+                                        right: 3%;
+                                        position: absolute;
+                                    }
+                            
+                            
                                 }
-
-                            }
 
                         }
                     }
@@ -126,8 +134,6 @@
             padding: 8px;
             margin: 0px 30px 0px 150px;
             
-          
-          
         }
     }
 
@@ -276,7 +282,7 @@
                     
                     }
                     &:hover {
-                            background: #fcfdff;
+                            background: hsl(222, 100%, 98%);
                         }
                 }
                

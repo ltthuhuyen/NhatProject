@@ -41,6 +41,7 @@ import Chart from "./Chart";
 import { cloneDeep } from "lodash";
 import ModalDetailCollectForm from "../containers/System/ModalDetailCollectForm";
 import { loadGraphModel } from "@tensorflow/tfjs-converter";
+import { push } from "connected-react-router";
 class Dashboard extends Component {
   constructor(props) {
     super(props);
@@ -55,7 +56,7 @@ class Dashboard extends Component {
       today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
 
     let time = today.setHours(0, 0, 0, 0);
-    console.log("time", currentTime);
+
     this.state = {
       status: "",
       countUser: [],
@@ -65,7 +66,6 @@ class Dashboard extends Component {
       isShowNotification: false,
       isShowAlert: false,
       isOpenModalDetailCollect: false,
-      arrCollectsStatusS4CurrentDate: [],
       arrCollectionFormStatisticByCurrentDate: [],
       arrCollectsStatusByCurrentDate: [],
       collectsStatisticOneAgo: {},
@@ -98,28 +98,22 @@ class Dashboard extends Component {
 
     if (this.state.label1) {
       let response = await getCollectionStatisticWeek(1);
-      console.log("res pon đi mount", response.res1);
-      this.setState(
-        {
+
+      this.setState({
+        labels: this.state.label1,
+        data: {
           labels: this.state.label1,
-          data: {
-            labels: this.state.label1,
-            datasets: [
-              {
-                label: "7 ngày gần nhất",
-                data: response?.res1?.data?.map((item, index) => {
-                  return item;
-                }),
-                backgroundColor: "rgba(255, 99, 132, 0.8)",
-              },
-            ],
-          },
+          datasets: [
+            {
+              label: "7 ngày gần nhất",
+              data: response?.res1?.data?.map((item, index) => {
+                return item;
+              }),
+              backgroundColor: "#8CC63E",
+            },
+          ],
         },
-        () => {
-          console.log("labels", this.state.label1);
-          console.log("labels", this.state.label2);
-        }
-      );
+      });
     }
   }
 
@@ -134,28 +128,28 @@ class Dashboard extends Component {
     }
   }
 
+  // đơn đã thu gom trong hôm nay
   collectFormStatisticByStatusOfCurrentDateFromReact = async () => {
+    let today = moment(new Date()).format("YYYY-MM-DD");
+    let todayTime = today + " " + "00:00:00";
     let response = await collectFormStatisticByStatusOfCurrentDate({
       status: "S4",
+      dateTimeBegin: todayTime,
     });
-    if (response) {
-      this.setState(
-        {
-          arrCollectsStatusS4CurrentDate: response.collects,
-        },
-        () => {
-          console.log(
-            "arrCollectsByCurrentDate1",
-            this.state.arrCollectsStatusS4CurrentDate
-          );
-        }
-      );
+    let arr = [];
+    for (let i = 0; i < response.collects.length; i++) {
+      if (response.collects[i] != null) {
+        arr.push(response.collects[i]);
+        this.setState({
+          arrCollectionFormStatisticByCurrentDate: arr,
+        });
+      }
     }
   };
 
   getAllCollectFormStatusByCurrentDateFromReact = async () => {
     let today = new Date();
-    console.log("today", today);
+    // console.log("today", today);
     let currentDate = moment(today).format("YYYY-MM-DD");
     var currentTime =
       today.getHours() +
@@ -165,13 +159,6 @@ class Dashboard extends Component {
       ("0" + today.getSeconds()).slice(-2);
     let currentDateTimeBegin = currentDate + " " + "00:00:00";
     let currentDateTimeStop = currentDate + " " + currentTime;
-    // console.log("moment", currentDate);
-    // console.log("moment", currentTime);
-    // console.log("currentDateTimeBegin", currentDateTimeBegin);
-    console.log("currentDateTimeStop", currentDateTimeStop);
-
-    // let tttt = currentTime.diff(tt, "minutes");
-    // console.log("tttt", tttt);
     let response = await getCollectionFormStatusByCurrentDate({
       currentDateBegin: currentDateTimeBegin,
       currentDateStop: currentDateTimeStop,
@@ -267,7 +254,6 @@ class Dashboard extends Component {
 
   getAllCollectFormStatisticWeekFromReact = async () => {
     let response = await getCollectionStatisticWeek(1);
-
     if (response) {
       this.setState({
         arrCollectsByWeek: response.res1,
@@ -290,14 +276,9 @@ class Dashboard extends Component {
   handleOnChangeInput = (e, id) => {
     let copyState = { ...this.state };
     copyState[id] = e.target.value;
-    this.setState(
-      {
-        ...copyState,
-      },
-      () => {
-        console.log("status", this.state);
-      }
-    );
+    this.setState({
+      ...copyState,
+    });
   };
 
   handleOnChangeDataPicker = (date) => {
@@ -307,33 +288,30 @@ class Dashboard extends Component {
       },
       () => {
         let date = moment(this.state.dateStart).format("YYYY-MM-DD");
-        this.setState(
-          {
-            date: date + " " + "00:00:00",
-          },
-          () => {
-            console.log("date", this.state.date);
-          }
-        );
+        this.setState({
+          date: date + " " + "00:00:00",
+        });
       }
     );
   };
 
   handleStatistic = async () => {
-    if (this.state.date && this.state.status) {
-      let response = await collectFormStatisticByStatusOfCurrentDate(
-        {
-          status: this.state.status,
-          dateTimeBegin: this.state.date,
-        },
-        () => {
-          console.log("response", response);
-        }
-      );
+    if (this.state.date) {
+      let response = await collectFormStatisticByStatusOfCurrentDate({
+        status: "S4",
+        dateTimeBegin: this.state.date,
+      });
+
       if (response) {
-        this.setState({
-          arrCollectionFormStatisticByCurrentDate: response.collects,
-        });
+        let arr = [];
+        for (let i = 0; i < response.collects.length; i++) {
+          if (response.collects[i] != null) {
+            arr.push(response.collects[i]);
+            this.setState({
+              arrCollectionFormStatisticByCurrentDate: arr,
+            });
+          }
+        }
       } else {
         toast.error("Vui lòng chọn ngày bắt đầu thống kê");
       }
@@ -341,7 +319,6 @@ class Dashboard extends Component {
   };
 
   handleLookDetail = (collect) => {
-    console.log("collect", collect);
     this.setState({
       isOpenModalDetailCollect: true,
       detailCollect: collect,
@@ -417,16 +394,13 @@ class Dashboard extends Component {
       userStatisticOneAgo,
       currentDateTimeStop,
     } = this.state;
-    console.log(
-      "arrCollectsStatusByCurrentDate",
-      this.state.arrCollectsStatusByCurrentDate
-    );
-    currentDateTimeStop = moment(currentDateTimeStop);
+
+    let currentDateTime = moment(currentDateTimeStop);
 
     let { currentPage, todosPerPage } = this.state;
     const indexOfLastTodo = currentPage * todosPerPage;
     const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
-    const currentTodos = arrCollectsStatusS4CurrentDate.slice(
+    const currentTodos = arrCollectionFormStatisticByCurrentDate.slice(
       indexOfFirstTodo,
       indexOfLastTodo
     );
@@ -434,7 +408,8 @@ class Dashboard extends Component {
     const pageNumbers = [];
     for (
       let i = 1;
-      i <= Math.ceil(arrCollectsStatusS4CurrentDate.length / todosPerPage);
+      i <=
+      Math.ceil(arrCollectionFormStatisticByCurrentDate.length / todosPerPage);
       i++
     ) {
       pageNumbers.push(i);
@@ -477,19 +452,18 @@ class Dashboard extends Component {
                         {arrCollectsStatusByCurrentDate.length > 0 &&
                           arrCollectsStatusByCurrentDate.map((item, index) => {
                             let t = moment(`${item.createdAt}`).format(
-                              "YYYY-MM-DD hh:mm:ss"
+                              "YYYY-MM-DD HH:mm:ss"
                             );
-                            console.log("t", t);
-                            let tt = moment(`${t}`);
-                            console.log("tt", tt);
-                            console.log(item.createdAt);
+
+                            let tt = moment(t);
+                            // console.log("tt", tt);
+                            // console.log("currentDateTime", currentDateTime);
+                            // console.log(currentDateTime.diff(tt));
                             return (
                               <>
                                 <div
                                   className="info-notification"
-                                  onClick={(e) =>
-                                    this.handleDetailCollectForm(item)
-                                  }
+                                  onClick={(e) => this.handleLookDetail(item)}
                                 >
                                   {item.giverData.firstName} {""}
                                   {item.giverData.lastName}{" "}
@@ -502,21 +476,19 @@ class Dashboard extends Component {
                                     {/* {item.createdAt} */}
                                   </div>
                                   <div className="text-minutes">
-                                    {currentDateTimeStop.diff(tt, "minutes") >
+                                    {currentDateTime.diff(tt, "minutes") >
                                     60 ? (
                                       <>
                                         {Math.floor(
-                                          currentDateTimeStop.diff(
-                                            tt,
-                                            "minutes"
-                                          ) / 60
+                                          currentDateTime.diff(tt, "minutes") /
+                                            60
                                         )}{" "}
                                         giờ trước
                                       </>
                                     ) : (
                                       <>
-                                        {currentDateTimeStop.diff(tt)} phút
-                                        trước
+                                        {currentDateTime.diff(tt, "minutes")}{" "}
+                                        phút trước
                                       </>
                                     )}
                                   </div>
@@ -733,16 +705,7 @@ class Dashboard extends Component {
                       this.handleOnChangeInput(e, "status");
                     }}
                   >
-                    <option selected>Tất cả</option>
-                    {statusArr &&
-                      statusArr.length > 0 &&
-                      statusArr.map((item, index) => {
-                        return (
-                          <option key={index} value={item.keyMap}>
-                            {item.valueVi}
-                          </option>
-                        );
-                      })}
+                    <option selected>Đã thu gom</option>
                   </select>
                 </div>
                 <div className="row1-content2 d-flex">
@@ -755,14 +718,14 @@ class Dashboard extends Component {
                 </div>
               </div>
               <hr></hr>
-              {arrCollectsStatusS4CurrentDate &&
-              arrCollectsStatusS4CurrentDate.length > 0 ? (
+              {arrCollectionFormStatisticByCurrentDate &&
+              arrCollectionFormStatisticByCurrentDate.length > 0 ? (
                 <>
                   <div className="row-2 wrapper-title-sum-statistic d-flex">
                     <span className="wrapper-sum d-flex">
                       <div className="">Tổng cộng:</div>
                       <div className="text-sum">
-                        {arrCollectsStatusS4CurrentDate.length} đơn
+                        {arrCollectionFormStatisticByCurrentDate.length} đơn
                       </div>
                     </span>
                   </div>
@@ -780,7 +743,6 @@ class Dashboard extends Component {
                           <th scope="col">Hành động</th>
                         </tr>
                       </thead>
-
                       <tbody className="tbody">
                         {currentTodos && currentTodos.length > 0 ? (
                           <>
@@ -875,8 +837,8 @@ class Dashboard extends Component {
                         ) : (
                           <>
                             {" "}
-                            {arrCollectsStatusS4CurrentDate &&
-                              arrCollectsStatusS4CurrentDate.map(
+                            {arrCollectionFormStatisticByCurrentDate &&
+                              arrCollectionFormStatisticByCurrentDate.map(
                                 (item, index) => {
                                   return (
                                     <tr key={index}>
@@ -962,7 +924,9 @@ class Dashboard extends Component {
                                           type="button"
                                           className="btn btn-detail-form px-2 "
                                           onClick={() =>
-                                            this.handleLookDetail(item)
+                                            this.handleLookDetail(
+                                              item.scheduleId
+                                            )
                                           }
                                         >
                                           <BsIcons.BsInfoCircle /> Chi tiết
@@ -1005,7 +969,6 @@ class Dashboard extends Component {
                               <th scope="col">Hành động</th>
                             </tr>
                           </thead>
-
                           <tbody className="tbody">
                             {currentTodos && currentTodos.length > 0 ? (
                               <>
@@ -1115,15 +1078,15 @@ class Dashboard extends Component {
                                     (item, index) => {
                                       return (
                                         <tr key={index}>
-                                          <td>{item.id}</td>
+                                          <td>{item.scheduleId}</td>
                                           <td>
                                             {
                                               item.scheduleData.giverData
-                                                .firstName
+                                                ?.firstName
                                             }{" "}
                                             {
                                               item.scheduleData.giverData
-                                                .lastName
+                                                ?.lastName
                                             }
                                           </td>
                                           <td>

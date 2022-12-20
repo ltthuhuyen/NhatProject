@@ -22,7 +22,11 @@ import {
   getAllAddressOfUser,
 } from "../../../services/addressService";
 import { searchCollectByAddressService } from "../../../services/searchService";
-import { saveUpdateStaticS2 } from "../../../services/appointmentService";
+import {
+  registerCollectionForm,
+  getAllScheduleStatus,
+  getAllCollectionFormBySchedule,
+} from "../../../services/collectionformService";
 import { Diversity1 } from "@mui/icons-material";
 
 class SearchCollectionForm extends Component {
@@ -41,6 +45,8 @@ class SearchCollectionForm extends Component {
       todosPerPage: 10,
       isShowAlert: false,
       addressUser: [],
+      arrScheduleStatusS2: [],
+      arrCollect: [],
     };
     this.handleClick = this.handleClick.bind(this);
   }
@@ -58,6 +64,9 @@ class SearchCollectionForm extends Component {
     await this.getAllDistrictsFromReact();
     await this.getAllWardFromReact();
     await this.getAllCollectsNearAddress();
+    await this.getScheduleS2();
+    await this.getAllCollectionByScheduleOfRecipient();
+    // await this.getCollectFormStatusS2OfRecipient();
   }
 
   getAllCitiesFromReact = async () => {
@@ -90,17 +99,11 @@ class SearchCollectionForm extends Component {
   //Đơn thu gom gần địa chỉ của bạn
   getAllCollectsNearAddress = async () => {
     let userId = this.props.userInfo.id;
-    console.log("userId", userId);
     let response = await getAllAddressOfUser(userId);
     if (response) {
-      this.setState(
-        {
-          addressUser: response.addresses,
-        },
-        () => {
-          console.log("arrAddresses", this.state.addressUser);
-        }
-      );
+      this.setState({
+        addressUser: response.addresses,
+      });
     }
     let { addressUser } = this.state;
     for (let i = 0; i < addressUser.length; i++) {
@@ -112,17 +115,9 @@ class SearchCollectionForm extends Component {
           date: moment(today).format(dateFormat.SEND_TO_SERVER),
         });
         if (response) {
-          this.setState(
-            {
-              arrCollectionFormsByAddress: response,
-            },
-            () => {
-              console.log(
-                "arrCollectionFormsByAddress",
-                this.state.arrCollectionFormsByAddress
-              );
-            }
-          );
+          this.setState({
+            arrCollectionFormsByAddress: response,
+          });
         }
       }
     }
@@ -200,19 +195,71 @@ class SearchCollectionForm extends Component {
     }
   };
 
-  handleUpdate = async (id) => {
-    let response = await saveUpdateStaticS2({
-      id: id.id,
+  handleUpdate = async (schedule) => {
+    let response = await registerCollectionForm({
+      scheduleId: schedule.id,
       recipientId: this.props.userInfo.id,
+      registerDate: new Date(),
+      receivedDate: "",
+      status: "S2",
     });
     if (response && response.errCode == 0) {
       toast.success("Đăng ký đơn thu gom thành công!");
     }
-    // this.props.history.push(`/recipient/collection-form-detail/${id.id}`);
+    await this.getAllCollectionByScheduleOfRecipient();
+  };
+
+  getScheduleS2 = async () => {
+    let response = await getAllScheduleStatus("S2");
+    if (response && response.errCode == 0) {
+      this.setState({
+        arrScheduleStatusS2: response.appointments,
+      });
+    }
+  };
+
+  getAllCollectionByScheduleOfRecipient = async () => {
+    let { arrScheduleStatusS2 } = this.state;
+    let response;
+    let arr = [];
+    let temp = [];
+    if (arrScheduleStatusS2) {
+      for (let i = 0; i < arrScheduleStatusS2.length; i++) {
+        arr.push(arrScheduleStatusS2[i].id);
+      }
+      console.log("arr", arr);
+
+      if (arr) {
+        for (let i = 0; i < arr.length; i++) {
+          response = await getAllCollectionFormBySchedule({
+            scheduleId: arr[i],
+            recipientId: this.state.recipientId,
+            status: "No",
+          });
+          if (
+            response &&
+            response.errCode === 0 &&
+            response.appointments != null
+          ) {
+            temp.push(response.appointments);
+          }
+        }
+      }
+      if (temp) {
+        this.setState(
+          {
+            arrCollect: temp,
+          },
+          () => {
+            console.log("arrCollect", this.state.arrCollect);
+          }
+        );
+      }
+    }
   };
 
   render() {
-    let { arrCities, arrCollectionFormsByAddress } = this.state;
+    let { arrCities, arrCollectionFormsByAddress, arrCollect } = this.state;
     let { currentPage, todosPerPage } = this.state;
     const indexOfLastTodo = currentPage * todosPerPage;
     const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
@@ -421,7 +468,23 @@ class SearchCollectionForm extends Component {
                             <p>{item.timeTypeData.valueVi}</p>
                           </div>
                         </div>
-                        {item.statusType === "S1" ? (
+                        {item.statusType === "S2" ? (
+                          arrCollect.map(
+                            (arrCollect) => arrCollect.scheduleId == item.id
+                          ) ? (
+                            <div disabled className="registed">
+                              <CheckCircleOutlineIcon className="icon" />
+                              Đã đăng ký
+                            </div>
+                          ) : (
+                            <button
+                              className="btn-register-receive"
+                              onClick={() => this.handleUpdate(item)}
+                            >
+                              <IoIcons.IoMdArrowRoundForward /> Đăng ký1
+                            </button>
+                          )
+                        ) : item.statusType === "S1" ? (
                           <button
                             className="btn-register-receive"
                             onClick={() => this.handleUpdate(item)}
@@ -429,10 +492,7 @@ class SearchCollectionForm extends Component {
                             <IoIcons.IoMdArrowRoundForward /> Đăng ký
                           </button>
                         ) : (
-                          <div disabled className="registed">
-                            <CheckCircleOutlineIcon className="icon" />
-                            Đã đăng ký
-                          </div>
+                          <></>
                         )}
                       </div>
                     </>

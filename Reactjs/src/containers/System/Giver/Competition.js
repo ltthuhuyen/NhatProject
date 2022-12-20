@@ -108,7 +108,8 @@ class Competition extends Component {
   };
 
   render() {
-    let { arrCompetitions, countSubmission } = this.state;
+    let { arrCompetitions, countSubmission, arrSubmissionsByCompetition } =
+      this.state;
     let userInfo = this.props.userInfo;
 
     return (
@@ -180,12 +181,22 @@ class Competition extends Component {
                             }
                           })}
                       </div>
-                      <button
-                        className="btn btn-upload-competion"
-                        onClick={() => this.handleCreateSubmission(item)}
-                      >
-                        Tham gia
-                      </button>
+                      {!userInfo || userInfo.roleId === "R2" ? (
+                        ""
+                      ) : (
+                        <button
+                          className="btn btn-upload-competion"
+                          onClick={() => this.handleCreateSubmission(item)}
+                          disabled={arrSubmissionsByCompetition
+                            .map(
+                              (arrSubmissionsByCompetition) =>
+                                arrSubmissionsByCompetition.participantId
+                            )
+                            .includes(userInfo.id)}
+                        >
+                          Tham gia
+                        </button>
+                      )}
                     </div>
                   </div>
                 );

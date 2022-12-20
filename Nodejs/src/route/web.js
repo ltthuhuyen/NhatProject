@@ -97,10 +97,10 @@ let initWebRoutes = (app) => {
     "/api/register-collect-form",
     appointmentController.handleRegisterCollect
   );
-  router.post(
-    "/api/get-appointment-of-recipient-status",
-    appointmentController.handleAppointmentsOfRecipientStatus
-  );
+  // router.post(
+  //   "/api/get-appointment-of-recipient-status",
+  //   appointmentController.handleAppointmentsOfRecipientStatus
+  // );
   router.put(
     "/api/update-registration-status",
     scheduleController.handleUpdateRegistrationStatus
@@ -109,6 +109,10 @@ let initWebRoutes = (app) => {
   router.put(
     "/api/update-receivedDate",
     scheduleController.handleUpdateReceivedDate
+  );
+  router.put(
+    "/api/update-status-expire",
+    scheduleController.handleUpdateStatusExpire
   );
 
   // router.get(
@@ -184,6 +188,11 @@ let initWebRoutes = (app) => {
   );
 
   router.post(
+    "/api/get-all-collects-by-appointmentDate",
+    appointmentController.handleGetAllCollectsByAppointmentDate
+  );
+
+  router.post(
     "/api/get-all-collects-status-by-currentDate",
     appointmentController.handleGetAllCollectsStatusByCurrentDate
   );
@@ -201,10 +210,10 @@ let initWebRoutes = (app) => {
     appointmentController.handleCollectFormStatisticByStatusOfCurrentDate
   );
 
-  // router.get(
-  //   "/api/collect-form-status-s3-expire",
-  //   appointmentController.handleAppointmentsStatusS3Expire
-  // );
+  router.get(
+    "/api/collect-form-status-s3-expire",
+    appointmentController.handleAppointmentsStatusS3Expire
+  );
 
   router.get(
     "/api/get-thongke-theo-tuan",
@@ -222,6 +231,7 @@ let initWebRoutes = (app) => {
   router.get("/api/search-news", searchController.handleSearchNews);
   router.post("/api/create-new-news", newsController.handleCreateNews);
   router.get("/api/get-all-news", newsController.handleGetAllNews);
+  router.get("/api/get-news-limit", newsController.handleGetNewsLimit);
   router.put("/api/edit-news", newsController.handleEditNews);
   router.delete("/api/delete-news", newsController.handleDeleteNews);
 

@@ -53,6 +53,11 @@ let handleUpdateReceivedDate = async (req, res) => {
   return res.status(200).json(message);
 };
 
+let handleUpdateStatusExpire = async (req, res) => {
+  let message = await scheduleService.updateStatusExpire();
+  return res.status(200).json(message);
+};
+
 module.exports = {
   handleCountCollect: handleCountCollect,
   handleCreateSchedule: handleCreateSchedule,
@@ -61,4 +66,5 @@ module.exports = {
   handleUpdateStatus: handleUpdateStatus,
   handleUpdateRegistrationStatus: handleUpdateRegistrationStatus,
   handleUpdateReceivedDate: handleUpdateReceivedDate,
+  handleUpdateStatusExpire: handleUpdateStatusExpire,
 };

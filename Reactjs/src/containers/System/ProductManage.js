@@ -14,7 +14,6 @@ import {
   editProductService,
   deleteProductSerVice,
 } from "../../services/productService";
-import { getAllCollectionForm } from "../../services/collectionformService";
 import { searchProduct } from "../../services/searchService";
 import { FormattedMessage } from "react-intl";
 import ModalProduct from "./ModalProduct";
@@ -22,7 +21,10 @@ import ModalEditProduct from "./ModalEditProduct";
 import NavAdmin from "../../components/NavAdmin";
 import moment from "moment";
 import { dateFormat } from "../../utils";
-import { getCollectionFormStatusByCurrentDate } from "../../services/collectionformService";
+import {
+  getAllSchedule,
+  getCollectionFormStatusByCurrentDate,
+} from "../../services/collectionformService";
 import CustomScrollbars from "../../components/CustomScrollbars";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import CloseIcon from "@mui/icons-material/Close";
@@ -32,6 +34,7 @@ class ProductManage extends Component {
     super(props);
     this.state = {
       arrProducts: [],
+      arrSchedule: [],
       isOpenModalProduct: false,
       isOpenModalEditProduct: false,
       productEdit: {},
@@ -61,11 +64,16 @@ class ProductManage extends Component {
   };
 
   getAllCollectionFormReact = async () => {
-    let response = await getAllCollectionForm("ALL");
-    if (response && response.errCode == 0) {
-      this.setState({
-        arrCollectionForms: response.appointments,
-      });
+    let responseSchedlue = await getAllSchedule("ALL");
+    if (responseSchedlue && responseSchedlue.errCode == 0) {
+      this.setState(
+        {
+          arrSchedule: responseSchedlue.appointments,
+        },
+        () => {
+          console.log("arrSchedule", this.state.arrSchedule);
+        }
+      );
     }
   };
 
@@ -142,20 +150,16 @@ class ProductManage extends Component {
   };
 
   createNewproduct = async (data) => {
-    try {
-      let res = await createNewProductService(data);
-      if (res && res.errCode === 0) {
-        toast.success(res.errMessage);
-        this.setState({
-          isOpenModalProduct: false,
-        });
-        await this.getAllProductsFromReact();
-      } else if (res && res.errCode === 1) {
-        toast.error(res.errMessage);
-      } else if (res && res.errCode === 2) {
-        toast.error("Vui lòng điền đầy đủ thông tin");
-      }
-    } catch (error) {}
+    let res = await createNewProductService(data);
+    console.log("res", res);
+    if (res && res.errCode == 0) {
+      toast.success("Thêm sản phẩm thành công");
+      await this.getAllProductsFromReact();
+    } else if (res && res.errCode == 1) {
+      toast.error("Sản phẩm này đã tồn tại");
+    } else if (res && res.errCode == 2) {
+      toast.error("Vui lòng điền đầy đủ thông tin");
+    }
   };
 
   handleEditProduct = async (product) => {
@@ -205,9 +209,16 @@ class ProductManage extends Component {
     this.props.changeLanguageAppRedux(language);
   };
   render() {
-    let { arrProducts, arrCollectsStatusByCurrentDate, isShowNotification } =
-      this.state;
+    let {
+      arrProducts,
+      arrSchedule,
+      arrCollectsStatusByCurrentDate,
+      isShowNotification,
+      currentDateTimeStop,
+    } = this.state;
     let arrCollectionForms = this.state.arrCollectionForms;
+
+    currentDateTimeStop = moment(currentDateTimeStop);
     let { currentPage, todosPerPage } = this.state;
     const indexOfLastTodo = currentPage * todosPerPage;
     const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
@@ -262,6 +273,10 @@ class ProductManage extends Component {
                           {arrCollectsStatusByCurrentDate.length > 0 &&
                             arrCollectsStatusByCurrentDate.map(
                               (item, index) => {
+                                let t = moment(item.createdAt);
+                                // console.log("t", t);
+                                let tt = moment(`${t}`);
+                                // console.log("tt", tt);
                                 return (
                                   <div
                                     className="info-notification"
@@ -276,6 +291,28 @@ class ProductManage extends Component {
                                       {item.productData.product_name} {""}
                                       tại {item.addressData.address_name} {""}
                                       {item.addressData.ward_name}
+                                    </div>
+                                    <div className="text-minutes">
+                                      {currentDateTimeStop.diff(tt, "minutes") >
+                                      60 ? (
+                                        <>
+                                          {Math.floor(
+                                            currentDateTimeStop.diff(
+                                              tt,
+                                              "minutes"
+                                            ) / 60
+                                          )}{" "}
+                                          giờ trước
+                                        </>
+                                      ) : (
+                                        <>
+                                          {currentDateTimeStop.diff(
+                                            tt,
+                                            "minutes"
+                                          )}{" "}
+                                          phút trước
+                                        </>
+                                      )}
                                     </div>
                                   </div>
                                 );
@@ -385,8 +422,8 @@ class ProductManage extends Component {
                               type="button"
                               className="btn btn-delete"
                               onClick={() => this.handleDeleteProduct(item)}
-                              disabled={arrCollectionForms
-                                .map((prd) => prd.productId)
+                              disabled={arrSchedule
+                                .map((prd) => prd.id)
                                 .includes(item.id)}
                             >
                               <AiIcons.AiOutlineDelete />

@@ -3,6 +3,8 @@ import emailService from "./emailService";
 import productService from "./productService";
 import addressService from "./addressService";
 import allCodeService from "./allCodeService";
+import appointmentService from "./appointmentService";
+import tempService from "./tempService";
 const Sequelize = require("sequelize");
 require("dotenv").config();
 
@@ -22,53 +24,61 @@ let countCollect = (id) => {
   });
 };
 let createNewSchedule = (data) => {
-  console.log(data.arrSchedule);
   return new Promise(async (resolve, reject) => {
     try {
-      if (!data.arrSchedule) {
+      if (!data) {
         resolve({
           errCode: 1,
           errMessage: "Vui lòng chọn đủ thông tin!",
         });
       } else {
-        let schedule = data.arrSchedule;
-        let product, date, time, address, amount;
-        // console.log("product", product);
-        // for (let i = 0; i < schedule.length; i++) {
-        //   let productId = schedule[i].productId;
-        //   product = await productService.getAllProducts(productId);
-        //   let addressId = schedule[i].addressId;
-        //   address = await addressService.getAllAddresses(addressId);
-        //   date = schedule[i].date;
-        //   let timeId = schedule[i].timeType;
-        //   time = await allCodeService.getTimeSerVice(timeId);
-        //   amount = schedule[i].amount;
-        // }
-        await db.Schedule.bulkCreate(schedule);
+        let temp = await tempService.getAllTemps(data.giverId);
 
-        // await emailService.sendEmail({
-        //   reciverEmail: address.userData.email,
-        //   giverName: address.userData.firstName + address.userData.lastName,
-        //   productName: product.product_name,
-        //   dateName: date,
-        //   timeName: time.valueVi,
-        //   amountName: amount,
-        //   addressName:
-        //     address.address_name +
-        //     " - " +
-        //     address.ward_name +
-        //     " - " +
-        //     address.district_name +
-        //     " - " +
-        //     address.city_name,
+        if (temp && temp.length > 0) {
+          let arr = [];
+          temp.map(async (item, index) => {
+            let obj = {};
+            (obj.giverId = data.giverId), (obj.addressId = data.addressId);
+            (obj.productId = item.productId),
+              (obj.date = data.date),
+              (obj.timeType = data.timeType),
+              (obj.amount = data.amount),
+              (obj.statusType = data.statusType);
+            arr.push(obj);
+          });
 
-        //   redirectLink:
-        //     "https://www.youtube.com/watch?v=0GL--Adfqhc&list=PLncHg6Kn2JT5-kzm53oVL5ZBAe-LTREGA&index=73&ab_channel=H%E1%BB%8FiD%C3%A2nIT",
-        // });
+          let schedule = await db.Schedule.bulkCreate(arr);
+          resolve({
+            errCode: 0,
+            errMessage: "OK",
+          });
+        }
 
-        resolve({
-          errCode: 0,
-          errMessage: "OK",
+        for (let i = 0; i < schedule.length; i++) {
+          let productId = schedule[i].productId;
+          product = await productService.getAllProducts(productId);
+          let addressId = schedule[i].addressId;
+          address = await addressService.getAllAddresses(addressId);
+          date = schedule[i].date;
+          let timeId = schedule[i].timeType;
+          time = await allCodeService.getTimeSerVice(timeId);
+          amount = schedule[i].amount;
+        }
+        await emailService.sendEmail({
+          reciverEmail: address.userData.email,
+          giverName: address.userData.firstName + address.userData.lastName,
+          productName: product.product_name,
+          dateName: date,
+          timeName: time.valueVi,
+          amountName: amount,
+          addressName:
+            address.address_name +
+            " - " +
+            address.ward_name +
+            " - " +
+            address.district_name +
+            " - " +
+            address.city_name,
         });
       }
     } catch (e) {
@@ -142,7 +152,6 @@ let updateStatusS3 = (data) => {
 };
 
 let updateStatus = (data) => {
-  console.log("data", data);
   return new Promise(async (resolve, reject) => {
     try {
       if (!data.id) {
@@ -155,10 +164,11 @@ let updateStatus = (data) => {
           where: { id: data.id },
           raw: false,
         });
+
         if (schedule) {
           (schedule.statusType = data.status), await schedule.save();
           await updateReceivedDate({
-            scheduleId: schedule.id,
+            scheduleId: data.id,
             statusType: "Yes",
           });
 
@@ -180,7 +190,7 @@ let updateStatus = (data) => {
 };
 
 let updateRegistrationStatus = (data) => {
-  console.log("data", data);
+  console.log("data1", data);
   return new Promise(async (resolve, reject) => {
     try {
       if (!data.id) {
@@ -193,12 +203,13 @@ let updateRegistrationStatus = (data) => {
           where: { id: data.id },
           raw: false,
         });
+        console.log("collect", collect);
         if (collect) {
           (collect.statusType = "Yes"), await collect.save();
           await updateStatusS3({
             id: collect.scheduleId,
           });
-          console.log(collect.scheduleId);
+
           resolve({
             errCode: 0,
             errMessange: "Cập nhật trạng thái thành công",
@@ -217,7 +228,6 @@ let updateRegistrationStatus = (data) => {
 };
 
 let updateReceivedDate = (data) => {
-  console.log(data);
   return new Promise(async (resolve, reject) => {
     try {
       if (!data.scheduleId) {
@@ -253,6 +263,31 @@ let updateReceivedDate = (data) => {
   });
 };
 
+// Cập nhật trạng thái đơn thu gom bị hết hạn => status = 'S5'
+let updateStatusExpire = () => {
+  return new Promise(async (resolve, reject) => {
+    let res = await appointmentService.getAllAppointmentsExpire("ALL");
+    // console.log("res.appointments", res);
+    try {
+      if (res && res.appointments) {
+        console.log("res.appointments", res.appointments);
+        for (let i = 0; i < res.appointments.length; i++) {
+          await updateStatus({
+            id: res.appointments[i].id,
+            status: "S5",
+          });
+          resolve({
+            errCode: 0,
+            errMessange: "Cập nhật trạng thái thành công",
+          });
+        }
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   countCollect: countCollect,
   createNewSchedule: createNewSchedule,
@@ -261,4 +296,5 @@ module.exports = {
   updateStatus: updateStatus,
   updateRegistrationStatus: updateRegistrationStatus,
   updateReceivedDate: updateReceivedDate,
+  updateStatusExpire: updateStatusExpire,
 };
